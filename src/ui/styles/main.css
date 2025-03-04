@@ -1,0 +1,72 @@
+.nav-link.active {
+  --bs-nav-underline-link-active-color: var(--bs-nav-link-color) !important;
+}
+
+.insertable {
+  font-size: 0.85rem;
+}
+
+.form-floating > input + label:after {
+  background: none !important;
+}
+
+.btn.rounded {
+  --bs-border-radius: 0.5rem;
+}
+
+.dropdown.btn-group {
+  --bs-border-radius: 0.5rem;
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+
+.dropdown.btn-group .btn {
+  background: none;
+  border: none;
+}
+
+.dropdown.btn-group:not(.disabled):hover {
+  background: #415567;
+}
+
+.dropdown.btn-group:not(.disabled) .dropdown-toggle:hover {
+  color: var(--bs-info);
+}
+
+.tooltip {
+  --bs-tooltip-bg: black;
+  --bs-tooltip-color: white;
+}
+
+.help-modal-body table {
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+
+.help-modal-body table th {
+  background: var(--bs-modal-bg);
+}
+
+.help-modal-body table td,
+.help-modal-body table th {
+  padding: 0.5rem;
+  border: 1px solid var(--bs-light);
+}
+
+.help-modal-body h5 {
+  margin-bottom: 1rem;
+  padding-top: 1rem;
+  font-size: large;
+  font-weight: bold;
+}
+
+.help-modal-body code {
+  color: var(--bs-info);
+}
+
+.help-modal-body ul {
+  padding-left: 1.5rem;
+}
