@@ -13,7 +13,7 @@ const args = parseArgs(process.argv);
 app.on("ready", async () => {
   const main = new MainProcess({
     mainWindow: {
-      size: { w: 530, h: 845 },
+      size: { w: 570, h: 845 },
       devTools: Reflect.has(args, "dev-tools")
     }
   });
