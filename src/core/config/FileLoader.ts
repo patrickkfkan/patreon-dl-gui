@@ -16,6 +16,8 @@ import type {
   StopOnCondition
 } from "patreon-dl";
 import { DateTime } from "patreon-dl";
+import path from 'path';
+import { existsSync } from "fs";
 
 export interface LoadFileResult {
   config: UIConfig | null;
@@ -226,6 +228,58 @@ function toDateTimePickerValue(value: string): ParseValueResult<string> {
   }
 }
 
+function toTargetValue(value: string): ParseValueResult<BrowserObtainableInput> {
+  const messages: AlertMessage[] = [];
+  const { result: valueToURL, hasError: valueToURLError } = parseURL(value);
+  if (!valueToURLError) {
+    // Check if original value contains semi-colon - this indicates multiple URLs
+    if (value.includes(';')) {
+      messages.push({
+        type: 'warn',
+        text: 'Multiple target URLs not supported. Only the first one will be used.'
+      })
+      const first = value.split(';')[0];
+      const { result: firstURL, hasError, messages: firstURLMessages } = parseURL(first);
+      if (hasError) {
+        return {
+          hasError: true,
+          messages: [
+            ...messages,
+            ...firstURLMessages
+          ]
+        };
+      }
+      const result = toBrowserObtainableInput(firstURL);
+      if (messages.length > 0) {
+        result.messages = [
+          ...messages,
+          ...(result.messages || [])
+        ]
+      }
+      return result;
+    }
+    return toBrowserObtainableInput(valueToURL);
+  }
+  // Value is not valid URL - check if it is a file path
+  const filePath = path.resolve(__dirname, value);
+  if (existsSync(filePath)) {
+    return {
+      hasError: true,
+      messages: [{
+        type: 'error',
+        text: 'Target files are not supported'
+      }]
+    };
+  }
+  return {
+    hasError: true,
+    messages: [{
+      type: 'error',
+      text: `Target "${value}" is invalid`
+    }]
+  };
+}
+
 export function loadUIConfigFromFile(filePath: string): LoadFileResult {
   const parser = new ConfigParser();
   try {
@@ -352,13 +406,7 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         "downloader",
         "target.url",
         defaultConfig.downloader["target"],
-        (value: string) => {
-          const { result, hasError, messages } = parseURL(value);
-          if (hasError) {
-            return { hasError, messages };
-          }
-          return toBrowserObtainableInput(result);
-        }
+        toTargetValue
       ),
       cookie: __fromFileConfigValue(
         "downloader",
