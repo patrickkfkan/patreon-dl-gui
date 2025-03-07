@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
-import type { AboutInfo } from "../../types/Events";
+import type { AboutInfo } from "../../types/MainEvents";
 
 function AboutModal() {
   const [info, setInfo] = useState<AboutInfo | null>(null);
@@ -8,7 +8,7 @@ function AboutModal() {
 
   useEffect(() => {
     const removeListenerCallbacks = [
-      window.electronAPI.on("aboutInfo", (info) => {
+      window.mainAPI.on("aboutInfo", (info) => {
         setInfo(info);
         setShow(true);
       })
@@ -20,7 +20,7 @@ function AboutModal() {
   }, []);
 
   const endAbout = useCallback(() => {
-    window.electronAPI.emitMainEvent("endAbout");
+    window.mainAPI.emitMainEvent("endAbout");
     setShow(false);
   }, []);
 

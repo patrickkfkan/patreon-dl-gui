@@ -10,7 +10,7 @@ import {
   saveFileConfig
 } from "../config/FileConfig";
 import type { FileConfig } from "../../types/FileConfig";
-import type { SaveFileConfigResult } from "../../types/Events";
+import type { SaveFileConfigResult } from "../../types/MainEvents";
 import RecentDocuments from "../util/RecentDocuments";
 
 export function FileEventSupportMixin<TBase extends MainProcessConstructor>(

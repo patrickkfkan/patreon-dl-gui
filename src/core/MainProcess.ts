@@ -1,19 +1,10 @@
 import MainWindow, { type MainWindowProps } from "./MainWindow";
 import PatreonBrowser from "./PatreonBrowser";
 import type { Editor } from "../types/App";
-import type {
-  RendererEvent,
-  MainEvent,
-  UICommand,
-  RendererEventListener,
-  MainEventListener,
-  ExecUICommandParams
-} from "../types/Events";
+import type { UICommand, ExecUICommandParams } from "../types/MainEvents";
 import type DownloaderConsoleLogger from "./DownloaderConsoleLogger";
-import type { BrowserWindow, IpcMainEvent } from "electron";
-import { dialog, ipcMain } from "electron";
+import { dialog } from "electron";
 import type PatreonDownloader from "patreon-dl";
-import fs from "fs";
 import _ from "lodash";
 import type { AppMenuOptions } from "./mixins/AppMenu";
 import { AppMenuSupportMixin } from "./mixins/AppMenu";
@@ -24,12 +15,14 @@ import { FileEventSupportMixin } from "./mixins/FileEvents";
 import { SupportEventSupportMixin } from "./mixins/SupportEvents";
 import RecentDocuments from "./util/RecentDocuments";
 import { APP_DATA_PATH } from "./Constants";
+import ProcessBase from "../ProcessBase";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MainProcessConstructor = new (...args: any[]) => MainProcessBase;
 
 export interface MainProcessInitArgs {
   mainWindow?: MainWindowProps;
+  browser: { executablePath: string };
   patreonURL?: URL;
 }
 
@@ -41,9 +34,10 @@ export interface DownloaderBundle {
   status: "init" | "running" | "end";
 }
 
-class MainProcessBase {
+class MainProcessBase extends ProcessBase<"main"> {
   protected win: MainWindow;
   protected browser: PatreonBrowser;
+  protected browserExecutablePath: string;
   protected activeEditor: Editor | null;
   protected modifiedEditors: Editor[];
   protected downloader: DownloaderBundle | null;
@@ -51,8 +45,10 @@ class MainProcessBase {
   #removeListenerCallbacks: (() => void)[];
 
   constructor(args: MainProcessInitArgs) {
-    this.win = MainWindow.create(args?.mainWindow);
-    this.browser = this.#createPatreonBrowser();
+    super();
+    this.win = MainWindow.create(args.mainWindow);
+    this.browserExecutablePath = args.browser.executablePath;
+    this.browser = this.#createPatreonBrowser(this.browserExecutablePath);
     this.activeEditor = null;
     this.modifiedEditors = [];
     this.downloader = null;
@@ -60,8 +56,8 @@ class MainProcessBase {
     this.#removeListenerCallbacks = [];
   }
 
-  #createPatreonBrowser() {
-    const browser = new PatreonBrowser();
+  #createPatreonBrowser(executablePath: string) {
+    const browser = new PatreonBrowser({ executablePath });
     browser.on("browserPageInfo", (info) => {
       this.emitRendererEvent(this.win, "browserPageInfo", info);
     });
@@ -92,17 +88,6 @@ class MainProcessBase {
     this.win.on("close", (e) => {
       this.end(e);
     });
-
-    try {
-      if (!fs.existsSync(APP_DATA_PATH)) {
-        fs.mkdirSync(APP_DATA_PATH, { recursive: true });
-      }
-    } catch (error: unknown) {
-      console.error(
-        `Failed to create app data path "${APP_DATA_PATH}":`,
-        error instanceof Error ? error.message : String(error)
-      );
-    }
 
     this.#removeListenerCallbacks.push(...this.registerMainEventListeners());
 
@@ -172,7 +157,7 @@ class MainProcessBase {
     }
 
     if (this.browser.isClosed()) {
-      this.browser = this.#createPatreonBrowser();
+      this.browser = this.#createPatreonBrowser(this.browserExecutablePath);
       let url = this.#initialURL.toString();
       const target = this.activeEditor?.config.downloader.target;
       if (target) {
@@ -196,37 +181,6 @@ class MainProcessBase {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...(params as [any])
     );
-  }
-
-  protected emitRendererEvent<E extends RendererEvent>(
-    win: BrowserWindow,
-    eventName: E,
-    ...args: Parameters<RendererEventListener<E>>
-  ) {
-    win.webContents.send(eventName, ...args);
-  }
-
-  on<E extends MainEvent>(
-    eventName: E,
-    listener: MainEventListener<E>,
-    options?: { once?: boolean }
-  ): () => void {
-    const internalListener = (
-      _event: IpcMainEvent,
-      ...args: Parameters<MainEventListener<E>>
-    ) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (listener as any)(...args);
-    };
-    const once = options?.once ?? false;
-    if (once) {
-      ipcMain.once(eventName, internalListener);
-    } else {
-      ipcMain.on(eventName, internalListener);
-    }
-    return () => {
-      ipcMain.off(eventName, internalListener);
-    };
   }
 }
 

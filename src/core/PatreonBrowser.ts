@@ -2,8 +2,8 @@ import type { PageInfo } from "../types/UIConfig";
 import PatreonPageAnalyzer from "./PatreonPageAnalyzer";
 import { APP_DATA_PATH, PATREON_URL, USER_AGENT } from "./Constants";
 import { EventEmitter } from "events";
-import type { Browser, Target } from "puppeteer";
-import puppeteer from "puppeteer";
+import type { Browser, Target } from "puppeteer-core";
+import puppeteer from "puppeteer-core";
 import path from "path";
 import fs from "fs";
 
@@ -13,14 +13,19 @@ const SESSION_DATA_PATH = path.join(
 );
 
 export default class PatreonBrowser extends EventEmitter {
+  #executablePath: string;
   #size: { w: number; h: number };
   #browser: Browser | null;
   #analyzerAbortController: AbortController | null;
 
-  constructor(args?: { size?: { w?: number; h?: number } }) {
+  constructor(args: {
+    executablePath: string;
+    size?: { w?: number; h?: number };
+  }) {
     super();
-    const w = args?.size?.w || 800;
-    const h = args?.size?.h || 845;
+    this.#executablePath = args.executablePath;
+    const w = args.size?.w || 800;
+    const h = args.size?.h || 845;
     this.#size = { w, h };
     this.#browser = null;
     this.#analyzerAbortController = null;
@@ -55,9 +60,14 @@ export default class PatreonBrowser extends EventEmitter {
   async #launch() {
     const browser = await puppeteer.launch({
       headless: false,
+      executablePath: this.#executablePath,
       defaultViewport: null,
       userDataDir: this.#ensureSessionDataPath(),
-      args: [`--window-size=${this.#size.w},${this.#size.h}`]
+      args: [
+        `--window-size=${this.#size.w},${this.#size.h}`,
+        "--hide-crash-restore-bubble",
+        "--no-sandbox"
+      ]
     });
 
     browser.on("targetchanged", async (t: Target) => {

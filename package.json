@@ -53,6 +53,7 @@
     "typescript-eslint": "^8.24.1"
   },
   "dependencies": {
+    "@puppeteer/browsers": "^2.7.1",
     "bootswatch": "^5.3.3",
     "classnames": "^2.5.1",
     "configparser": "^0.3.10",
@@ -63,7 +64,7 @@
     "material-icons": "^1.13.13",
     "material-symbols": "^0.28.1",
     "patreon-dl": "^2.4.1",
-    "puppeteer": "^24.1.1",
+    "puppeteer-core": "^24.3.1",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",

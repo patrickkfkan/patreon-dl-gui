@@ -103,7 +103,7 @@ const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const removeListenerCallbacks = config
       ? [
-          window.electronAPI.on("browserPageInfo", (info) => {
+          window.mainAPI.on("browserPageInfo", (info) => {
             if (actionPending) {
               return;
             }

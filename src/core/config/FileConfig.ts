@@ -7,7 +7,7 @@ import type { FileConfig, FileConfigContents } from "../../types/FileConfig";
 import dateFormat from "dateformat";
 import { EOL } from "os";
 import { openSync, writeSync } from "fs";
-import type { SaveFileConfigResult } from "../../types/Events";
+import type { SaveFileConfigResult } from "../../types/MainEvents";
 
 const TRUE_STRING = "1";
 const FALSE_STRING = "0";

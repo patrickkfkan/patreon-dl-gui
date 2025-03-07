@@ -63,7 +63,7 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const removeListenerCallbacks = [
-      window.electronAPI.on("editorCreated", (editor) => {
+      window.mainAPI.on("editorCreated", (editor) => {
         addEditor(editor);
       })
     ];
@@ -74,7 +74,7 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
   }, [addEditor, editors]);
 
   useEffect(() => {
-    window.electronAPI.emitMainEvent("activeEditorInfo", {
+    window.mainAPI.emitMainEvent("activeEditorInfo", {
       editor: activeEditor
     });
   }, [activeEditor]);
@@ -96,7 +96,7 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
   const markEditorModified = useCallback(
     (editor: Editor) => {
       setEditorProp(editor, { modified: true });
-      window.electronAPI.emitMainEvent("modifiedEditorsInfo", {
+      window.mainAPI.emitMainEvent("modifiedEditorsInfo", {
         editors: editors.filter((editor) => editor.modified)
       });
     },

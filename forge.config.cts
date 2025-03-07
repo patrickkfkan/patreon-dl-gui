@@ -26,10 +26,18 @@ const config: ForgeConfig = {
         entryPoints: [
           {
             html: './src/index.html',
-            js: './src/renderer.ts',
+            js: './src/core/renderer.ts',
             name: 'main_window',
             preload: {
-              js: './src/preload.ts',
+              js: './src/core/preload.ts',
+            },
+          },
+          {
+            html: './src/index.html',
+            js: './src/bootstrap/renderer.ts',
+            name: 'bootstrap_window',
+            preload: {
+              js: './src/bootstrap/preload.ts',
             },
           }
         ],

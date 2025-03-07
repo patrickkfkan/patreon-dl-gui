@@ -10,7 +10,7 @@ function ConfirmSaveModal() {
 
   useEffect(() => {
     const removeListenerCallbacks = [
-      window.electronAPI.on("promptOverwriteOnSave", (config) => {
+      window.mainAPI.on("promptOverwriteOnSave", (config) => {
         setFileConfig(config);
         setShow(true);
       })
@@ -26,14 +26,14 @@ function ConfirmSaveModal() {
       return;
     }
     setShow(false);
-    window.electronAPI.emitMainEvent("confirmSave", {
+    window.mainAPI.emitMainEvent("confirmSave", {
       confirmed: true,
       config: fileConfig
     });
   }, [fileConfig]);
 
   const cancel = useCallback(() => {
-    window.electronAPI.emitMainEvent("confirmSave", { confirmed: false });
+    window.mainAPI.emitMainEvent("confirmSave", { confirmed: false });
     setShow(false);
   }, []);
 

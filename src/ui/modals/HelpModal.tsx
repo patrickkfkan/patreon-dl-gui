@@ -23,7 +23,7 @@ function HelpModal() {
 
   useEffect(() => {
     const removeListenerCallbacks = [
-      window.electronAPI.on("requestHelpResult", (result) => {
+      window.mainAPI.on("requestHelpResult", (result) => {
         setContents(result.contents);
         setShow(true);
       })
@@ -35,7 +35,7 @@ function HelpModal() {
   }, []);
 
   const endHelp = useCallback(() => {
-    window.electronAPI.emitMainEvent("endHelp");
+    window.mainAPI.emitMainEvent("endHelp");
     setShow(false);
   }, []);
 

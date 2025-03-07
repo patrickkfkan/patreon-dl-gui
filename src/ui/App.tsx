@@ -17,7 +17,7 @@ import AboutModal from "./modals/AboutModal";
 
 function App() {
   useEffect(() => {
-    window.electronAPI.emitMainEvent("uiReady");
+    window.mainAPI.emitMainEvent("uiReady");
   }, []);
 
   return (

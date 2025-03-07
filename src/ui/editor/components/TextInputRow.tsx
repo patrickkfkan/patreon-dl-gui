@@ -82,7 +82,7 @@ function TextInputRow<
 
   const openFSChooser = useCallback(
     (type: "dir" | "file") => {
-      window.electronAPI.on(
+      window.mainAPI.on(
         "fsChooserResult",
         (result) => {
           if (result.canceled) {
@@ -92,7 +92,7 @@ function TextInputRow<
         },
         { once: true }
       );
-      window.electronAPI.emitMainEvent("openFSChooser", {
+      window.mainAPI.emitMainEvent("openFSChooser", {
         properties: type === "dir" ? ["openDirectory"] : ["openFile"],
         title: type === "dir" ? "Choose directory" : "Choose file"
       });

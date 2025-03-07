@@ -9,7 +9,7 @@ function PreviewModal() {
 
   useEffect(() => {
     const removeListenerCallbacks = [
-      window.electronAPI.on("previewInfo", (info) => {
+      window.mainAPI.on("previewInfo", (info) => {
         setFileConfig(info);
         setShow(true);
       })
@@ -33,7 +33,7 @@ function PreviewModal() {
   }, [fileConfig]);
 
   const endPreview = useCallback(() => {
-    window.electronAPI.emitMainEvent("endPreview");
+    window.mainAPI.emitMainEvent("endPreview");
     setShow(false);
   }, []);
 

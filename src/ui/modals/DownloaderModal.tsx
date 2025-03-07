@@ -1,4 +1,7 @@
-import type { DownloaderEndInfo, DownloaderInitInfo } from "../../types/Events";
+import type {
+  DownloaderEndInfo,
+  DownloaderInitInfo
+} from "../../types/MainEvents";
 import type { DownloaderLogMessage } from "../../core/DownloaderConsoleLogger";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import type { JSX } from "react";
@@ -143,13 +146,13 @@ function DownloaderModal() {
   }, []);
 
   const endDownloadProcess = useCallback(() => {
-    window.electronAPI.emitMainEvent("endDownloadProcess");
+    window.mainAPI.emitMainEvent("endDownloadProcess");
     setShow(false);
   }, []);
 
   const confirmStartDownload = useCallback(
     (confirmed: boolean) => {
-      window.electronAPI.emitMainEvent("promptStartDownloadResult", {
+      window.mainAPI.emitMainEvent("promptStartDownloadResult", {
         confirmed
       });
       if (!confirmed) {
@@ -161,7 +164,7 @@ function DownloaderModal() {
 
   useEffect(() => {
     const removeListenerCallbacks = [
-      window.electronAPI.on("downloaderInit", (info) => {
+      window.mainAPI.on("downloaderInit", (info) => {
         contentsScrollParamsRef.current.autoScroll = false;
         if (info.hasError) {
           updateContents("string", info.error);
@@ -185,14 +188,14 @@ function DownloaderModal() {
           confirmStartDownload(true);
         }
       }),
-      window.electronAPI.on("downloaderStart", () => {
+      window.mainAPI.on("downloaderStart", () => {
         contentsScrollParamsRef.current.autoScroll = true;
         setState({
           status: "running"
         });
         setShow(true);
       }),
-      window.electronAPI.on("downloaderEnd", (info) => {
+      window.mainAPI.on("downloaderEnd", (info) => {
         clearContentsFlushTimer();
         flushContentsBuffer();
         if (info.hasError) {
@@ -212,7 +215,7 @@ function DownloaderModal() {
         });
         setShow(true);
       }),
-      window.electronAPI.on("downloaderLogMessage", (message) => {
+      window.mainAPI.on("downloaderLogMessage", (message) => {
         updateContents("log", message, true);
       })
     ];
@@ -228,7 +231,7 @@ function DownloaderModal() {
   ]);
 
   const abortDownload = useCallback(() => {
-    window.electronAPI.emitMainEvent("abortDownload");
+    window.mainAPI.emitMainEvent("abortDownload");
   }, []);
 
   const title = useMemo(() => {

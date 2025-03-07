@@ -1,9 +1,9 @@
 import { useEditor } from "./EditorContextProvider";
 import type {
   ExecUICommandParams,
-  RendererEvent,
+  MainProcessRendererEvent,
   UICommand
-} from "../../types/Events";
+} from "../../types/MainEvents";
 import { createContext, useCallback, useContext, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import type { UIConfig, UIConfigSection } from "../../types/UIConfig";
@@ -45,7 +45,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
 
   const waitForSaveResult = useCallback(() => {
     return new Promise<void>((resolve) => {
-      window.electronAPI.on(
+      window.mainAPI.on(
         "saveResult",
         (result) => {
           if (!result.canceled && !result.hasError) {
@@ -80,7 +80,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
 
   const waitForOpenFileResult = useCallback(() => {
     return new Promise<void>((resolve) => {
-      window.electronAPI.on(
+      window.mainAPI.on(
         "openFileResult",
         (result) => {
           if (!result.canceled && !result.hasError) {
@@ -107,7 +107,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
 
   const waitForCloseEditorResult = useCallback(() => {
     return new Promise<void>((resolve) => {
-      window.electronAPI.on(
+      window.mainAPI.on(
         "closeEditorResult",
         (result) => {
           if (!result.canceled) {
@@ -120,9 +120,9 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
     });
   }, [doCloseEditor]);
 
-  const waitForEvent = useCallback((eventName: RendererEvent) => {
+  const waitForEvent = useCallback((eventName: MainProcessRendererEvent) => {
     return new Promise<void>((resolve) => {
-      window.electronAPI.on(
+      window.mainAPI.on(
         eventName,
         () => {
           resolve();
@@ -133,13 +133,13 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const createEditor = useCallback(() => {
-    window.electronAPI.emitMainEvent("newEditor");
+    window.mainAPI.emitMainEvent("newEditor");
   }, []);
 
   const openFile = useCallback(
     (filePath?: string) => {
       startAction(() => {
-        window.electronAPI.emitMainEvent("openFile", editors, filePath);
+        window.mainAPI.emitMainEvent("openFile", editors, filePath);
       }, waitForOpenFileResult());
     },
     [startAction, editors, waitForOpenFileResult]
@@ -150,7 +150,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     startAction(() => {
-      window.electronAPI.emitMainEvent("closeEditor", activeEditor);
+      window.mainAPI.emitMainEvent("closeEditor", activeEditor);
     }, waitForCloseEditorResult());
   }, [startAction, activeEditor, waitForCloseEditorResult]);
 
@@ -159,7 +159,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     startAction(() => {
-      window.electronAPI.emitMainEvent("save", activeEditor);
+      window.mainAPI.emitMainEvent("save", activeEditor);
     }, waitForSaveResult());
   }, [activeEditor, setActionPending, startAction]);
 
@@ -168,7 +168,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     startAction(() => {
-      window.electronAPI.emitMainEvent("saveAs", activeEditor);
+      window.mainAPI.emitMainEvent("saveAs", activeEditor);
     }, waitForSaveResult());
   }, [setActionPending, activeEditor, startAction]);
 
@@ -177,7 +177,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     startAction(() => {
-      window.electronAPI.emitMainEvent("preview", activeEditor);
+      window.mainAPI.emitMainEvent("preview", activeEditor);
     }, waitForEvent("previewEnd"));
   }, [activeEditor]);
 
@@ -186,7 +186,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     startAction(() => {
-      window.electronAPI.emitMainEvent("startDownload", activeEditor);
+      window.mainAPI.emitMainEvent("startDownload", activeEditor);
     }, waitForEvent("downloadProcessEnd"));
   }, [activeEditor]);
 
@@ -200,7 +200,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
   const requestHelp = useCallback(
     <S extends UIConfigSection>(section: S, prop: keyof UIConfig[S]) => {
       startAction(() => {
-        window.electronAPI.emitMainEvent("requestHelp", section, prop as never);
+        window.mainAPI.emitMainEvent("requestHelp", section, prop as never);
       }, waitForEvent("helpEnd"));
     },
     []
@@ -208,7 +208,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
 
   const showAbout = useCallback(() => {
     startAction(() => {
-      window.electronAPI.emitMainEvent("requestAboutInfo");
+      window.mainAPI.emitMainEvent("requestAboutInfo");
     }, waitForEvent("aboutEnd"));
   }, []);
 
@@ -227,7 +227,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const removeListenerCallbacks = [
-      window.electronAPI.on("execUICommand", (command, ...params) => {
+      window.mainAPI.on("execUICommand", (command, ...params) => {
         context[command](...(params as [never]));
       })
     ];

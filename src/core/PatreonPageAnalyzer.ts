@@ -1,6 +1,6 @@
 import type { Tier } from "../types/UIConfig";
 import { PATREON_URL } from "./Constants";
-import type { Page } from "puppeteer";
+import type { Page } from "puppeteer-core";
 import type { URLAnalysis } from "patreon-dl";
 
 const PAGE_PATHNAME_FORMATS = {

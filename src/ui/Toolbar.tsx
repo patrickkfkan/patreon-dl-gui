@@ -45,7 +45,7 @@ function Toolbar() {
 
   useEffect(() => {
     const removeListenerCallbacks = [
-      window.electronAPI.on("recentDocumentsInfo", (info) => {
+      window.mainAPI.on("recentDocumentsInfo", (info) => {
         setRecentDocuments(info.entries);
       })
     ];
