@@ -2,11 +2,11 @@ import type { UIConfig } from "../../types/UIConfig";
 import type { DateTime } from "patreon-dl";
 import {
   ConsoleLogger,
-  FileLogger,
   getDefaultDownloaderOptions,
   type DeepRequired,
   type DownloaderOptions
 } from "patreon-dl";
+import { getDefaultFileLoggerOptions } from "../util/Config";
 
 export function getStartupUIConfig(): UIConfig {
   return convertPatreonDLOptionsToUIConfig(getDefaultDownloaderOptions());
@@ -22,7 +22,7 @@ function convertPatreonDLOptionsToUIConfig(
     return date.valueOf().toISOString().slice(0, 16);
   };
   const consoleLoggerOptions = ConsoleLogger.getDefaultConfig();
-  const fileLoggerOptions = FileLogger.getDefaultConfig();
+  const fileLoggerOptions = getDefaultFileLoggerOptions();
   const postsPublishedAfter = __convertPublishDate(
     p.include.postsPublished.after
   );
