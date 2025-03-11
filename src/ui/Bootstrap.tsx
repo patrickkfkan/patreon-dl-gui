@@ -2,7 +2,8 @@ import "bootswatch/dist/superhero/bootstrap.min.css";
 import "material-icons/iconfont/material-icons.css";
 import "material-symbols";
 import "./styles/main.css";
-import { JSX, useCallback, useEffect, useState } from "react";
+import type { JSX} from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 
 interface BootstrapState {

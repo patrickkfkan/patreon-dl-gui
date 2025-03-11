@@ -1,11 +1,12 @@
-import { BrowserWindow, ipcMain, IpcMainEvent } from "electron";
-import {
+import type { BrowserWindow, IpcMainEvent } from "electron";
+import { ipcMain } from "electron";
+import type {
   BootstrapProcessMainEvent,
   BootstrapProcessMainEventListener,
   BootstrapProcessRendererEvent,
   BootstrapProcessRendererEventListener
 } from "./types/BootstrapEvents";
-import {
+import type {
   MainProcessMainEvent,
   MainProcessMainEventListener,
   MainProcessRendererEvent,

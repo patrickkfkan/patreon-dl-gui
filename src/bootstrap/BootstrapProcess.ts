@@ -1,12 +1,12 @@
 import fs from "fs";
-import BootstrapWindow, { BootstrapWindowProps } from "./BootstrapWindow";
+import type { BootstrapWindowProps } from "./BootstrapWindow";
+import BootstrapWindow from "./BootstrapWindow";
 import { APP_DATA_PATH } from "../core/Constants";
 import ProcessBase from "../ProcessBase";
-import { app } from "electron";
 import * as PuppeteerBrowsers from "@puppeteer/browsers";
 import path from "path";
-import { Dependency } from "../types/BootstrapEvents";
-import { BootstrapData } from "../types/Bootstrap";
+import type { Dependency } from "../types/BootstrapEvents";
+import type { BootstrapData } from "../types/Bootstrap";
 
 export interface BootstrapProcessInitArgs {
   window?: BootstrapWindowProps;
@@ -139,7 +139,7 @@ export default class BootstrapProcess extends ProcessBase<"bootstrap"> {
             downloadProgress: 0
           });
           const browser = await PuppeteerBrowsers.install({
-            browser: "chrome" as any,
+            browser: "chrome" as PuppeteerBrowsers.InstallOptions['browser'],
             cacheDir: PUPPETEER_CACHE_DIR,
             buildId: BROWSER_DEPENDENCY.version,
             unpack: true,

@@ -1,5 +1,6 @@
-import { ipcRenderer, IpcRendererEvent } from "electron";
-import {
+import type { IpcRendererEvent } from "electron";
+import { ipcRenderer } from "electron";
+import type {
   ProcessMainEvent,
   ProcessMainEventListener,
   ProcessRendererEvent,
