@@ -32,9 +32,12 @@ function PreviewModal() {
     });
   }, [fileConfig]);
 
-  const endPreview = useCallback(() => {
-    window.mainAPI.emitMainEvent("endPreview");
+  const hide = useCallback(() => {
     setShow(false);
+  }, []);
+
+  const end = useCallback(() => {
+    window.mainAPI.emitMainEvent("endPreview");
   }, []);
 
   if (!fileConfig) {
@@ -47,7 +50,8 @@ function PreviewModal() {
     <>
       <Modal
         show={show}
-        onHide={endPreview}
+        onHide={hide}
+        onExited={end}
         scrollable={true}
         size="xl"
         fullscreen="lg-down"
@@ -57,9 +61,9 @@ function PreviewModal() {
           <Modal.Title>
             <div className="d-flex flex-column">
               <span>{name}</span>
-              {filePath ? (
+              {filePath ?
                 <span className="fs-6 text-info">{filePath}</span>
-              ) : null}
+              : null}
             </div>
           </Modal.Title>
           <div className="d-flex flex-grow-1 justify-content-end">

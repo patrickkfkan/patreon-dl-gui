@@ -294,7 +294,11 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
       alerts: [
         {
           type: "error",
-          text: `Could not load config from "${filePath}": ${error instanceof Error ? error.message : typeof error === "object" ? JSON.stringify(error) : error}`
+          text: `Could not load config from "${filePath}": ${
+            error instanceof Error ? error.message
+            : typeof error === "object" ? JSON.stringify(error)
+            : error
+          }`
         }
       ]
     };
@@ -695,9 +699,10 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
       )
     },
     "embed.downloader.youtube": {
-      type: __getFileConfigValue("embed.downloader.youtube", "exec")
-        ? "custom"
-        : "default",
+      type:
+        __getFileConfigValue("embed.downloader.youtube", "exec") ? "custom" : (
+          "default"
+        ),
       exec: __fromFileConfigValue(
         "embed.downloader.youtube",
         "exec",
@@ -836,11 +841,20 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         target: null,
         cookie: null,
         tiers: null
+      },
+      appliedProxySettings: {
+        url: defaultConfig["request"]["proxy.url"],
+        rejectUnauthorizedTLS:
+          defaultConfig["request"]["proxy.reject.unauthorized.tls"]
       }
     }
   };
 
   config.downloader.target.inputMode = "browser";
+  config.downloader.cookie.inputMode = "browser";
+  config["support.data"].appliedProxySettings.url = config.request["proxy.url"];
+  config["support.data"].appliedProxySettings.rejectUnauthorizedTLS =
+    config.request["proxy.reject.unauthorized.tls"];
 
   return {
     config,

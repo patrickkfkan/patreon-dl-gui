@@ -24,15 +24,12 @@ type DownloaderState =
     };
 
 type ContentType = "string" | "element" | "object" | "log";
-type ContentValue<T extends ContentType> = T extends "string"
-  ? string
-  : T extends "element"
-    ? JSX.Element
-    : T extends "object"
-      ? object
-      : T extends "log"
-        ? DownloaderLogMessage
-        : never;
+type ContentValue<T extends ContentType> =
+  T extends "string" ? string
+  : T extends "element" ? JSX.Element
+  : T extends "object" ? object
+  : T extends "log" ? DownloaderLogMessage
+  : never;
 
 interface ContentsScrollParams {
   autoScroll: boolean;
@@ -145,9 +142,12 @@ function DownloaderModal() {
     }
   }, []);
 
-  const endDownloadProcess = useCallback(() => {
-    window.mainAPI.emitMainEvent("endDownloadProcess");
+  const close = useCallback(() => {
     setShow(false);
+  }, []);
+
+  const end = useCallback(() => {
+    window.mainAPI.emitMainEvent("endDownloadProcess");
   }, []);
 
   const confirmStartDownload = useCallback(
@@ -156,10 +156,10 @@ function DownloaderModal() {
         confirmed
       });
       if (!confirmed) {
-        endDownloadProcess();
+        close();
       }
     },
-    [endDownloadProcess]
+    [close]
   );
 
   useEffect(() => {
@@ -240,26 +240,26 @@ function DownloaderModal() {
     }
     switch (state.status) {
       case "init":
-        return state.info.hasError
-          ? "Could not create downloader instance"
+        return state.info.hasError ?
+            "Could not create downloader instance"
           : "Downloader ready";
       case "running":
         return "Download in progress...";
       case "end":
-        return state.info.hasError
-          ? "Download ended with uncaught error"
-          : state.info.aborted
-            ? "Download aborted"
-            : "Download finished";
+        return (
+          state.info.hasError ? "Download ended with uncaught error"
+          : state.info.aborted ? "Download aborted"
+          : "Download finished"
+        );
     }
   }, [state]);
 
   const message =
-    state?.status === "init" && !state.info.hasError
-      ? state.info.prompt
-        ? "Proceed?"
-        : "Download will begin shortly..."
-      : null;
+    state?.status === "init" && !state.info.hasError ?
+      state.info.prompt ?
+        "Proceed?"
+      : "Download will begin shortly..."
+    : null;
 
   const headerButtons = useMemo(() => {
     if (!state) {
@@ -307,31 +307,29 @@ function DownloaderModal() {
     }
     switch (state.status) {
       case "init":
-        return state.info.hasError ? (
-          <Button
-            variant="secondary"
-            onClick={endDownloadProcess}
-            aria-label="Close"
-          >
-            Close
-          </Button>
-        ) : state.info.prompt ? (
-          <>
-            <Button
-              variant="secondary"
-              onClick={() => confirmStartDownload(false)}
-              aria-label="Cancel download"
-            >
-              Cancel
+        return (
+          state.info.hasError ?
+            <Button variant="secondary" onClick={close} aria-label="Close">
+              Close
             </Button>
-            <Button
-              onClick={() => confirmStartDownload(true)}
-              aria-label="Proceed"
-            >
-              Proceed
-            </Button>
-          </>
-        ) : null;
+          : state.info.prompt ?
+            <>
+              <Button
+                variant="secondary"
+                onClick={() => confirmStartDownload(false)}
+                aria-label="Cancel download"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => confirmStartDownload(true)}
+                aria-label="Proceed"
+              >
+                Proceed
+              </Button>
+            </>
+          : null
+        );
       case "running":
         return (
           <Button
@@ -344,11 +342,7 @@ function DownloaderModal() {
         );
       case "end":
         return (
-          <Button
-            variant="secondary"
-            onClick={endDownloadProcess}
-            aria-label="Close"
-          >
+          <Button variant="secondary" onClick={close} aria-label="Close">
             Close
           </Button>
         );
@@ -376,7 +370,8 @@ function DownloaderModal() {
     <>
       <Modal
         show={show}
-        onHide={endDownloadProcess}
+        onHide={close}
+        onExited={end}
         backdrop="static"
         keyboard={false}
         scrollable={true}
@@ -388,7 +383,9 @@ function DownloaderModal() {
           <Modal.Title>
             <div className="d-flex flex-column">
               <span>{title}</span>
-              {message ? <span className="mt-2 fs-5">{message}</span> : null}
+              {message ?
+                <span className="mt-2 fs-5">{message}</span>
+              : null}
             </div>
           </Modal.Title>
           <div className="d-flex flex-grow-1 justify-content-end">

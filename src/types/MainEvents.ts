@@ -5,6 +5,7 @@ import type { PageInfo, UIConfig, UIConfigSection } from "./UIConfig";
 import type { DownloaderLogMessage } from "../core/DownloaderConsoleLogger";
 import type { OpenDialogOptions } from "electron";
 import type { RecentDocument } from "../core/util/RecentDocuments";
+import { ApplyProxyResult } from "../core/MainWindow";
 
 export type MainProcessRendererEvent =
   | "editorCreated"
@@ -26,10 +27,13 @@ export type MainProcessRendererEvent =
   | "helpEnd"
   | "aboutInfo"
   | "aboutEnd"
-  | "recentDocumentsInfo";
+  | "recentDocumentsInfo"
+  | "browserPageNavigated"
+  | "applyProxyResult";
 
 export type MainProcessMainEvent =
   | "uiReady"
+  | "viewBounds"
   | "openFSChooser"
   | "newEditor"
   | "closeEditor"
@@ -38,17 +42,23 @@ export type MainProcessMainEvent =
   | "openFile"
   | "save"
   | "confirmSave"
+  | "endPromptOverwriteOnSave"
   | "saveAs"
   | "startDownload"
   | "promptStartDownloadResult"
   | "abortDownload"
   | "endDownloadProcess"
   | "modifiedEditorsInfo"
-  | "activeEditorInfo"
+  | "activeEditorChange"
   | "requestHelp"
   | "endHelp"
   | "requestAboutInfo"
-  | "endAbout";
+  | "endAbout"
+  | "setWebBrowserURL"
+  | "setWebBrowserURLToHome"
+  | "webBrowserBack"
+  | "webBrowserForward"
+  | "openExternalBrowser";
 
 export type UICommand =
   | "createEditor"
@@ -185,101 +195,79 @@ export interface RecentDocumentsInfo {
   entries: readonly RecentDocument[];
 }
 
-export type ExecUICommandParams<C extends UICommand> = C extends "showHelpIcons"
-  ? Parameters<(show: boolean) => void>
-  : C extends "openFile"
-    ? Parameters<(filePath?: string) => void>
-    : [];
+export type ExecUICommandParams<C extends UICommand> =
+  C extends "showHelpIcons" ? Parameters<(show: boolean) => void>
+  : C extends "openFile" ? Parameters<(filePath?: string) => void>
+  : [];
+
+export interface WebBrowserPageNavigatedInfo {
+  url: string;
+  canGoForward: boolean;
+  canGoBack: boolean;
+}
+
+export interface ViewBounds {
+  editorView: Electron.Rectangle;
+  webBrowserView: Electron.Rectangle;
+}
 
 export type MainProcessRendererEventListener<
   E extends MainProcessRendererEvent
-> = E extends "aboutInfo"
-  ? (info: AboutInfo) => void
-  : E extends "editorCreated"
-    ? (editor: Editor) => void
-    : E extends "closeEditorResult"
-      ? (result: CloseEditorResult) => void
-      : E extends "openFileResult"
-        ? (result: OpenFileResult) => void
-        : E extends "browserPageInfo"
-          ? (info: PageInfo) => void
-          : E extends "fsChooserResult"
-            ? (result: FSChooserResult) => void
-            : E extends "previewInfo"
-              ? (info: FileConfig) => void
-              : E extends "previewEnd"
-                ? () => void
-                : E extends "promptOverwriteOnSave"
-                  ? (config: FileConfig<"hasPath">) => void
-                  : E extends "saveResult"
-                    ? (result: SaveFileConfigResult) => void
-                    : E extends "downloaderInit"
-                      ? (info: DownloaderInitInfo) => void
-                      : E extends "downloaderStart"
-                        ? () => void
-                        : E extends "downloaderEnd"
-                          ? (info: DownloaderEndInfo) => void
-                          : E extends "downloaderLogMessage"
-                            ? (message: DownloaderLogMessage) => void
-                            : E extends "downloadProcessEnd"
-                              ? () => void
-                              : E extends "requestHelpResult"
-                                ? (result: RequestHelpResult) => void
-                                : E extends "helpEnd"
-                                  ? () => void
-                                  : E extends "aboutEnd"
-                                    ? () => void
-                                    : E extends "execUICommand"
-                                      ? <C extends UICommand>(
-                                          command: C,
-                                          ...params: ExecUICommandParams<C>
-                                        ) => void
-                                      : E extends "recentDocumentsInfo"
-                                        ? (info: RecentDocumentsInfo) => void
-                                        : never;
+> =
+  E extends "aboutInfo" ? (info: AboutInfo) => void
+  : E extends "editorCreated" ? (editor: Editor) => void
+  : E extends "closeEditorResult" ? (result: CloseEditorResult) => void
+  : E extends "openFileResult" ? (result: OpenFileResult) => void
+  : E extends "browserPageInfo" ? (info: PageInfo) => void
+  : E extends "fsChooserResult" ? (result: FSChooserResult) => void
+  : E extends "previewInfo" ? (info: FileConfig) => void
+  : E extends "previewEnd" ? () => void
+  : E extends "promptOverwriteOnSave" ? (config: FileConfig<"hasPath">) => void
+  : E extends "saveResult" ? (result: SaveFileConfigResult) => void
+  : E extends "downloaderInit" ? (info: DownloaderInitInfo) => void
+  : E extends "downloaderStart" ? () => void
+  : E extends "downloaderEnd" ? (info: DownloaderEndInfo) => void
+  : E extends "downloaderLogMessage" ? (message: DownloaderLogMessage) => void
+  : E extends "downloadProcessEnd" ? () => void
+  : E extends "requestHelpResult" ? (result: RequestHelpResult) => void
+  : E extends "helpEnd" ? () => void
+  : E extends "aboutEnd" ? () => void
+  : E extends "execUICommand" ?
+    <C extends UICommand>(command: C, ...params: ExecUICommandParams<C>) => void
+  : E extends "recentDocumentsInfo" ? (info: RecentDocumentsInfo) => void
+  : E extends "browserPageNavigated" ?
+    (info: WebBrowserPageNavigatedInfo) => void
+  : E extends "applyProxyResult" ? (result: ApplyProxyResult) => void
+  : never;
 
 export type MainProcessMainEventListener<E extends MainProcessMainEvent> =
-  E extends "uiReady"
-    ? () => void
-    : E extends "openFSChooser"
-      ? (dialogOptions: OpenDialogOptions) => void
-      : E extends "newEditor"
-        ? () => void
-        : E extends "closeEditor"
-          ? (editor: Editor) => void
-          : E extends "preview"
-            ? (editor: Editor) => void
-            : E extends "endPreview"
-              ? () => void
-              : E extends "openFile"
-                ? (currentEditors: Editor[], filePath?: string) => void
-                : E extends "save"
-                  ? (editor: Editor) => void
-                  : E extends "confirmSave"
-                    ? (result: ConfirmSaveResult) => void
-                    : E extends "saveAs"
-                      ? (editor: Editor) => void
-                      : E extends "startDownload"
-                        ? (editor: Editor) => void
-                        : E extends "promptStartDownloadResult"
-                          ? (result: PromptStartDownloadResult) => void
-                          : E extends "abortDownload"
-                            ? () => void
-                            : E extends "endDownloadProcess"
-                              ? () => void
-                              : E extends "modifiedEditorsInfo"
-                                ? (info: ModifiedEditorsInfo) => void
-                                : E extends "activeEditorInfo"
-                                  ? (info: ActiveEditorInfo) => void
-                                  : E extends "requestHelp"
-                                    ? <S extends UIConfigSection>(
-                                        section: S,
-                                        prop: keyof UIConfig[S]
-                                      ) => void
-                                    : E extends "endHelp"
-                                      ? () => void
-                                      : E extends "requestAboutInfo"
-                                        ? () => void
-                                        : E extends "endAbout"
-                                          ? () => void
-                                          : never;
+  E extends "uiReady" ? () => void
+  : E extends "viewBounds" ? (bounds: ViewBounds) => void
+  : E extends "openFSChooser" ? (dialogOptions: OpenDialogOptions) => void
+  : E extends "newEditor" ? () => void
+  : E extends "closeEditor" ? (editor: Editor) => void
+  : E extends "preview" ? (editor: Editor) => void
+  : E extends "endPreview" ? () => void
+  : E extends "openFile" ? (currentEditors: Editor[], filePath?: string) => void
+  : E extends "save" ? (editor: Editor) => void
+  : E extends "confirmSave" ? (result: ConfirmSaveResult) => void
+  : E extends "endPromptOverwriteOnSave" ? () => void
+  : E extends "saveAs" ? (editor: Editor) => void
+  : E extends "startDownload" ? (editor: Editor) => void
+  : E extends "promptStartDownloadResult" ?
+    (result: PromptStartDownloadResult) => void
+  : E extends "abortDownload" ? () => void
+  : E extends "endDownloadProcess" ? () => void
+  : E extends "modifiedEditorsInfo" ? (info: ModifiedEditorsInfo) => void
+  : E extends "activeEditorChange" ? (info: ActiveEditorInfo) => void
+  : E extends "requestHelp" ?
+    <S extends UIConfigSection>(section: S, prop: keyof UIConfig[S]) => void
+  : E extends "endHelp" ? () => void
+  : E extends "requestAboutInfo" ? () => void
+  : E extends "endAbout" ? () => void
+  : E extends "setWebBrowserURL" ? (url: string) => void
+  : E extends "setWebBrowserURLToHome" ? () => void
+  : E extends "webBrowserBack" ? () => void
+  : E extends "webBrowserForward" ? () => void
+  : E extends "openExternalBrowser" ? (url: string) => void
+  : never;

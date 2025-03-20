@@ -1,10 +1,12 @@
 import type { UIConfig } from "../../types/UIConfig";
 import { useConfig } from "../contexts/ConfigProvider";
 import TextInputRow from "./components/TextInputRow";
-import { Container, Tab, Tabs } from "react-bootstrap";
-import { useMemo, useState } from "react";
+import { Collapse, Container, Tab, Tabs } from "react-bootstrap";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import _ from "lodash";
 import CheckboxRow from "./components/CheckboxRow";
+import { toast } from "react-toastify";
+import { useEditor } from "../contexts/EditorContextProvider";
 
 interface NetworkBoxState {
   request: UIConfig["request"];
@@ -25,9 +27,74 @@ function getNetworkBoxState(config: UIConfig): NetworkBoxState {
 }
 
 function NetworkBox() {
-  const { config } = useConfig();
+  const { config, setConfigValue } = useConfig();
+  const { activeEditor } = useEditor();
   const state = getNetworkBoxState(config);
-  const [proxyNoticeDismissed, setProxyNoticeDismissed] = useState(false);
+  const [showProxyNotice, setShowProxyNotice] = useState(false);
+
+  useEffect(() => {
+    const removeListenerCallbacks = [
+      window.mainAPI.on("applyProxyResult", (result) => {
+        if (result.status === "success") {
+          setConfigValue("support.data", "appliedProxySettings", {
+            url: config.request["proxy.url"],
+            rejectUnauthorizedTLS:
+              config.request["proxy.reject.unauthorized.tls"]
+          });
+          setShowProxyNotice(false);
+          toast("Proxy settings applied", {
+            type: "success",
+            position: "bottom-center",
+            theme: "dark"
+          });
+        } else {
+          toast(`Failed to apply proxy settings: ${result.error}`, {
+            type: "success",
+            position: "bottom-center",
+            theme: "dark"
+          });
+        }
+      })
+    ];
+
+    return () => {
+      removeListenerCallbacks.forEach((cb) => cb());
+    };
+  }, [config]);
+
+  const applyProxySettings = useCallback(async () => {
+    if (!activeEditor) {
+      return;
+    }
+    try {
+      await window.mainAPI.invoke("applyProxy", activeEditor);
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  }, [activeEditor]);
+
+  const refreshProxyNoticeVisibility = useCallback(() => {
+    const applied = config["support.data"].appliedProxySettings;
+    const current = config["request"];
+    if (applied.url.trim() === "" && current["proxy.url"].trim() === "") {
+      setShowProxyNotice(false);
+      return;
+    }
+    setShowProxyNotice(
+      applied.url.trim() !== current["proxy.url"].trim() ||
+        applied.rejectUnauthorizedTLS !==
+          current["proxy.reject.unauthorized.tls"]
+    );
+  }, [
+    config["support.data"].appliedProxySettings.url,
+    config.request["proxy.url"],
+    config["support.data"].appliedProxySettings.rejectUnauthorizedTLS,
+    config.request["proxy.reject.unauthorized.tls"]
+  ]);
+
+  useEffect(() => {
+    refreshProxyNoticeVisibility();
+  }, [refreshProxyNoticeVisibility]);
 
   return useMemo(() => {
     return (
@@ -63,31 +130,30 @@ function NetworkBox() {
         </Tab>
 
         <Tab className="pb-2" eventKey="network-proxy" title="Proxy">
-          {!proxyNoticeDismissed ? (
+          <Collapse in={showProxyNotice}>
             <Container fluid className="mb-3">
               <div className="border border-info p-2">
-                <span>
-                  You are advised to use the same proxy settings in the provided
-                  browser to ensure consistency of captured values.
-                </span>
+                <span>Proxy settings changed.</span>
                 <span className="flex-grow-1 text-align-right ps-2">
-                  <a href="#" onClick={() => setProxyNoticeDismissed(true)}>
-                    Dismiss
+                  <a href="#" onClick={applyProxySettings}>
+                    Apply
                   </a>
                 </span>
               </div>
             </Container>
-          ) : null}
+          </Collapse>
           <Container fluid>
             <TextInputRow
               config={["request", "proxy.url"]}
               label="Proxy URL"
+              onChange={refreshProxyNoticeVisibility}
               helpTooltip="URL of proxy server"
               helpHasMoreInfo
             />
             <CheckboxRow
               config={["request", "proxy.reject.unauthorized.tls"]}
               label="Reject unauthorized TLS"
+              onChange={refreshProxyNoticeVisibility}
               helpTooltip="Reject servers with invalid certificates"
               helpHasMoreInfo
             />
@@ -95,7 +161,12 @@ function NetworkBox() {
         </Tab>
       </Tabs>
     );
-  }, [state, proxyNoticeDismissed]);
+  }, [
+    state,
+    showProxyNotice,
+    applyProxySettings,
+    refreshProxyNoticeVisibility
+  ]);
 }
 
 export default NetworkBox;

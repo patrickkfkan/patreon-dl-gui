@@ -1,5 +1,4 @@
-import MainWindow, { type MainWindowProps } from "./MainWindow";
-import PatreonBrowser from "./PatreonBrowser";
+import MainWindow from "./MainWindow";
 import type { Editor } from "../types/App";
 import type { UICommand, ExecUICommandParams } from "../types/MainEvents";
 import type DownloaderConsoleLogger from "./DownloaderConsoleLogger";
@@ -8,23 +7,21 @@ import type PatreonDownloader from "patreon-dl";
 import _ from "lodash";
 import type { AppMenuOptions } from "./mixins/AppMenu";
 import { AppMenuSupportMixin } from "./mixins/AppMenu";
-import { createEditor } from "./util/Editor";
 import { DownloadEventSupportMixin } from "./mixins/DownloadEvents";
 import { EditorEventSupportMixin } from "./mixins/EditorEvents";
 import { FileEventSupportMixin } from "./mixins/FileEvents";
 import { SupportEventSupportMixin } from "./mixins/SupportEvents";
 import RecentDocuments from "./util/RecentDocuments";
 import { APP_DATA_PATH } from "./Constants";
-import ProcessBase from "../ProcessBase";
+import ProcessBase from "./ProcessBase";
+import { WebBrowserEventSupportMixin } from "./mixins/WebBrowserEvents";
+import { getStartupUIConfig } from "./config/UIConfig";
+import parseArgs from "yargs-parser";
+import { loadLastWindowState, saveWindowState } from "./util/State";
+import { existsSync, mkdirSync } from "fs";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MainProcessConstructor = new (...args: any[]) => MainProcessBase;
-
-export interface MainProcessInitArgs {
-  mainWindow?: MainWindowProps;
-  browser: { executablePath: string };
-  patreonURL?: URL;
-}
 
 export interface DownloaderBundle {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,48 +31,56 @@ export interface DownloaderBundle {
   status: "init" | "running" | "end";
 }
 
+const processArgs = parseArgs(process.argv);
+
 class MainProcessBase extends ProcessBase<"main"> {
   protected win: MainWindow;
-  protected browser: PatreonBrowser;
-  protected browserExecutablePath: string;
   protected activeEditor: Editor | null;
   protected modifiedEditors: Editor[];
   protected downloader: DownloaderBundle | null;
-  #initialURL: URL;
-  #removeListenerCallbacks: (() => void)[];
+  #cleanupCallbacks: (() => void)[];
+  #lastCreatedEditorId = 0;
 
-  constructor(args: MainProcessInitArgs) {
+  constructor() {
     super();
-    this.win = MainWindow.create(args.mainWindow);
-    this.browserExecutablePath = args.browser.executablePath;
-    this.browser = this.#createPatreonBrowser(this.browserExecutablePath);
+    const devTools = Reflect.has(processArgs, "dev-tools");
+    const lastWindowState = loadLastWindowState() || {};
+    this.win = new MainWindow({
+      devTools,
+      ...lastWindowState
+    });
     this.activeEditor = null;
     this.modifiedEditors = [];
     this.downloader = null;
-    this.#initialURL = args?.patreonURL || new URL("https://www.patreon.com");
-    this.#removeListenerCallbacks = [];
-  }
-
-  #createPatreonBrowser(executablePath: string) {
-    const browser = new PatreonBrowser({ executablePath });
-    browser.on("browserPageInfo", (info) => {
-      this.emitRendererEvent(this.win, "browserPageInfo", info);
-    });
-    browser.on("close", () => {
-      this.end();
-    });
-    return browser;
+    this.#cleanupCallbacks = [];
   }
 
   protected setAppMenu(_options?: AppMenuOptions) {
     // To be fulfilled by AppMenuSupportMixin
   }
 
+  #ensureAppDataPath() {
+    if (!existsSync(APP_DATA_PATH)) {
+      try {
+        mkdirSync(APP_DATA_PATH, {
+          recursive: true
+        });
+      } catch (error: unknown) {
+        console.error(
+          `Failed to create app data path "${APP_DATA_PATH}":`,
+          error instanceof Error ? error.message : String(error)
+        );
+      }
+    }
+  }
+
   protected registerMainEventListeners() {
     return [
-      this.on("uiReady", () => {
-        this.emitRendererEvent(this.win, "editorCreated", createEditor());
-        this.emitRendererEvent(this.win, "recentDocumentsInfo", {
+      this.on("uiReady", async () => {
+        await this.createEditor(null, (editor) => {
+          this.emitRendererEvent(this.win.editorView, "editorCreated", editor);
+        });
+        this.emitRendererEvent(this.win.editorView, "recentDocumentsInfo", {
           entries: RecentDocuments.list()
         });
       })
@@ -84,17 +89,68 @@ class MainProcessBase extends ProcessBase<"main"> {
   }
 
   async start() {
+    this.#ensureAppDataPath();
     this.setAppMenu();
     this.win.on("close", (e) => {
       this.end(e);
     });
 
-    this.#removeListenerCallbacks.push(...this.registerMainEventListeners());
+    this.#cleanupCallbacks.push(
+      ...this.registerMainEventListeners(),
+      this.handle("getEditorPanelWidth", () => {
+        return this.win.getStateInfo().editorPanelWidth;
+      })
+    );
+
+    this.win.onMainWindowEvent("stateChange", (info) => {
+      saveWindowState(info);
+    });
+
+    this.win.onWebBrowserViewEvent("pageInfo", (info) => {
+      this.emitRendererEvent(this.win.editorView, "browserPageInfo", info);
+    });
+
+    this.win.onWebBrowserViewEvent("pageNavigated", (info) => {
+      this.emitRendererEvent(this.win.editorView, "browserPageNavigated", info);
+    });
+
+    this.win.onWebBrowserViewEvent("applyProxyResult", (result) => {
+      this.emitRendererEvent(this.win.editorView, "applyProxyResult", result);
+    });
 
     await this.win.launch();
-    await this.browser.goto(this.#initialURL.toString());
 
     console.debug(`Main process started. App data path is "${APP_DATA_PATH}".`);
+  }
+
+  protected async createEditor(
+    props?: Pick<Editor, "config" | "filePath" | "name" | "loadAlerts"> | null,
+    editorCallback?: (editor: Editor) => void
+  ) {
+    const config = props?.config || null;
+    const filePath = props?.filePath || null;
+    const name = props?.name || null;
+    const editorId = this.#lastCreatedEditorId;
+    const editor: Editor = {
+      id: editorId,
+      name: name || (editorId > 0 ? `Untitled-${editorId}` : "Untitled"),
+      filePath: filePath,
+      config: config || getStartupUIConfig(),
+      modified: false,
+      promptOnSave: !!filePath
+    };
+    if (props?.loadAlerts && props.loadAlerts.length > 0) {
+      editor.loadAlerts = props.loadAlerts;
+    }
+    this.#lastCreatedEditorId++;
+
+    if (editorCallback) {
+      editorCallback(editor);
+    }
+
+    await this.win.createWebBrowserViewForEditor(editor);
+
+    return editor;
   }
 
   async end(e?: Electron.Event) {
@@ -126,9 +182,9 @@ class MainProcessBase extends ProcessBase<"main"> {
           return;
         }
         const message =
-          this.modifiedEditors.length === 1
-            ? `"${this.modifiedEditors[0].name}" has been modified. Discard changes?`
-            : `${this.modifiedEditors.length} files have been modified. Discard changes?`;
+          this.modifiedEditors.length === 1 ?
+            `"${this.modifiedEditors[0].name}" has been modified. Discard changes?`
+          : `${this.modifiedEditors.length} files have been modified. Discard changes?`;
         const confirmDiscard =
           (
             await dialog.showMessageBox(this.win, {
@@ -147,16 +203,13 @@ class MainProcessBase extends ProcessBase<"main"> {
       })();
     });
     if (confirmed) {
-      this.#removeListenerCallbacks.forEach((cb) => cb());
-      this.#removeListenerCallbacks = [];
-      this.browser.removeAllListeners();
-      this.browser.close();
-      this.win.removeAllListeners();
-      this.win.close();
+      this.#cleanupCallbacks.forEach((cb) => cb());
+      this.#cleanupCallbacks = [];
+      await this.win.destroy();
       return;
     }
 
-    if (this.browser.isClosed()) {
+    /*if (this.browser.isClosed()) {
       this.browser = this.#createPatreonBrowser(this.browserExecutablePath);
       let url = this.#initialURL.toString();
       const target = this.activeEditor?.config.downloader.target;
@@ -167,7 +220,7 @@ class MainProcessBase extends ProcessBase<"main"> {
             : target.manualValue.trim()) || url;
       }
       await this.browser.goto(url);
-    }
+    }*/
   }
 
   execUICommand<C extends UICommand>(
@@ -175,7 +228,7 @@ class MainProcessBase extends ProcessBase<"main"> {
     ...params: ExecUICommandParams<C>
   ) {
     this.emitRendererEvent(
-      this.win,
+      this.win.editorView,
       "execUICommand",
       command,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -184,10 +237,12 @@ class MainProcessBase extends ProcessBase<"main"> {
   }
 }
 
-const MainProcess = SupportEventSupportMixin(
-  DownloadEventSupportMixin(
-    EditorEventSupportMixin(
-      FileEventSupportMixin(AppMenuSupportMixin(MainProcessBase))
+const MainProcess = WebBrowserEventSupportMixin(
+  SupportEventSupportMixin(
+    DownloadEventSupportMixin(
+      EditorEventSupportMixin(
+        FileEventSupportMixin(AppMenuSupportMixin(MainProcessBase))
+      )
     )
   )
 );

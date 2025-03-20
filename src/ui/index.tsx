@@ -1,13 +1,13 @@
 import App from "./App";
 import { createRoot } from "react-dom/client";
-import Bootstrap from "./Bootstrap";
+import ModalWrapper from "./modals/ModalWrapper";
 
 export function loadMainUI() {
   const root = createRoot(document.body);
   root.render(<App />);
 }
 
-export function loadBootstrapUI() {
+export function loadModalWrapper() {
   const root = createRoot(document.body);
-  root.render(<Bootstrap />);
+  root.render(<ModalWrapper />);
 }

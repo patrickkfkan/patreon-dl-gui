@@ -1,6 +1,5 @@
 import { dialog } from "electron";
 import type { MainProcessConstructor } from "../MainProcess";
-import { createEditor } from "../util/Editor";
 
 export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -11,8 +10,14 @@ export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
       return [
         ...callbacks,
 
-        this.on("newEditor", () => {
-          this.emitRendererEvent(this.win, "editorCreated", createEditor());
+        this.on("newEditor", async () => {
+          await this.createEditor(null, (editor) => {
+            this.emitRendererEvent(
+              this.win.editorView,
+              "editorCreated",
+              editor
+            );
+          });
         }),
 
         this.on("closeEditor", async (editor) => {
@@ -26,19 +31,20 @@ export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
             };
             const result = await dialog.showMessageBox(this.win, dialogOpts);
             if (result.response === dialogOpts.cancelId) {
-              this.emitRendererEvent(this.win, "closeEditorResult", {
+              this.emitRendererEvent(this.win.editorView, "closeEditorResult", {
                 canceled: true
               });
               return;
             }
           }
-          this.emitRendererEvent(this.win, "closeEditorResult", {
+          await this.win.removeWebBrowserViewForEditor(editor);
+          this.emitRendererEvent(this.win.editorView, "closeEditorResult", {
             canceled: false,
             editor
           });
         }),
 
-        this.on("activeEditorInfo", (info) => {
+        this.on("activeEditorChange", (info) => {
           const shouldRefreshMenu =
             (this.activeEditor === null || info.editor === null) &&
             this.activeEditor !== info.editor;
@@ -53,10 +59,17 @@ export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
               }
             });
           }
+          if (info.editor) {
+            this.win.setActiveWebBrowserViewByEditor(info.editor);
+          }
         }),
 
         this.on("modifiedEditorsInfo", (info) => {
           this.modifiedEditors = info.editors;
+        }),
+
+        this.handle("applyProxy", (editor) => {
+          return this.win.applyProxy(editor);
         })
       ];
     }

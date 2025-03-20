@@ -98,41 +98,41 @@ function BrowserObtainableInputRow<
 
   const inputModeIcon = (
     <InputGroup.Text>
-      <span className="fs-6 material-icons">
+      <span className="fs-6 material-icons" style={{ lineHeight: "inherit" }}>
         {inputMode === "manual" ? "edit" : "language"}
       </span>
     </InputGroup.Text>
   );
 
-  const inputModeDropDown = !disableManualInput ? (
-    <Dropdown as={ButtonGroup}>
-      <Dropdown.Toggle size="sm" variant="secondary" />
-      <Dropdown.Menu>
-        <Dropdown.Item href="#" onClick={() => setInputMode("manual")}>
-          <div className="d-flex align-items-center">
-            <span className="fs-6 me-2 material-icons">edit</span>
-            {manualInputModeLabel}
-          </div>
-        </Dropdown.Item>
-        <Dropdown.Item href="#" onClick={() => setInputMode("browser")}>
-          <div className="d-flex align-items-center">
-            <span className="fs-6 me-2 material-icons">language</span>Capture
-            from browser
-          </div>
-        </Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
-  ) : null;
+  const inputModeDropDown =
+    !disableManualInput ?
+      <Dropdown as={ButtonGroup}>
+        <Dropdown.Toggle size="sm" variant="secondary" />
+        <Dropdown.Menu>
+          <Dropdown.Item href="#" onClick={() => setInputMode("manual")}>
+            <div className="d-flex align-items-center">
+              <span className="fs-6 me-2 material-icons">edit</span>
+              {manualInputModeLabel}
+            </div>
+          </Dropdown.Item>
+          <Dropdown.Item href="#" onClick={() => setInputMode("browser")}>
+            <div className="d-flex align-items-center">
+              <span className="fs-6 me-2 material-icons">language</span>Capture
+              from browser
+            </div>
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
+    : null;
 
   const capturingText = "Capturing from browser...";
-  const floatingText = capturePaused
-    ? `(Paused)${browserValue ? ` ${capturingText}` : ""}`
-    : browserValue && browserValue.description
-      ? capturingText
-      : null;
+  const floatingText =
+    capturePaused ? `(Paused)${browserValue ? ` ${capturingText}` : ""}`
+    : browserValue && browserValue.description ? capturingText
+    : null;
 
   let valueEl =
-    inputMode === "manual" ? (
+    inputMode === "manual" ?
       <Form.Control
         type="text"
         size="sm"
@@ -140,16 +140,14 @@ function BrowserObtainableInputRow<
         onChange={(e) => updateManualValue(e.currentTarget.value)}
         aria-label={ariaLabel || label}
       />
-    ) : (
-      <Form.Control
+    : <Form.Control
         type="text"
         size="sm"
         readOnly
-        className={`bg-transparent text-light ${!browserValue?.value ? "fst-italic" : ""}`}
+        className={`bg-body text-light ${!browserValue?.value ? "fst-italic" : ""}`}
         value={browserValue?.description || capturingText}
         aria-label={ariaLabel || label}
-      />
-    );
+      />;
 
   if (inputMode === "browser" && floatingText) {
     valueEl = (
@@ -166,6 +164,7 @@ function BrowserObtainableInputRow<
         <Button
           size="sm"
           variant="link"
+          className="bg-body"
           onClick={() => setCapturePaused(!capturePaused)}
           title={capturePaused ? "Resume capture" : "Pause capture"}
           aria-label={capturePaused ? "Resume capture" : "Pause capture"}
@@ -182,21 +181,19 @@ function BrowserObtainableInputRow<
   }
 
   return (
-    <>
-      <Row className="py-1 align-items-center">
-        <Col xs={4}>{label}:</Col>
-        <Col xs={8} className="d-flex align-items-center">
-          <InputGroup
-            className={`${inputMode === "browser" ? "border border-secondary" : ""}`}
-          >
-            {inputModeIcon}
-            {valueEl}
-            {inputModeDropDown}
-          </InputGroup>
-          {createHelpIcon(props)}
-        </Col>
-      </Row>
-    </>
+    <Row
+      className={`py-1 align-items-center browser-obtainable-input ${inputMode}-input-mode`}
+    >
+      <Col xs={4}>{label}:</Col>
+      <Col xs={8} className="d-flex align-items-center">
+        <InputGroup>
+          {inputModeIcon}
+          {valueEl}
+          {inputModeDropDown}
+        </InputGroup>
+        {createHelpIcon(props)}
+      </Col>
+    </Row>
   );
 }
 

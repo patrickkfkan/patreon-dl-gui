@@ -17,6 +17,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
         ...callbacks,
 
         this.on("startDownload", async (editor: Editor) => {
+          this.win.showModalView();
           try {
             const {
               targetURL,
@@ -51,7 +52,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                 dlConfig.include.postsPublished.before.toString();
             }
 
-            this.emitRendererEvent(this.win, "downloaderInit", {
+            this.emitRendererEvent(this.win.modalView, "downloaderInit", {
               hasError: false,
               downloaderConfig: ObjectHelper.clean(displayConfig, {
                 deep: true,
@@ -65,7 +66,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
             const errMsg =
               error instanceof Error ? error.message : String(error);
             this.downloader = null;
-            this.emitRendererEvent(this.win, "downloaderInit", {
+            this.emitRendererEvent(this.win.modalView, "downloaderInit", {
               hasError: true,
               error: `Error: ${errMsg}`
             });
@@ -80,31 +81,31 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
             try {
               this.downloader.consoleLogger.on("message", (message) => {
                 this.emitRendererEvent(
-                  this.win,
+                  this.win.modalView,
                   "downloaderLogMessage",
                   message
                 );
               });
               this.downloader.status = "running";
-              this.emitRendererEvent(this.win, "downloaderStart");
+              this.emitRendererEvent(this.win.modalView, "downloaderStart");
               await this.downloader.instance.start({
                 signal: this.downloader.abortController.signal
               });
               this.downloader.status = "end";
               if (this.downloader.abortController.signal.aborted) {
-                this.emitRendererEvent(this.win, "downloaderEnd", {
+                this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
                   hasError: false,
                   aborted: true
                 });
                 return;
               }
-              this.emitRendererEvent(this.win, "downloaderEnd", {
+              this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
                 hasError: false,
                 aborted: false
               });
             } catch (error: unknown) {
               this.downloader.status = "end";
-              this.emitRendererEvent(this.win, "downloaderEnd", {
+              this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
                 hasError: true,
                 error: error instanceof Error ? error.message : String(error)
               });
@@ -123,7 +124,8 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
         }),
 
         this.on("endDownloadProcess", () => {
-          this.emitRendererEvent(this.win, "downloadProcessEnd");
+          this.win.hideModalView();
+          this.emitRendererEvent(this.win.modalView, "downloadProcessEnd");
         })
       ];
     }

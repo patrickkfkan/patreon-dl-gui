@@ -34,16 +34,17 @@ function HelpIcon<S extends UIConfigSection, P extends keyof UIConfig[S]>(
     return null;
   }
 
-  const moreInfoLink = config ? (
-    <a
-      href="#"
-      className="text-info link-underline link-underline-opacity-0 ms-1"
-      onClick={getMoreInfo}
-      aria-label="More information"
-    >
-      More info.
-    </a>
-  ) : null;
+  const moreInfoLink =
+    config ?
+      <a
+        href="#"
+        className="text-info link-underline link-underline-opacity-0 ms-1"
+        onClick={getMoreInfo}
+        aria-label="More information"
+      >
+        More info.
+      </a>
+    : null;
 
   return (
     <>

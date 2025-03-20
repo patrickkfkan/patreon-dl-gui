@@ -39,7 +39,7 @@ function AlertsBox() {
   ));
 
   return (
-    <Accordion defaultActiveKey="0">
+    <Accordion defaultActiveKey="0" className="mb-3">
       <Accordion.Item eventKey="1">
         <Accordion.Header>
           <span className="material-symbols-outlined text-warning">
@@ -47,7 +47,7 @@ function AlertsBox() {
           </span>{" "}
           There were issues loading this config.
           <div className="d-flex flex-grow-1 justify-content-end pe-3">
-            <a className="text-muted" onClick={dismiss}>
+            <a href="#" onClick={dismiss}>
               Dismiss
             </a>
           </div>

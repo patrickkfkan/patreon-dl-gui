@@ -25,7 +25,7 @@ const config: ForgeConfig = {
         config: rendererConfig,
         entryPoints: [
           {
-            html: './src/index.html',
+            html: './src/core/index.html',
             js: './src/core/renderer.ts',
             name: 'main_window',
             preload: {
@@ -33,11 +33,11 @@ const config: ForgeConfig = {
             },
           },
           {
-            html: './src/index.html',
-            js: './src/bootstrap/renderer.ts',
-            name: 'bootstrap_window',
+            html: './src/core/modal/index.html',
+            js: './src/core/modal/renderer.ts',
+            name: 'modal_window',
             preload: {
-              js: './src/bootstrap/preload.ts',
+              js: './src/core/modal/preload.ts',
             },
           }
         ],

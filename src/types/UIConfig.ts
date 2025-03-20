@@ -121,17 +121,23 @@ export interface UIConfig {
       cookie: BrowserObtainedValue | null;
       tiers: Tier[] | null;
     };
+    appliedProxySettings: {
+      url: string;
+      rejectUnauthorizedTLS: boolean;
+    };
   };
 }
 
 export type UIConfigSection = keyof UIConfig;
 
 export type UIConfigSectionWithPropsOf<T> = {
-  [S in UIConfigSection]: ObjectKeysByValueType<UIConfig[S], T> extends infer R
-    ? R extends string | number | symbol
-      ? S
-      : never
-    : never;
+  [S in UIConfigSection]: ObjectKeysByValueType<UIConfig[S], T> extends (
+    infer R
+  ) ?
+    R extends string | number | symbol ?
+      S
+    : never
+  : never;
 }[UIConfigSection];
 
 export type UIConfigProp<

@@ -12,14 +12,13 @@ If you are going to download videos, you should also install [FFmpeg](https://ww
 
 ## Quick start guide
 
-- On first run, the app will prompt you for installation of the Chrome web browser.
-- After installation, the app launches with the main window and a web browser window opened.
-- In the web browser window, go to the Patreon page you want to download content from. For content that is accessible only through subscription (which you need to have), ensure you are logged in. Content that is downloadable includes:
+- The app has two major components: the editor and an embedded web browser.
+- In the embedded web browser, go to the Patreon page you want to download content from. For content that is accessible only through subscription (which you need to have), ensure you are logged in. Content that is downloadable includes:
   - Posts by a creator
   - A single post
   - Posts in a collection
   - Product purchased from a creator's shop
-- When you visit a Patreon page, the app checks whether it contains content that is downloadable. Identified *targets* are shown in the main window, along with crucial data such as *cookie* which is required to download patron-only content.
+- When you visit a Patreon page, the app checks whether it contains content that is downloadable. Identified *targets* are shown in the Download section of the editor, along with crucial data such as *cookie* which is required to download patron-only content.
 - Once a target is identified, you can configure the options to suit your needs. To get help about an option, select the "Show Help Icons" item in the Help menu.
 - To begin downloading the target, click the "play" button in the toolbar. You may also save the configuration to file and open it on another occasion.
 

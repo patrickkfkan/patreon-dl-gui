@@ -53,7 +53,7 @@ function EmbedsBox() {
             { value: "custom", label: "Use external downloader" }
           ]}
         />
-        {embedDownloaderYouTube.type === "custom" ? (
+        {embedDownloaderYouTube.type === "custom" ?
           <TextInputRow
             config={["embed.downloader.youtube", "exec"]}
             label="YouTube download command"
@@ -61,7 +61,7 @@ function EmbedsBox() {
             helpTooltip="Command to download embedded YouTube videos."
             helpHasMoreInfo
           />
-        ) : null}
+        : null}
         <TextInputRow
           config={["embed.downloader.vimeo", "exec"]}
           label="Vimeo download command"

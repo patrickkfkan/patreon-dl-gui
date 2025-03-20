@@ -11,6 +11,7 @@ import { createHelpIcon } from "./Common";
 type CheckboxRowProps<S extends UIConfigSectionWithPropsOf<boolean>> = {
   config: UIConfigSectionPropTuple<S, boolean>;
   label: string;
+  onChange?: (value: boolean) => void;
 } & HelpProps &
   AccessibilityProps;
 
@@ -18,7 +19,7 @@ function CheckboxRow<S extends UIConfigSectionWithPropsOf<boolean>>(
   props: CheckboxRowProps<S>
 ) {
   const { config, setConfigValue } = useConfig();
-  const { config: pConfig, label, ariaLabel } = props;
+  const { config: pConfig, label, ariaLabel, onChange } = props;
   const [section, prop] = pConfig;
   const value = config[section][prop] as boolean;
 
@@ -28,9 +29,12 @@ function CheckboxRow<S extends UIConfigSectionWithPropsOf<boolean>>(
       <Col className="d-flex align-items-center">
         <Form.Check
           checked={value}
-          onChange={() =>
-            setConfigValue(section, prop, !value as UIConfig[S][typeof prop])
-          }
+          onChange={() => {
+            setConfigValue(section, prop, !value as UIConfig[S][typeof prop]);
+            if (onChange) {
+              onChange(value);
+            }
+          }}
           aria-label={ariaLabel || label}
         />
         {createHelpIcon({ ...props, className: "ms-3" })}

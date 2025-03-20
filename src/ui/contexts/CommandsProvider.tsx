@@ -4,8 +4,14 @@ import type {
   MainProcessRendererEvent,
   UICommand
 } from "../../types/MainEvents";
-import { createContext, useCallback, useContext, useEffect } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo
+} from "react";
+import { toast } from "react-toastify";
 import type { UIConfig, UIConfigSection } from "../../types/UIConfig";
 
 export type CommandsContextValue = {
@@ -15,6 +21,12 @@ export type CommandsContextValue = {
     section: S,
     prop: keyof UIConfig[S]
   ) => void;
+  webBrowser: {
+    gotoURL: (url: string) => void;
+    gotoHome: () => void;
+    goBack: () => void;
+    goForward: () => void;
+  };
 };
 
 const CommandsContext = createContext<CommandsContextValue>(
@@ -212,6 +224,24 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
     }, waitForEvent("aboutEnd"));
   }, []);
 
+  const webBrowser = useMemo(
+    () => ({
+      gotoURL: (url: string) => {
+        window.mainAPI.emitMainEvent("setWebBrowserURL", url);
+      },
+      gotoHome: () => {
+        window.mainAPI.emitMainEvent("setWebBrowserURLToHome");
+      },
+      goBack: () => {
+        window.mainAPI.emitMainEvent("webBrowserBack");
+      },
+      goForward: () => {
+        window.mainAPI.emitMainEvent("webBrowserForward");
+      }
+    }),
+    []
+  );
+
   const context = {
     createEditor,
     openFile,
@@ -222,7 +252,8 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
     startDownload,
     showHelpIcons,
     requestHelp,
-    showAbout
+    showAbout,
+    webBrowser
   };
 
   useEffect(() => {
@@ -240,7 +271,6 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <CommandsContext.Provider value={context}>
       {children}
-      <ToastContainer />
     </CommandsContext.Provider>
   );
 };

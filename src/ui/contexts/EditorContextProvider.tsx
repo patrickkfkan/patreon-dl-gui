@@ -74,7 +74,7 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
   }, [addEditor, editors]);
 
   useEffect(() => {
-    window.mainAPI.emitMainEvent("activeEditorInfo", {
+    window.mainAPI.emitMainEvent("activeEditorChange", {
       editor: activeEditor
     });
   }, [activeEditor]);

@@ -1,6 +1,8 @@
 import type { IpcRendererEvent } from "electron";
 import { ipcRenderer } from "electron";
 import type {
+  ProcessInvocableMethod,
+  ProcessInvocableMethodHandler,
   ProcessMainEvent,
   ProcessMainEventListener,
   ProcessRendererEvent,
@@ -37,5 +39,12 @@ export default class RendererAPI<T extends ProcessType> {
     ...args: Parameters<ProcessMainEventListener<T, E>>
   ) {
     ipcRenderer.send(eventName, ...args);
+  }
+
+  invoke<M extends ProcessInvocableMethod<T>>(
+    methodName: M,
+    ...args: Parameters<ProcessInvocableMethodHandler<T, M>>
+  ): Promise<ReturnType<ProcessInvocableMethodHandler<T, M>>> {
+    return ipcRenderer.invoke(methodName, ...args);
   }
 }

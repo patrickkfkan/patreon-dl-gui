@@ -62,8 +62,9 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
       maxRetries: uiConfig.request["max.retries"],
       maxConcurrent: uiConfig.request["max.concurrent"],
       minTime: uiConfig.request["min.time"],
-      proxy: uiConfig.request["proxy.url"].trim()
-        ? {
+      proxy:
+        uiConfig.request["proxy.url"].trim() ?
+          {
             url: uiConfig.request["proxy.url"].trim(),
             rejectUnauthorizedTLS:
               uiConfig.request["proxy.reject.unauthorized.tls"]

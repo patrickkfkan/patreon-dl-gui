@@ -94,9 +94,9 @@ export function convertUIConfigToFileContents(config: UIConfig) {
     },
     "embed.downloader.youtube": {
       exec:
-        config["embed.downloader.youtube"].type === "custom"
-          ? config["embed.downloader.youtube"].exec.trim()
-          : ""
+        config["embed.downloader.youtube"].type === "custom" ?
+          config["embed.downloader.youtube"].exec.trim()
+        : ""
     },
     "embed.downloader.vimeo": {
       exec: config["embed.downloader.vimeo"].exec.trim()

@@ -1,4 +1,4 @@
-import { app, dialog } from "electron";
+import { app, dialog, shell } from "electron";
 import type { MainProcessConstructor } from "../MainProcess";
 import { getHelpContents } from "../util/Help";
 import { APP_URL } from "../Constants";
@@ -15,7 +15,8 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
         this.on("requestHelp", (section, prop) => {
           try {
             const contents = getHelpContents(section, prop);
-            this.emitRendererEvent(this.win, "requestHelpResult", {
+            this.win.showModalView();
+            this.emitRendererEvent(this.win.modalView, "requestHelpResult", {
               contents
             });
             return;
@@ -24,16 +25,18 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
               "Error",
               error instanceof Error ? error.message : String(error)
             );
-            this.emitRendererEvent(this.win, "helpEnd");
+            this.emitRendererEvent(this.win.editorView, "helpEnd");
           }
         }),
 
         this.on("endHelp", () => {
-          this.emitRendererEvent(this.win, "helpEnd");
+          this.win.hideModalView();
+          this.emitRendererEvent(this.win.editorView, "helpEnd");
         }),
 
         this.on("requestAboutInfo", () => {
-          this.emitRendererEvent(this.win, "aboutInfo", {
+          this.win.showModalView();
+          this.emitRendererEvent(this.win.modalView, "aboutInfo", {
             appName: app.getName(),
             appVersion: app.getVersion(),
             appURL: APP_URL
@@ -41,7 +44,12 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
         }),
 
         this.on("endAbout", () => {
-          this.emitRendererEvent(this.win, "aboutEnd");
+          this.win.hideModalView();
+          this.emitRendererEvent(this.win.editorView, "aboutEnd");
+        }),
+
+        this.on("openExternalBrowser", (url) => {
+          shell.openExternal(url);
         })
       ];
     }

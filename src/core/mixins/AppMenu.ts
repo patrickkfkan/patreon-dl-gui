@@ -35,9 +35,13 @@ export function AppMenuSupportMixin<TBase extends MainProcessConstructor>(
             click: () => {
               RecentDocuments.clear();
               this.setAppMenu();
-              this.emitRendererEvent(this.win, "recentDocumentsInfo", {
-                entries: RecentDocuments.list()
-              });
+              this.emitRendererEvent(
+                this.win.editorView,
+                "recentDocumentsInfo",
+                {
+                  entries: RecentDocuments.list()
+                }
+              );
             }
           }
         );
