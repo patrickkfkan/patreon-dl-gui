@@ -10,23 +10,23 @@ export function WebBrowserEventSupportMixin<
       return [
         ...callbacks,
 
-        this.on("setWebBrowserURL", (url) => {
+        this.handle("setWebBrowserURL", (url) => {
           this.win.webBrowserView?.gotoURL(url);
         }),
 
-        this.on("setWebBrowserURLToHome", () => {
+        this.handle("setWebBrowserURLToHome", () => {
           this.win.webBrowserView?.gotoURL(PATREON_URL);
         }),
 
-        this.on("webBrowserBack", () => {
+        this.handle("webBrowserBack", () => {
           this.win.webBrowserView?.goBack();
         }),
 
-        this.on("webBrowserForward", () => {
+        this.handle("webBrowserForward", () => {
           this.win.webBrowserView?.goForward();
         }),
 
-        this.on("viewBounds", (bounds) => {
+        this.on("viewBoundsChange", (bounds) => {
           this.win.updateViewBounds(bounds);
         })
       ];

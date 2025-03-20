@@ -10,7 +10,7 @@ export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
       return [
         ...callbacks,
 
-        this.on("newEditor", async () => {
+        this.handle("newEditor", async () => {
           await this.createEditor(null, (editor) => {
             this.emitRendererEvent(
               this.win.editorView,
@@ -20,7 +20,7 @@ export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
           });
         }),
 
-        this.on("closeEditor", async (editor) => {
+        this.handle("closeEditor", async (editor) => {
           if (editor.modified) {
             const dialogOpts = {
               title: "Confirm",
@@ -31,17 +31,16 @@ export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
             };
             const result = await dialog.showMessageBox(this.win, dialogOpts);
             if (result.response === dialogOpts.cancelId) {
-              this.emitRendererEvent(this.win.editorView, "closeEditorResult", {
+              return {
                 canceled: true
-              });
-              return;
+              };
             }
           }
           await this.win.removeWebBrowserViewForEditor(editor);
-          this.emitRendererEvent(this.win.editorView, "closeEditorResult", {
+          return {
             canceled: false,
             editor
-          });
+          };
         }),
 
         this.on("activeEditorChange", (info) => {
@@ -64,7 +63,7 @@ export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
           }
         }),
 
-        this.on("modifiedEditorsInfo", (info) => {
+        this.on("modifiedEditorsChange", (info) => {
           this.modifiedEditors = info.editors;
         }),
 

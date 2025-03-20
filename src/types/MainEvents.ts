@@ -1,64 +1,39 @@
 import type { Editor } from "./App";
 import type { FileLoggerConfig } from "patreon-dl";
 import type { FileConfig } from "./FileConfig";
-import type { PageInfo, UIConfig, UIConfigSection } from "./UIConfig";
+import type { PageInfo } from "./UIConfig";
 import type { DownloaderLogMessage } from "../core/DownloaderConsoleLogger";
-import type { OpenDialogOptions } from "electron";
 import type { RecentDocument } from "../core/util/RecentDocuments";
-import { ApplyProxyResult } from "../core/MainWindow";
+import type { ApplyProxyResult } from "../core/MainWindow";
 
 export type MainProcessRendererEvent =
   | "editorCreated"
-  | "closeEditorResult"
-  | "openFileResult"
   | "browserPageInfo"
-  | "fsChooserResult"
   | "previewInfo"
-  | "previewEnd"
   | "promptOverwriteOnSave"
-  | "saveResult"
   | "downloaderInit"
   | "downloaderStart"
   | "downloaderEnd"
   | "downloaderLogMessage"
-  | "downloadProcessEnd"
   | "execUICommand"
   | "requestHelpResult"
-  | "helpEnd"
   | "aboutInfo"
-  | "aboutEnd"
   | "recentDocumentsInfo"
   | "browserPageNavigated"
   | "applyProxyResult";
 
 export type MainProcessMainEvent =
   | "uiReady"
-  | "viewBounds"
-  | "openFSChooser"
-  | "newEditor"
-  | "closeEditor"
-  | "preview"
-  | "endPreview"
-  | "openFile"
-  | "save"
-  | "confirmSave"
-  | "endPromptOverwriteOnSave"
-  | "saveAs"
-  | "startDownload"
-  | "promptStartDownloadResult"
-  | "abortDownload"
-  | "endDownloadProcess"
-  | "modifiedEditorsInfo"
+  | "viewBoundsChange"
   | "activeEditorChange"
-  | "requestHelp"
-  | "endHelp"
-  | "requestAboutInfo"
-  | "endAbout"
-  | "setWebBrowserURL"
-  | "setWebBrowserURLToHome"
-  | "webBrowserBack"
-  | "webBrowserForward"
-  | "openExternalBrowser";
+  | "confirmSave"
+  | "confirmSaveModalClose"
+  | "modifiedEditorsChange"
+  | "previewModalClose"
+  | "helpModalClose"
+  | "aboutModalClose"
+  | "confirmStartDownload"
+  | "downloaderModalClose";
 
 export type UICommand =
   | "createEditor"
@@ -77,45 +52,9 @@ export interface AboutInfo {
   appURL: string;
 }
 
-export type FSChooserResult =
-  | {
-      canceled: true;
-      filePath?: undefined;
-    }
-  | {
-      canceled: false;
-      filePath: string;
-    };
-
-export type CloseEditorResult =
-  | {
-      canceled: true;
-      editor?: undefined;
-    }
-  | {
-      canceled: false;
-      editor: Editor;
-    };
-
-export type OpenFileResult =
-  | {
-      canceled: true;
-      hasError?: undefined;
-      editor?: undefined;
-      isNewEditor?: undefined;
-    }
-  | {
-      canceled?: undefined;
-      hasError: true;
-      editor?: undefined;
-      isNewEditor?: undefined;
-    }
-  | {
-      canceled?: undefined;
-      hasError?: undefined;
-      editor: Editor;
-      isNewEditor: boolean;
-    };
+export interface ActiveEditorInfo {
+  editor: Editor | null;
+}
 
 export type SaveFileConfigResult =
   | {
@@ -175,16 +114,12 @@ export type DownloaderEndInfo =
       aborted: boolean;
     };
 
-export interface PromptStartDownloadResult {
+export interface ConfirmStartDownloadResult {
   confirmed: boolean;
 }
 
 export interface ModifiedEditorsInfo {
   editors: Editor[];
-}
-
-export interface ActiveEditorInfo {
-  editor: Editor | null;
 }
 
 export interface RequestHelpResult {
@@ -216,22 +151,14 @@ export type MainProcessRendererEventListener<
 > =
   E extends "aboutInfo" ? (info: AboutInfo) => void
   : E extends "editorCreated" ? (editor: Editor) => void
-  : E extends "closeEditorResult" ? (result: CloseEditorResult) => void
-  : E extends "openFileResult" ? (result: OpenFileResult) => void
   : E extends "browserPageInfo" ? (info: PageInfo) => void
-  : E extends "fsChooserResult" ? (result: FSChooserResult) => void
   : E extends "previewInfo" ? (info: FileConfig) => void
-  : E extends "previewEnd" ? () => void
   : E extends "promptOverwriteOnSave" ? (config: FileConfig<"hasPath">) => void
-  : E extends "saveResult" ? (result: SaveFileConfigResult) => void
   : E extends "downloaderInit" ? (info: DownloaderInitInfo) => void
   : E extends "downloaderStart" ? () => void
   : E extends "downloaderEnd" ? (info: DownloaderEndInfo) => void
   : E extends "downloaderLogMessage" ? (message: DownloaderLogMessage) => void
-  : E extends "downloadProcessEnd" ? () => void
   : E extends "requestHelpResult" ? (result: RequestHelpResult) => void
-  : E extends "helpEnd" ? () => void
-  : E extends "aboutEnd" ? () => void
   : E extends "execUICommand" ?
     <C extends UICommand>(command: C, ...params: ExecUICommandParams<C>) => void
   : E extends "recentDocumentsInfo" ? (info: RecentDocumentsInfo) => void
@@ -242,32 +169,15 @@ export type MainProcessRendererEventListener<
 
 export type MainProcessMainEventListener<E extends MainProcessMainEvent> =
   E extends "uiReady" ? () => void
-  : E extends "viewBounds" ? (bounds: ViewBounds) => void
-  : E extends "openFSChooser" ? (dialogOptions: OpenDialogOptions) => void
-  : E extends "newEditor" ? () => void
-  : E extends "closeEditor" ? (editor: Editor) => void
-  : E extends "preview" ? (editor: Editor) => void
-  : E extends "endPreview" ? () => void
-  : E extends "openFile" ? (currentEditors: Editor[], filePath?: string) => void
-  : E extends "save" ? (editor: Editor) => void
-  : E extends "confirmSave" ? (result: ConfirmSaveResult) => void
-  : E extends "endPromptOverwriteOnSave" ? () => void
-  : E extends "saveAs" ? (editor: Editor) => void
-  : E extends "startDownload" ? (editor: Editor) => void
-  : E extends "promptStartDownloadResult" ?
-    (result: PromptStartDownloadResult) => void
-  : E extends "abortDownload" ? () => void
-  : E extends "endDownloadProcess" ? () => void
-  : E extends "modifiedEditorsInfo" ? (info: ModifiedEditorsInfo) => void
+  : E extends "viewBoundsChange" ? (bounds: ViewBounds) => void
   : E extends "activeEditorChange" ? (info: ActiveEditorInfo) => void
-  : E extends "requestHelp" ?
-    <S extends UIConfigSection>(section: S, prop: keyof UIConfig[S]) => void
-  : E extends "endHelp" ? () => void
-  : E extends "requestAboutInfo" ? () => void
-  : E extends "endAbout" ? () => void
-  : E extends "setWebBrowserURL" ? (url: string) => void
-  : E extends "setWebBrowserURLToHome" ? () => void
-  : E extends "webBrowserBack" ? () => void
-  : E extends "webBrowserForward" ? () => void
-  : E extends "openExternalBrowser" ? (url: string) => void
+  : E extends "confirmSave" ? (result: ConfirmSaveResult) => void
+  : E extends "confirmSaveModalClose" ? () => void
+  : E extends "modifiedEditorsChange" ? (info: ModifiedEditorsInfo) => void
+  : E extends "previewModalClose" ? () => void
+  : E extends "helpModalClose" ? () => void
+  : E extends "aboutModalClose" ? () => void
+  : E extends "confirmStartDownload" ?
+    (result: ConfirmStartDownloadResult) => void
+  : E extends "downloaderModalClose" ? () => void
   : never;

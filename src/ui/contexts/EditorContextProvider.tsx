@@ -96,7 +96,7 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
   const markEditorModified = useCallback(
     (editor: Editor) => {
       setEditorProp(editor, { modified: true });
-      window.mainAPI.emitMainEvent("modifiedEditorsInfo", {
+      window.mainAPI.emitMainEvent("modifiedEditorsChange", {
         editors: editors.filter((editor) => editor.modified)
       });
     },

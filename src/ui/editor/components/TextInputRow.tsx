@@ -80,21 +80,15 @@ function TextInputRow<
   );
 
   const openFSChooser = useCallback(
-    (type: "dir" | "file") => {
-      window.mainAPI.on(
-        "fsChooserResult",
-        (result) => {
-          if (result.canceled) {
-            return;
-          }
-          _setConfigValue(result.filePath);
-        },
-        { once: true }
-      );
-      window.mainAPI.emitMainEvent("openFSChooser", {
+    async (type: "dir" | "file") => {
+      const result = await window.mainAPI.invoke("openFSChooser", {
         properties: type === "dir" ? ["openDirectory"] : ["openFile"],
         title: type === "dir" ? "Choose directory" : "Choose file"
       });
+      if (result.canceled) {
+        return;
+      }
+      _setConfigValue(result.filePath);
     },
     [_setConfigValue]
   );

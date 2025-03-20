@@ -23,8 +23,8 @@ function AboutModal() {
     setShow(false);
   }, []);
 
-  const end = useCallback(() => {
-    window.mainAPI.emitMainEvent("endAbout");
+  const end = useCallback(async () => {
+    await window.mainAPI.emitMainEvent("aboutModalClose");
   }, []);
 
   if (!info) {
@@ -43,9 +43,9 @@ function AboutModal() {
           <div className="mt-3">
             <a
               href="#"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
-                window.mainAPI.emitMainEvent("openExternalBrowser", appURL);
+                await window.mainAPI.invoke("openExternalBrowser", appURL);
               }}
             >
               {appURL}

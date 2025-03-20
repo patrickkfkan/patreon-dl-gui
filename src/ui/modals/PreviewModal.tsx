@@ -36,8 +36,8 @@ function PreviewModal() {
     setShow(false);
   }, []);
 
-  const end = useCallback(() => {
-    window.mainAPI.emitMainEvent("endPreview");
+  const end = useCallback(async () => {
+    await window.mainAPI.emitMainEvent("previewModalClose");
   }, []);
 
   if (!fileConfig) {

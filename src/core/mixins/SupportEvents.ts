@@ -12,44 +12,56 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
       return [
         ...callbacks,
 
-        this.on("requestHelp", (section, prop) => {
-          try {
-            const contents = getHelpContents(section, prop);
-            this.win.showModalView();
-            this.emitRendererEvent(this.win.modalView, "requestHelpResult", {
-              contents
-            });
-            return;
-          } catch (error: unknown) {
-            dialog.showErrorBox(
-              "Error",
-              error instanceof Error ? error.message : String(error)
-            );
-            this.emitRendererEvent(this.win.editorView, "helpEnd");
-          }
-        }),
+        this.handle("requestHelp", (section, prop) => {
+          return new Promise<void>((resolve) => {
+            try {
+              const contents = getHelpContents(section, prop);
 
-        this.on("endHelp", () => {
-          this.win.hideModalView();
-          this.emitRendererEvent(this.win.editorView, "helpEnd");
-        }),
+              this.on(
+                "helpModalClose",
+                () => {
+                  this.win.hideModalView();
+                  resolve();
+                },
+                { once: true }
+              );
 
-        this.on("requestAboutInfo", () => {
-          this.win.showModalView();
-          this.emitRendererEvent(this.win.modalView, "aboutInfo", {
-            appName: app.getName(),
-            appVersion: app.getVersion(),
-            appURL: APP_URL
+              this.win.showModalView();
+              this.emitRendererEvent(this.win.modalView, "requestHelpResult", {
+                contents
+              });
+            } catch (error: unknown) {
+              dialog.showErrorBox(
+                "Error",
+                error instanceof Error ? error.message : String(error)
+              );
+              this.win.hideModalView();
+              resolve();
+            }
           });
         }),
 
-        this.on("endAbout", () => {
-          this.win.hideModalView();
-          this.emitRendererEvent(this.win.editorView, "aboutEnd");
+        this.handle("requestAboutInfo", () => {
+          return new Promise<void>((resolve) => {
+            this.on(
+              "aboutModalClose",
+              () => {
+                this.win.hideModalView();
+                resolve();
+              },
+              { once: true }
+            );
+            this.win.showModalView();
+            this.emitRendererEvent(this.win.modalView, "aboutInfo", {
+              appName: app.getName(),
+              appVersion: app.getVersion(),
+              appURL: APP_URL
+            });
+          });
         }),
 
-        this.on("openExternalBrowser", (url) => {
-          shell.openExternal(url);
+        this.handle("openExternalBrowser", (url) => {
+          return shell.openExternal(url);
         })
       ];
     }

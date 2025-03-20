@@ -21,9 +21,9 @@ function HelpModal() {
     };
   }, []);
 
-  const openExternalBrowser = useCallback((url?: string) => {
+  const openExternalBrowser = useCallback(async (url?: string) => {
     if (url) {
-      window.mainAPI.emitMainEvent("openExternalBrowser", url);
+      await window.mainAPI.invoke("openExternalBrowser", url);
     }
   }, []);
 
@@ -39,9 +39,9 @@ function HelpModal() {
           href="#"
           target="_blank"
           rel="noreferrer"
-          onClick={(e) => {
+          onClick={async (e) => {
             e.preventDefault();
-            openExternalBrowser(props.href);
+            await openExternalBrowser(props.href);
           }}
         >
           {props.children}
@@ -55,8 +55,8 @@ function HelpModal() {
     setShow(false);
   }, []);
 
-  const end = useCallback(() => {
-    window.mainAPI.emitMainEvent("endHelp");
+  const end = useCallback(async () => {
+    await window.mainAPI.emitMainEvent("helpModalClose");
   }, []);
 
   if (!contents) {

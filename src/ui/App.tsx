@@ -43,7 +43,7 @@ function App() {
       };
     };
     if (webBrowserViewRef.current && editorPanelRef.current) {
-      window.mainAPI.emitMainEvent("viewBounds", {
+      window.mainAPI.emitMainEvent("viewBoundsChange", {
         editorView: __getBounds(editorPanelRef.current),
         webBrowserView: __getBounds(webBrowserViewRef.current)
       });

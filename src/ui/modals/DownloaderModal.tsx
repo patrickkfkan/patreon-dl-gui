@@ -146,13 +146,13 @@ function DownloaderModal() {
     setShow(false);
   }, []);
 
-  const end = useCallback(() => {
-    window.mainAPI.emitMainEvent("endDownloadProcess");
+  const end = useCallback(async () => {
+    await window.mainAPI.emitMainEvent("downloaderModalClose");
   }, []);
 
   const confirmStartDownload = useCallback(
     (confirmed: boolean) => {
-      window.mainAPI.emitMainEvent("promptStartDownloadResult", {
+      window.mainAPI.emitMainEvent("confirmStartDownload", {
         confirmed
       });
       if (!confirmed) {
@@ -230,8 +230,8 @@ function DownloaderModal() {
     confirmStartDownload
   ]);
 
-  const abortDownload = useCallback(() => {
-    window.mainAPI.emitMainEvent("abortDownload");
+  const abortDownload = useCallback(async () => {
+    await window.mainAPI.invoke("abortDownload");
   }, []);
 
   const title = useMemo(() => {

@@ -38,7 +38,7 @@ function ConfirmSaveModal() {
   }, []);
 
   const end = useCallback(() => {
-    window.mainAPI.emitMainEvent("endPromptOverwriteOnSave");
+    window.mainAPI.emitMainEvent("confirmSaveModalClose");
   }, []);
 
   if (!fileConfig) {
