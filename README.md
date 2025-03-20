@@ -12,7 +12,7 @@ If you are going to download videos, you should also install [FFmpeg](https://ww
 
 ## Quick start guide
 
-- The app has two major components: the editor and an embedded web browser.
+- The UI consists of two major components: the editor and an embedded web browser.
 - In the embedded web browser, go to the Patreon page you want to download content from. For content that is accessible only through subscription (which you need to have), ensure you are logged in. Content that is downloadable includes:
   - Posts by a creator
   - A single post
@@ -37,7 +37,7 @@ If you intend to create a config file in `patreon-dl-gui` for use with `patreon-
 
 | `patreon-dl-gui` version | `patreon-dl` version used |
 |--------------------------|---------------------------|
-| v1.0.0                   | v2.4.1                    |
+| v1.0.0 - v2.0.0          | v2.4.1                    |
 
 ## Running / packaging the app from source
 
@@ -58,7 +58,18 @@ To package the app for your OS:
 $ npm run make
 ```
 
+## Technical notes
+
+This project uses a customized version of the [proxy-chain](https://github.com/apify/proxy-chain) library to set proxy in web browser sessions. The customizations have been submitted to the `proxy-chain` repo in [PR #577](https://github.com/apify/proxy-chain/pull/577).
+
 ## Changelog
+
+v2.0.0
+- Major UI overhaul: web browser is now embedded into the main window
+- Remove the need to download web browser dependency
+- One-click to apply proxy settings to web browser session
+- File logger is disabled by default
+- Some minor bugfixes
 
 v1.0.0
 - Initial release
