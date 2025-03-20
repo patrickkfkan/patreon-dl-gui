@@ -369,6 +369,7 @@ function DownloaderModal() {
   return (
     <>
       <Modal
+        contentClassName="h-100"
         show={show}
         onHide={close}
         onExited={end}
