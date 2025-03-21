@@ -72,7 +72,6 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                   },
                   { once: true }
                 );
-
               } catch (error: unknown) {
                 const errMsg =
                   error instanceof Error ? error.message : String(error);

@@ -38,11 +38,14 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [showHelpIcons, setShowHelpIcons] = useState(false);
   const [, setRefreshToken] = useState(new Date().getMilliseconds());
 
-  const sendModifiedEditorsChangeEvent = useCallback((override?: Editor[]) => {
-    window.mainAPI.emitMainEvent("modifiedEditorsChange", {
-      editors: (override || editors).filter((editor) => editor.modified)
-    });
-  }, [editors]);
+  const sendModifiedEditorsChangeEvent = useCallback(
+    (override?: Editor[]) => {
+      window.mainAPI.emitMainEvent("modifiedEditorsChange", {
+        editors: (override || editors).filter((editor) => editor.modified)
+      });
+    },
+    [editors]
+  );
 
   const closeEditor = useCallback(
     (editor: Editor) => {
@@ -95,7 +98,8 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
 
   const setEditorProp = useCallback<EditorContextValue["setEditorProp"]>(
     (editor, values) => {
-      const modifiedStateChanged = values.modified !== undefined && values.modified !== editor.modified;
+      const modifiedStateChanged =
+        values.modified !== undefined && values.modified !== editor.modified;
       for (const [prop, value] of Object.entries(values)) {
         (editor as unknown as Record<string, typeof value>)[prop] = value;
       }

@@ -278,7 +278,9 @@ export default class MainWindow extends BaseWindow {
 
   async destroy() {
     this.removeAllListeners();
-    await Promise.all((this.#webBrowserViews.map((entry) => entry.view.destroy())));
+    await Promise.all(
+      this.#webBrowserViews.map((entry) => entry.view.destroy())
+    );
     this.editorView.destroy();
     this.modalView.destroy();
     this.close();
