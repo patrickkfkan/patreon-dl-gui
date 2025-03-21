@@ -1,7 +1,7 @@
 import type { FileConfig } from "../../types/FileConfig";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import { ToastContainer, toast } from "react-toastify";
+import { showToast } from "../helpers/Toast";
 
 function PreviewModal() {
   const [fileConfig, setFileConfig] = useState<FileConfig | null>(null);
@@ -25,11 +25,7 @@ function PreviewModal() {
       return;
     }
     navigator.clipboard.writeText(fileConfig.contents);
-    toast("Config copied to clipboard", {
-      type: "success",
-      position: "bottom-center",
-      theme: "dark"
-    });
+    showToast("success", "Config copied to clipboard");
   }, [fileConfig]);
 
   const hide = useCallback(() => {
@@ -90,7 +86,6 @@ function PreviewModal() {
           {contents}
         </Modal.Body>
       </Modal>
-      <ToastContainer />
     </>
   );
 }

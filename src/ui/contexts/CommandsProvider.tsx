@@ -11,8 +11,8 @@ import {
   useEffect,
   useMemo
 } from "react";
-import { toast } from "react-toastify";
 import type { UIConfig, UIConfigSection } from "../../types/UIConfig";
+import { showToast } from "../helpers/Toast";
 
 export type CommandsContextValue = {
   [C in UICommand]: (...params: ExecUICommandParams<C>) => void;
@@ -61,11 +61,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
             `No matching editor for ID ${result.config.editorId} in saveResult`
           );
         }
-        toast("Config saved", {
-          type: "success",
-          position: "bottom-center",
-          theme: "dark"
-        });
+        showToast("success", "Config saved");
       }
     },
     [editors, setEditorProp]

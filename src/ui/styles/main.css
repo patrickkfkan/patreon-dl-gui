@@ -90,8 +90,3 @@
 .help-modal-body ul {
   padding-left: 1.5rem;
 }
-
-/* Position toast relative to parent instead of document */
-.Toastify__toast-container {
-  position: relative !important;
-}

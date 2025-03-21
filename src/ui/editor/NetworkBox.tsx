@@ -5,8 +5,8 @@ import { Collapse, Container, Tab, Tabs } from "react-bootstrap";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import _ from "lodash";
 import CheckboxRow from "./components/CheckboxRow";
-import { toast } from "react-toastify";
 import { useEditor } from "../contexts/EditorContextProvider";
+import { showToast } from "../helpers/Toast";
 
 interface NetworkBoxState {
   request: UIConfig["request"];
@@ -42,17 +42,9 @@ function NetworkBox() {
               config.request["proxy.reject.unauthorized.tls"]
           });
           setShowProxyNotice(false);
-          toast("Proxy settings applied", {
-            type: "success",
-            position: "bottom-center",
-            theme: "dark"
-          });
+          showToast("success", "Proxy settings applied");
         } else {
-          toast(`Failed to apply proxy settings: ${result.error}`, {
-            type: "success",
-            position: "bottom-center",
-            theme: "dark"
-          });
+          showToast("error", `Failed to apply proxy settings: ${result.error}`);
         }
       })
     ];

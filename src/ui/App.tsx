@@ -132,7 +132,6 @@ function App() {
                 </ConfigProvider>
               </div>
             </CustomScrollbars>
-            <ToastContainer style={{ overflow: "hidden" }} />
           </div>
           <div
             ref={dividerRef}
@@ -151,6 +150,12 @@ function App() {
             <WebBrowserToolbar />
             <div ref={webBrowserViewRef} className="flex-grow-1"></div>
           </div>
+          <ToastContainer
+            style={{
+              overflow: "hidden",
+              left: `calc(${editorPanelWidth}px / 2)`
+            }}
+          />
         </div>
       </CommandsProvider>
     </EditorContextProvider>

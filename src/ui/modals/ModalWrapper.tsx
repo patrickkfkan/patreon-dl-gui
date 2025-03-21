@@ -1,3 +1,4 @@
+import { ToastContainer } from "react-toastify";
 import AboutModal from "./AboutModal";
 import ConfirmSaveModal from "./ConfirmSaveModal";
 import DownloaderModal from "./DownloaderModal";
@@ -12,6 +13,7 @@ function ModalWrapper() {
       <DownloaderModal />
       <HelpModal />
       <PreviewModal />
+      <ToastContainer />
     </>
   );
 }
