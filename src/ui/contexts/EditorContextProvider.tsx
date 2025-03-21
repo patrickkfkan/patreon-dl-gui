@@ -38,6 +38,12 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [showHelpIcons, setShowHelpIcons] = useState(false);
   const [, setRefreshToken] = useState(new Date().getMilliseconds());
 
+  const sendModifiedEditorsChangeEvent = useCallback((override?: Editor[]) => {
+    window.mainAPI.emitMainEvent("modifiedEditorsChange", {
+      editors: (override || editors).filter((editor) => editor.modified)
+    });
+  }, [editors]);
+
   const closeEditor = useCallback(
     (editor: Editor) => {
       const editorIndex =
@@ -49,8 +55,12 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
         editorsAfterRemove[editorIndex - 1] || editorsAfterRemove[0] || null;
       setEditors(editorsAfterRemove);
       setActiveEditor(nextActiveEditor);
+      if (editor.modified) {
+        // `editors` not yet updated - need to override that
+        sendModifiedEditorsChangeEvent(editorsAfterRemove);
+      }
     },
-    [editors]
+    [editors, sendModifiedEditorsChangeEvent]
   );
 
   const addEditor = useCallback(
@@ -85,22 +95,23 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
 
   const setEditorProp = useCallback<EditorContextValue["setEditorProp"]>(
     (editor, values) => {
+      const modifiedStateChanged = values.modified !== undefined && values.modified !== editor.modified;
       for (const [prop, value] of Object.entries(values)) {
         (editor as unknown as Record<string, typeof value>)[prop] = value;
       }
+      if (modifiedStateChanged) {
+        sendModifiedEditorsChangeEvent();
+      }
       triggerRefresh();
     },
-    []
+    [sendModifiedEditorsChangeEvent]
   );
 
   const markEditorModified = useCallback(
     (editor: Editor) => {
       setEditorProp(editor, { modified: true });
-      window.mainAPI.emitMainEvent("modifiedEditorsChange", {
-        editors: editors.filter((editor) => editor.modified)
-      });
     },
-    [setEditorProp, editors]
+    [setEditorProp]
   );
 
   if (!activeEditor) {
