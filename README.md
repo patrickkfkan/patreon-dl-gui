@@ -26,14 +26,18 @@ If you are going to download videos, you should also install [FFmpeg](https://ww
 
 `patreon-dl-gui` is a standalone app that utilizes the `patreon-dl` library to download Patreon content. On the other hand, `patreon-dl` comes with a CLI tool that has the option to read downloader options from a config file.
 
-Generally speaking, config files saved in `patreon-dl-gui` can be passed to the `patreon-dl` CLI tool without issue. However, you should note that the config schema accepted by `patreon-dl` CLI is broader than that for `patreon-dl-gui`. This means, if you have a config file manually created for use by `patreon-dl` CLI, opening it in `patreon-dl-gui` will not necessarily import all the options therein. In particular:
+Generally speaking, config files saved in `patreon-dl-gui` can be passed to the `patreon-dl` CLI tool without issue, subject to the following exception:
+
+- The "Connect to YouTube account" option found in `patreon-dl-gui` has no equivalent in `patreon-dl` CLI config. You would have to connect to your YouTube account separately through executing `patreon-dl --configure-youtube`.
+
+What about the other way round? You should note that the config schema accepted by `patreon-dl` CLI is broader than that for `patreon-dl-gui`. This means, if you have a config file manually created for use by `patreon-dl` CLI, opening it in `patreon-dl-gui` will not necessarily import all the options therein. In particular:
 
 - Multiple targets are not supported.
 - For file logger configuration, sections other than `[logger.file.1]` are ignored. `patreon-dl-gui` only supports a single file logger configuration.
 
 When you open a config file, the app will notify you of any omitted or unsupported options.
 
-If you intend to create a config file in `patreon-dl-gui` for use with `patreon-dl` CLI, you should ensure that the version of `patreon-dl` used by the app matches that of the CLI:
+If you intend to create a config file in `patreon-dl-gui` for use with `patreon-dl` CLI, you should also ensure that the version of `patreon-dl` used by the app matches that of the CLI:
 
 | `patreon-dl-gui` version | `patreon-dl` version used |
 |--------------------------|---------------------------|
@@ -68,8 +72,9 @@ v2.0.0
 - Major UI overhaul: web browser is now embedded into the main window
 - Remove the need to download web browser dependency
 - One-click to apply proxy settings to web browser session
+- Add option to connect to YouTube acount for embedded YouTube videos
 - File logger is disabled by default
-- Some minor bugfixes
+- Bugfixes
 
 v1.0.0
 - Initial release
