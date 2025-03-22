@@ -6,7 +6,7 @@ An Electron app that provides a GUI for [patreon-dl](https://github.com/patrickk
 
 ## Installation
 
-Download and install the package suitable for your system. Linux (RPM and DEB) and Windows x64 versions are provided. If you are on a different system, you may [run or package the app from source](#running--packaging-the-app-from-source).
+[Download](https://github.com/patrickkfkan/patreon-dl-gui/releases) and install the package suitable for your system. Linux (RPM and DEB) and Windows x64 versions are provided. If you are on a different system, you may [run or package the app from source](#running--packaging-the-app-from-source).
 
 If you are going to download videos, you should also install [FFmpeg](https://www.ffmpeg.org/). This is required for most videos found on Patreon.
 
