@@ -35,9 +35,13 @@ export function AppMenuSupportMixin<TBase extends MainProcessConstructor>(
             click: () => {
               RecentDocuments.clear();
               this.setAppMenu();
-              this.emitRendererEvent(this.win, "recentDocumentsInfo", {
-                entries: RecentDocuments.list()
-              });
+              this.emitRendererEvent(
+                this.win.editorView,
+                "recentDocumentsInfo",
+                {
+                  entries: RecentDocuments.list()
+                }
+              );
             }
           }
         );
@@ -99,6 +103,10 @@ export function AppMenuSupportMixin<TBase extends MainProcessConstructor>(
                 accelerator: "F5",
                 enabled: options?.enabled?.startDownload ?? true,
                 click: () => this.execUICommand("startDownload")
+              },
+              {
+                label: "YouTube Configurator",
+                click: () => this.execUICommand("configureYouTube")
               }
             ]
           },

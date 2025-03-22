@@ -1,6 +1,5 @@
 import { dialog } from "electron";
 import type { MainProcessConstructor } from "../MainProcess";
-import { createEditor } from "../util/Editor";
 
 export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -11,11 +10,17 @@ export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
       return [
         ...callbacks,
 
-        this.on("newEditor", () => {
-          this.emitRendererEvent(this.win, "editorCreated", createEditor());
+        this.handle("newEditor", async () => {
+          await this.createEditor(null, (editor) => {
+            this.emitRendererEvent(
+              this.win.editorView,
+              "editorCreated",
+              editor
+            );
+          });
         }),
 
-        this.on("closeEditor", async (editor) => {
+        this.handle("closeEditor", async (editor) => {
           if (editor.modified) {
             const dialogOpts = {
               title: "Confirm",
@@ -26,19 +31,19 @@ export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
             };
             const result = await dialog.showMessageBox(this.win, dialogOpts);
             if (result.response === dialogOpts.cancelId) {
-              this.emitRendererEvent(this.win, "closeEditorResult", {
+              return {
                 canceled: true
-              });
-              return;
+              };
             }
           }
-          this.emitRendererEvent(this.win, "closeEditorResult", {
+          await this.win.removeWebBrowserViewForEditor(editor);
+          return {
             canceled: false,
             editor
-          });
+          };
         }),
 
-        this.on("activeEditorInfo", (info) => {
+        this.on("activeEditorChange", (info) => {
           const shouldRefreshMenu =
             (this.activeEditor === null || info.editor === null) &&
             this.activeEditor !== info.editor;
@@ -53,10 +58,17 @@ export function EditorEventSupportMixin<TBase extends MainProcessConstructor>(
               }
             });
           }
+          if (info.editor) {
+            this.win.setActiveWebBrowserViewByEditor(info.editor);
+          }
         }),
 
-        this.on("modifiedEditorsInfo", (info) => {
+        this.on("modifiedEditorsChange", (info) => {
           this.modifiedEditors = info.editors;
+        }),
+
+        this.handle("applyProxy", (editor) => {
+          return this.win.applyProxy(editor);
         })
       ];
     }

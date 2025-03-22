@@ -37,6 +37,10 @@ function ConfirmSaveModal() {
     setShow(false);
   }, []);
 
+  const end = useCallback(() => {
+    window.mainAPI.emitMainEvent("confirmSaveModalClose");
+  }, []);
+
   if (!fileConfig) {
     return null;
   }
@@ -47,6 +51,8 @@ function ConfirmSaveModal() {
     <>
       <Modal
         show={show}
+        onHide={cancel}
+        onExited={end}
         onEscapeKeyDown={cancel}
         backdrop="static"
         scrollable={true}

@@ -2,11 +2,11 @@
 
 ---
 
-Download targets are captured through the provided web browser.
+Download targets are captured through the embedded web browser.
 
 ##### Usage
 
-In the provided web browser, visit a Patreon page showing the contents you want to download. Supported contents include:
+In the embedded web browser, visit a Patreon page showing the contents you want to download. Supported contents include:
 
 - Posts by a creator
 - A single post

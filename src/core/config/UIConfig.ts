@@ -2,11 +2,11 @@ import type { UIConfig } from "../../types/UIConfig";
 import type { DateTime } from "patreon-dl";
 import {
   ConsoleLogger,
-  FileLogger,
   getDefaultDownloaderOptions,
   type DeepRequired,
   type DownloaderOptions
 } from "patreon-dl";
+import { getDefaultFileLoggerOptions } from "../util/Config";
 
 export function getStartupUIConfig(): UIConfig {
   return convertPatreonDLOptionsToUIConfig(getDefaultDownloaderOptions());
@@ -22,7 +22,7 @@ function convertPatreonDLOptionsToUIConfig(
     return date.valueOf().toISOString().slice(0, 16);
   };
   const consoleLoggerOptions = ConsoleLogger.getDefaultConfig();
-  const fileLoggerOptions = FileLogger.getDefaultConfig();
+  const fileLoggerOptions = getDefaultFileLoggerOptions();
   const postsPublishedAfter = __convertPublishDate(
     p.include.postsPublished.after
   );
@@ -62,23 +62,23 @@ function convertPatreonDLOptionsToUIConfig(
       "content.info": p.include.contentInfo,
       "content.media": {
         type:
-          typeof p.include.contentMedia === "boolean"
-            ? p.include.contentMedia
-            : "custom",
+          typeof p.include.contentMedia === "boolean" ?
+            p.include.contentMedia
+          : "custom",
         custom:
-          typeof p.include.contentMedia === "boolean"
-            ? []
-            : p.include.contentMedia
+          typeof p.include.contentMedia === "boolean" ?
+            []
+          : p.include.contentMedia
       },
       "preview.media": {
         type:
-          typeof p.include.previewMedia === "boolean"
-            ? p.include.previewMedia
-            : "custom",
+          typeof p.include.previewMedia === "boolean" ?
+            p.include.previewMedia
+          : "custom",
         custom:
-          typeof p.include.previewMedia === "boolean"
-            ? []
-            : p.include.previewMedia
+          typeof p.include.previewMedia === "boolean" ?
+            []
+          : p.include.previewMedia
       },
       "all.media.variants": p.include.allMediaVariants,
       "images.by.filename": p.include.mediaByFilename.images || "",
@@ -90,23 +90,20 @@ function convertPatreonDLOptionsToUIConfig(
       },
       "posts.with.media.type": {
         type:
-          typeof p.include.postsWithMediaType === "string"
-            ? p.include.postsWithMediaType
-            : "custom",
+          typeof p.include.postsWithMediaType === "string" ?
+            p.include.postsWithMediaType
+          : "custom",
         custom:
-          typeof p.include.postsWithMediaType === "string"
-            ? []
-            : p.include.postsWithMediaType
+          typeof p.include.postsWithMediaType === "string" ?
+            []
+          : p.include.postsWithMediaType
       },
       "posts.published": {
         type:
-          postsPublishedAfter && postsPublishedBefore
-            ? "between"
-            : postsPublishedAfter
-              ? "after"
-              : postsPublishedBefore
-                ? "before"
-                : "anytime",
+          postsPublishedAfter && postsPublishedBefore ? "between"
+          : postsPublishedAfter ? "after"
+          : postsPublishedBefore ? "before"
+          : "anytime",
         after: postsPublishedAfter,
         before: postsPublishedBefore
       },
@@ -150,11 +147,18 @@ function convertPatreonDLOptionsToUIConfig(
       "date.time.format": fileLoggerOptions.dateTimeFormat,
       color: fileLoggerOptions.color
     },
+    "patreon.dl.gui": {
+      "connect.youtube": false
+    },
     "support.data": {
       browserObtainedValues: {
         target: null,
         cookie: null,
         tiers: null
+      },
+      appliedProxySettings: {
+        url: p.request.proxy?.url ?? "",
+        rejectUnauthorizedTLS: p.request.proxy?.rejectUnauthorizedTLS ?? true
       }
     }
   };

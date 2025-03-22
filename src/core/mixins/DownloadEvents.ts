@@ -16,114 +16,80 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
       return [
         ...callbacks,
 
-        this.on("startDownload", async (editor: Editor) => {
-          try {
-            const {
-              targetURL,
-              downloaderOptions,
-              consoleLogger,
-              fileLogger,
-              prompt
-            } = convertUIConfigToPatreonDLOptions(editor.config);
-            this.downloader = {
-              instance: await PatreonDownloader.getInstance(
-                targetURL,
-                downloaderOptions
-              ),
-              consoleLogger,
-              abortController: new AbortController(),
-              status: "init"
-            };
-            const dlConfig = this.downloader.instance.getConfig();
-            const displayConfig = _.cloneDeep(dlConfig) as DeepWriteable<
-              typeof dlConfig
-            > &
-              Record<string, unknown>;
-            delete displayConfig.type;
-            delete displayConfig.postFetch;
-            delete displayConfig.productId;
-            if (dlConfig.include?.postsPublished?.after) {
-              displayConfig.include.postsPublished.after =
-                dlConfig.include.postsPublished.after.toString();
-            }
-            if (dlConfig.include?.postsPublished?.before) {
-              displayConfig.include.postsPublished.before =
-                dlConfig.include.postsPublished.before.toString();
-            }
+        this.handle("startDownload", (editor: Editor) => {
+          return new Promise<void>((resolve) => {
+            (async () => {
+              this.on(
+                "downloaderModalClose",
+                () => {
+                  this.win.hideModalView();
+                  resolve();
+                },
+                { once: true }
+              );
+              this.win.showModalView();
+              try {
+                const {
+                  targetURL,
+                  downloaderOptions,
+                  consoleLogger,
+                  fileLogger,
+                  prompt
+                } = convertUIConfigToPatreonDLOptions(editor.config);
+                this.downloader = {
+                  instance: await PatreonDownloader.getInstance(
+                    targetURL,
+                    downloaderOptions
+                  ),
+                  consoleLogger,
+                  abortController: new AbortController(),
+                  status: "init"
+                };
+                const dlConfig = this.downloader.instance.getConfig();
 
-            this.emitRendererEvent(this.win, "downloaderInit", {
-              hasError: false,
-              downloaderConfig: ObjectHelper.clean(displayConfig, {
-                deep: true,
-                cleanNulls: true,
-                cleanEmptyObjects: true
-              }),
-              fileLoggerConfig: fileLogger.getConfig(),
-              prompt
-            });
-          } catch (error: unknown) {
-            const errMsg =
-              error instanceof Error ? error.message : String(error);
-            this.downloader = null;
-            this.emitRendererEvent(this.win, "downloaderInit", {
-              hasError: true,
-              error: `Error: ${errMsg}`
-            });
-          }
-        }),
-
-        this.on("promptStartDownloadResult", async (result) => {
-          if (!this.#checkDownloaderExists(this.downloader)) {
-            return;
-          }
-          if (result.confirmed) {
-            try {
-              this.downloader.consoleLogger.on("message", (message) => {
-                this.emitRendererEvent(
-                  this.win,
-                  "downloaderLogMessage",
-                  message
-                );
-              });
-              this.downloader.status = "running";
-              this.emitRendererEvent(this.win, "downloaderStart");
-              await this.downloader.instance.start({
-                signal: this.downloader.abortController.signal
-              });
-              this.downloader.status = "end";
-              if (this.downloader.abortController.signal.aborted) {
-                this.emitRendererEvent(this.win, "downloaderEnd", {
+                this.emitRendererEvent(this.win.modalView, "downloaderInit", {
                   hasError: false,
-                  aborted: true
+                  downloaderConfig: ObjectHelper.clean(
+                    this.#getDisplayConfig(dlConfig),
+                    {
+                      deep: true,
+                      cleanNulls: true,
+                      cleanEmptyObjects: true
+                    }
+                  ),
+                  fileLoggerConfig: fileLogger.getConfig(),
+                  prompt
                 });
-                return;
+
+                this.on(
+                  "confirmStartDownload",
+                  async (result) => {
+                    if (result.confirmed) {
+                      await this.#startDownloader();
+                    } else {
+                      this.downloader = null;
+                    }
+                  },
+                  { once: true }
+                );
+              } catch (error: unknown) {
+                const errMsg =
+                  error instanceof Error ? error.message : String(error);
+                this.downloader = null;
+                this.emitRendererEvent(this.win.modalView, "downloaderInit", {
+                  hasError: true,
+                  error: `Error: ${errMsg}`
+                });
               }
-              this.emitRendererEvent(this.win, "downloaderEnd", {
-                hasError: false,
-                aborted: false
-              });
-            } catch (error: unknown) {
-              this.downloader.status = "end";
-              this.emitRendererEvent(this.win, "downloaderEnd", {
-                hasError: true,
-                error: error instanceof Error ? error.message : String(error)
-              });
-            } finally {
-              this.downloader.consoleLogger.removeAllListeners();
-              this.downloader = null;
-            }
-          }
+            })();
+          });
         }),
 
-        this.on("abortDownload", () => {
+        this.handle("abortDownload", () => {
           if (!this.#checkDownloaderExists(this.downloader)) {
             return;
           }
           this.downloader.abortController.abort();
-        }),
-
-        this.on("endDownloadProcess", () => {
-          this.emitRendererEvent(this.win, "downloadProcessEnd");
         })
       ];
     }
@@ -136,6 +102,67 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
         return false;
       }
       return true;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    #getDisplayConfig(config: ReturnType<PatreonDownloader<any>["getConfig"]>) {
+      const displayConfig = _.cloneDeep(config) as DeepWriteable<
+        typeof config
+      > &
+        Record<string, unknown>;
+      delete displayConfig.type;
+      delete displayConfig.postFetch;
+      delete displayConfig.productId;
+      if (config.include?.postsPublished?.after) {
+        displayConfig.include.postsPublished.after =
+          config.include.postsPublished.after.toString();
+      }
+      if (config.include?.postsPublished?.before) {
+        displayConfig.include.postsPublished.before =
+          config.include.postsPublished.before.toString();
+      }
+      return displayConfig;
+    }
+
+    async #startDownloader() {
+      if (!this.#checkDownloaderExists(this.downloader)) {
+        return;
+      }
+      try {
+        this.downloader.consoleLogger.on("message", (message) => {
+          this.emitRendererEvent(
+            this.win.modalView,
+            "downloaderLogMessage",
+            message
+          );
+        });
+        this.downloader.status = "running";
+        this.emitRendererEvent(this.win.modalView, "downloaderStart");
+        await this.downloader.instance.start({
+          signal: this.downloader.abortController.signal
+        });
+        this.downloader.status = "end";
+        if (this.downloader.abortController.signal.aborted) {
+          this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
+            hasError: false,
+            aborted: true
+          });
+          return;
+        }
+        this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
+          hasError: false,
+          aborted: false
+        });
+      } catch (error: unknown) {
+        this.downloader.status = "end";
+        this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
+          hasError: true,
+          error: error instanceof Error ? error.message : String(error)
+        });
+      } finally {
+        this.downloader.consoleLogger.removeAllListeners();
+        this.downloader = null;
+      }
     }
   };
 }

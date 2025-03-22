@@ -1,11 +1,12 @@
 import { contextBridge } from "electron";
-import RendererAPI from "../RendererAPI";
+import RendererAPI from "./RendererAPI";
 
 const mainAPI = new RendererAPI<"main">();
 
 contextBridge.exposeInMainWorld("mainAPI", {
   on: mainAPI.on,
-  emitMainEvent: mainAPI.emitMainEvent
+  emitMainEvent: mainAPI.emitMainEvent,
+  invoke: mainAPI.invoke
 });
 
 declare global {

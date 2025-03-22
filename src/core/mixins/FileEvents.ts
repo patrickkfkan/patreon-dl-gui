@@ -3,7 +3,6 @@ import { loadUIConfigFromFile } from "../config/FileLoader";
 import type { MainProcessConstructor } from "../MainProcess";
 import path from "path";
 import { EOL } from "os";
-import { createEditor } from "../util/Editor";
 import type { Editor } from "../../types/App";
 import {
   convertUIConfigToFileContentsString,
@@ -12,6 +11,7 @@ import {
 import type { FileConfig } from "../../types/FileConfig";
 import type { SaveFileConfigResult } from "../../types/MainEvents";
 import RecentDocuments from "../util/RecentDocuments";
+import type { OpenFileResult } from "../../types/MainInvocableMethods";
 
 export function FileEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -22,21 +22,21 @@ export function FileEventSupportMixin<TBase extends MainProcessConstructor>(
       return [
         ...callbacks,
 
-        this.on("openFSChooser", async (options) => {
+        this.handle("openFSChooser", async (options) => {
           const result = await dialog.showOpenDialog(this.win, options);
           if (result.canceled) {
-            this.emitRendererEvent(this.win, "fsChooserResult", {
+            return {
               canceled: true
-            });
+            };
           } else {
-            this.emitRendererEvent(this.win, "fsChooserResult", {
+            return {
               canceled: false,
               filePath: result.filePaths[0]
-            });
+            };
           }
         }),
 
-        this.on("openFile", async (currentEditors, _filePath?: string) => {
+        this.handle("openFile", async (currentEditors, _filePath?: string) => {
           let filePath;
           if (_filePath) {
             filePath = _filePath;
@@ -46,10 +46,9 @@ export function FileEventSupportMixin<TBase extends MainProcessConstructor>(
               title: "Open file"
             });
             if (result.canceled) {
-              this.emitRendererEvent(this.win, "openFileResult", {
+              return {
                 canceled: true
-              });
-              return;
+              };
             }
             filePath = result.filePaths[0];
           }
@@ -57,94 +56,114 @@ export function FileEventSupportMixin<TBase extends MainProcessConstructor>(
             (editor) => editor.filePath === filePath
           );
           if (currentEditorWithSameFilePath) {
-            this.emitRendererEvent(this.win, "openFileResult", {
+            return {
               editor: currentEditorWithSameFilePath,
               isNewEditor: false
-            });
-            return;
+            };
           }
           const { config, alerts } = loadUIConfigFromFile(filePath);
           if (config) {
-            const editor = createEditor({
-              config,
-              name: path.parse(filePath).base,
-              filePath,
-              loadAlerts: alerts.length > 0 ? alerts : undefined
+            return new Promise<OpenFileResult>((resolve) => {
+              this.createEditor(
+                {
+                  config,
+                  name: path.parse(filePath).base,
+                  filePath,
+                  loadAlerts: alerts.length > 0 ? alerts : undefined
+                },
+                (editor) => {
+                  resolve({
+                    editor,
+                    isNewEditor: true
+                  });
+                }
+              ).then(() => {
+                this.#addRecentDocument(filePath);
+              });
             });
-            if (config.downloader.target.manualValue.trim()) {
-              this.browser.goto(config.downloader.target.manualValue, true);
-            }
-            this.#addRecentDocument(filePath);
-            this.emitRendererEvent(this.win, "openFileResult", {
-              editor,
-              isNewEditor: true
-            });
-            return;
           }
           dialog.showErrorBox("Error", alerts.map((m) => m.text).join(EOL));
-          this.emitRendererEvent(this.win, "openFileResult", {
+          return {
             hasError: true
+          };
+        }),
+
+        this.handle("save", async (editor: Editor) => {
+          return new Promise<SaveFileConfigResult>((resolve) => {
+            if (editor.filePath) {
+              const fileConfig = {
+                editorId: editor.id,
+                name: editor.name,
+                filePath: editor.filePath,
+                contents: convertUIConfigToFileContentsString(editor.config)
+              };
+              if (editor.promptOnSave) {
+                this.on(
+                  "confirmSave",
+                  (result) => {
+                    if (result.confirmed) {
+                      resolve(this.#doSave(result.config));
+                    } else {
+                      resolve({
+                        canceled: true
+                      });
+                    }
+                  },
+                  { once: true }
+                );
+
+                this.on(
+                  "confirmSaveModalClose",
+                  () => {
+                    this.win.hideModalView();
+                  },
+                  { once: true }
+                );
+
+                this.win.showModalView();
+                this.emitRendererEvent(
+                  this.win.modalView,
+                  "promptOverwriteOnSave",
+                  fileConfig
+                );
+              } else {
+                resolve(this.#doSave(fileConfig));
+              }
+            } else {
+              this.#doSaveAs(editor).then(resolve);
+            }
           });
         }),
 
-        this.on("save", async (editor: Editor) => {
-          if (editor.filePath) {
-            const fileConfig = {
+        this.handle("saveAs", async (editor: Editor) => {
+          return await this.#doSaveAs(editor);
+        }),
+
+        this.handle("preview", (editor) => {
+          return new Promise<void>((resolve) => {
+            const fileConfig: FileConfig = {
               editorId: editor.id,
               name: editor.name,
               filePath: editor.filePath,
               contents: convertUIConfigToFileContentsString(editor.config)
             };
-            if (editor.promptOnSave) {
-              this.emitRendererEvent(
-                this.win,
-                "promptOverwriteOnSave",
-                fileConfig
-              );
-            } else {
-              this.emitRendererEvent(
-                this.win,
-                "saveResult",
-                this.#doSave(fileConfig)
-              );
-            }
-          } else {
-            const result = await this.#doSaveAs(editor);
-            this.emitRendererEvent(this.win, "saveResult", result);
-          }
-        }),
 
-        this.on("confirmSave", (result) => {
-          if (result.confirmed) {
-            this.emitRendererEvent(
-              this.win,
-              "saveResult",
-              this.#doSave(result.config)
+            this.on(
+              "previewModalClose",
+              () => {
+                this.win.hideModalView();
+                resolve();
+              },
+              { once: true }
             );
-          } else {
-            this.emitRendererEvent(this.win, "saveResult", {
-              canceled: true
-            });
-          }
-        }),
 
-        this.on("saveAs", async (editor: Editor) => {
-          const result = await this.#doSaveAs(editor);
-          this.emitRendererEvent(this.win, "saveResult", result);
-        }),
-
-        this.on("preview", async (editor) => {
-          const fileConfig: FileConfig = {
-            editorId: editor.id,
-            name: editor.name,
-            filePath: editor.filePath,
-            contents: convertUIConfigToFileContentsString(editor.config)
-          };
-          this.emitRendererEvent(this.win, "previewInfo", fileConfig);
-        }),
-
-        this.on("endPreview", () => {
-          this.emitRendererEvent(this.win, "previewEnd");
+            this.win.showModalView();
+            this.emitRendererEvent(
+              this.win.modalView,
+              "previewInfo",
+              fileConfig
+            );
+          });
         })
       ];
     }
@@ -183,7 +202,7 @@ export function FileEventSupportMixin<TBase extends MainProcessConstructor>(
         filePath
       });
       this.setAppMenu();
-      this.emitRendererEvent(this.win, "recentDocumentsInfo", {
+      this.emitRendererEvent(this.win.editorView, "recentDocumentsInfo", {
         entries: RecentDocuments.list()
       });
     }

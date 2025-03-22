@@ -7,6 +7,8 @@ import type {
   FileLoggerOptions
 } from "patreon-dl";
 import { ChainLogger, ConsoleLogger, DateTime, FileLogger } from "patreon-dl";
+import { getDefaultFileLoggerOptions } from "./util/Config";
+import YouTubeConfigurator, { YT_CREDS_PATH } from "./util/YouTubeConfigurator";
 
 export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   const targetURL = uiConfig.downloader.target.browserValue?.value;
@@ -19,6 +21,14 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   const downloaderOptions: DownloaderOptions = {
     cookie: fileConfig.downloader["cookie"],
     pathToFFmpeg: fileConfig.downloader["path.to.ffmpeg"],
+    pathToYouTubeCredentials:
+      (
+        uiConfig['embed.downloader.youtube'].type === 'default' &&
+        uiConfig["patreon.dl.gui"]["connect.youtube"] &&
+        YouTubeConfigurator.getConnectionStatus().isConnected
+      ) ?
+        YT_CREDS_PATH
+      : undefined,
     useStatusCache: uiConfig.downloader["use.status.cache"],
     stopOn: uiConfig.downloader["stop.on"],
     dryRun: uiConfig.downloader["dry.run"],
@@ -61,8 +71,9 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
       maxRetries: uiConfig.request["max.retries"],
       maxConcurrent: uiConfig.request["max.concurrent"],
       minTime: uiConfig.request["min.time"],
-      proxy: uiConfig.request["proxy.url"].trim()
-        ? {
+      proxy:
+        uiConfig.request["proxy.url"].trim() ?
+          {
             url: uiConfig.request["proxy.url"].trim(),
             rejectUnauthorizedTLS:
               uiConfig.request["proxy.reject.unauthorized.tls"]
@@ -70,6 +81,23 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
         : null
     }
   };
+
+  const embedDownloaders: DownloaderOptions['embedDownloaders'] = [];
+  if (uiConfig["embed.downloader.youtube"].type === 'custom' && uiConfig["embed.downloader.youtube"].exec.trim()) {
+    embedDownloaders.push({
+      provider: 'youtube',
+      exec: uiConfig['embed.downloader.youtube'].exec.trim()
+    });
+  }
+  if (uiConfig['embed.downloader.vimeo'].exec.trim()) {
+    embedDownloaders.push({
+      provider: 'vimeo',
+      exec: uiConfig['embed.downloader.vimeo'].exec.trim()
+    });
+  }
+  if (embedDownloaders.length > 0) {
+    downloaderOptions.embedDownloaders = embedDownloaders;
+  }
 
   const consoleLoggerOptions: ConsoleLoggerOptions = {
     ...ConsoleLogger.getDefaultConfig(),
@@ -88,7 +116,7 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   const consoleLogger = new DownloaderConsoleLogger(consoleLoggerOptions);
 
   const fileLoggerOptions: FileLoggerOptions = {
-    ...FileLogger.getDefaultConfig(),
+    ...getDefaultFileLoggerOptions(),
     enabled: uiConfig["logger.file.1"].enabled,
     logLevel: uiConfig["logger.file.1"]["log.level"],
     logDir: fileConfig["logger.file.1"]["log.dir"],

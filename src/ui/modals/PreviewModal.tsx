@@ -1,7 +1,7 @@
 import type { FileConfig } from "../../types/FileConfig";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import { ToastContainer, toast } from "react-toastify";
+import { showToast } from "../helpers/Toast";
 
 function PreviewModal() {
   const [fileConfig, setFileConfig] = useState<FileConfig | null>(null);
@@ -25,16 +25,15 @@ function PreviewModal() {
       return;
     }
     navigator.clipboard.writeText(fileConfig.contents);
-    toast("Config copied to clipboard", {
-      type: "success",
-      position: "bottom-center",
-      theme: "dark"
-    });
+    showToast("success", "Config copied to clipboard");
   }, [fileConfig]);
 
-  const endPreview = useCallback(() => {
-    window.mainAPI.emitMainEvent("endPreview");
+  const hide = useCallback(() => {
     setShow(false);
+  }, []);
+
+  const end = useCallback(() => {
+    window.mainAPI.emitMainEvent("previewModalClose");
   }, []);
 
   if (!fileConfig) {
@@ -47,7 +46,8 @@ function PreviewModal() {
     <>
       <Modal
         show={show}
-        onHide={endPreview}
+        onHide={hide}
+        onExited={end}
         scrollable={true}
         size="xl"
         fullscreen="lg-down"
@@ -57,9 +57,9 @@ function PreviewModal() {
           <Modal.Title>
             <div className="d-flex flex-column">
               <span>{name}</span>
-              {filePath ? (
+              {filePath ?
                 <span className="fs-6 text-info">{filePath}</span>
-              ) : null}
+              : null}
             </div>
           </Modal.Title>
           <div className="d-flex flex-grow-1 justify-content-end">
@@ -86,7 +86,6 @@ function PreviewModal() {
           {contents}
         </Modal.Body>
       </Modal>
-      <ToastContainer />
     </>
   );
 }

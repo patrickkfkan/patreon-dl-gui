@@ -11,10 +11,11 @@ The URL follows this scheme: `protocol://[username:[password]]@hostname:port`. F
 
 <div class="d-inline-flex align-items-center border border-3 border-top-0 border-end-0 border-bottom-0 border-info px-2 py-1 mb-4">
   <span class="material-icons text-info me-2 fs-5">info</span>
-  You are advised to use the same proxy settings in the provided browser to ensure consistency of captured values.
+  Web browser sessions are persistent. This means data such as login status is preserved. When you set a proxy URL, the session will be
+  persisted based on the URL's hostname. In other words, if you set a new proxy URL (never been used in patreon-dl-gui), the embedded web browser will start a new session.
 </div>
 
 <div class="d-inline-flex align-items-center border border-3 border-top-0 border-end-0 border-bottom-0 border-warning px-2 py-1 mb-4">
   <span class="material-icons text-warning me-2 fs-5">warning</span>
-  FFmpeg, which is required to download videos in streaming format, supports HTTP proxy only. If the URL points to another type of proxy, video streams will be handled without passing through the proxy.
+  FFmpeg, which is required to download videos in streaming format, supports HTTP proxy only. For other types of proxy, video streams will be handled through direct connection (i.e. without proxy).
 </div>
