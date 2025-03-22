@@ -836,6 +836,14 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         toBoolean
       )
     },
+    "patreon.dl.gui": {
+      "connect.youtube": __fromFileConfigValue(
+        "patreon.dl.gui",
+        "connect.youtube",
+        false,
+        toBoolean
+      )
+    },
     "support.data": {
       browserObtainedValues: {
         target: null,

@@ -151,6 +151,10 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
     await window.mainAPI.invoke("requestAboutInfo");
   }, []);
 
+  const configureYouTube = useCallback(async () => {
+    await window.mainAPI.invoke("configureYouTube");
+  }, []);
+
   const webBrowser = useMemo(
     () => ({
       gotoURL: (url: string) => {
@@ -180,6 +184,7 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
     showHelpIcons,
     requestHelp,
     showAbout,
+    configureYouTube,
     webBrowser
   };
 

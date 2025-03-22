@@ -139,6 +139,9 @@ export function convertUIConfigToFileContents(config: UIConfig) {
       ),
       "date.time.format": config["logger.file.1"]["date.time.format"].trim(),
       color: booleanToString(config["logger.file.1"]["color"])
+    },
+    "patreon.dl.gui": {
+      "connect.youtube": booleanToString(config["patreon.dl.gui"]["connect.youtube"])
     }
   };
 

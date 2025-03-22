@@ -88,5 +88,8 @@ export const FILE_CONFIG_SECTION_PROPS = {
     "include.error.stack",
     "date.time.format",
     "color"
+  ],
+  "patreon.dl.gui": [
+    "connect.youtube"
   ]
 } as const;

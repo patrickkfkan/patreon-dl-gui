@@ -103,6 +103,10 @@ export function AppMenuSupportMixin<TBase extends MainProcessConstructor>(
                 accelerator: "F5",
                 enabled: options?.enabled?.startDownload ?? true,
                 click: () => this.execUICommand("startDownload")
+              },
+              {
+                label: "YouTube Configurator",
+                click: () => this.execUICommand("configureYouTube")
               }
             ]
           },

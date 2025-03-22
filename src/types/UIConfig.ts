@@ -115,6 +115,9 @@ export interface UIConfig {
     "date.time.format": string;
     color: boolean;
   };
+  "patreon.dl.gui": {
+    "connect.youtube": boolean;
+  };
   "support.data": {
     browserObtainedValues: {
       target: BrowserObtainedValue | null;

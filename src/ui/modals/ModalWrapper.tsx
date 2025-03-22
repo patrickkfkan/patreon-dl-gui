@@ -4,6 +4,7 @@ import ConfirmSaveModal from "./ConfirmSaveModal";
 import DownloaderModal from "./DownloaderModal";
 import HelpModal from "./HelpModal";
 import PreviewModal from "./PreviewModal";
+import YouTubeConfiguratorModal from "./YouTubeConfiguratorModal";
 
 function ModalWrapper() {
   return (
@@ -13,6 +14,7 @@ function ModalWrapper() {
       <DownloaderModal />
       <HelpModal />
       <PreviewModal />
+      <YouTubeConfiguratorModal />
       <ToastContainer />
     </>
   );

@@ -21,7 +21,11 @@ export type MainProcessInvocableMethod =
   | "webBrowserBack"
   | "webBrowserForward"
   | "startDownload"
-  | "abortDownload";
+  | "abortDownload"
+  | "configureYouTube"
+  | "startYouTubeConnect"
+  | "cancelYouTubeConnect"
+  | "disconnectYouTube";
 
 export type MainProcessInvocableMethodHandler<
   M extends MainProcessInvocableMethod
@@ -47,6 +51,10 @@ export type MainProcessInvocableMethodHandler<
   : M extends "webBrowserForward" ? () => void
   : M extends "startDownload" ? (editor: Editor) => void
   : M extends "abortDownload" ? () => void
+  : M extends "configureYouTube" ? () => void
+  : M extends "startYouTubeConnect" ? () => void
+  : M extends "cancelYouTubeConnect" ? () => void
+  : M extends "disconnectYouTube" ? () => void
   : never;
 
 export type CloseEditorResult =

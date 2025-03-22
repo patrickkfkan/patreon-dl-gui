@@ -2,15 +2,27 @@ import { app, dialog, shell } from "electron";
 import type { MainProcessConstructor } from "../MainProcess";
 import { getHelpContents } from "../util/Help";
 import { APP_URL } from "../Constants";
+import YouTubeConfigurator from "../util/YouTubeConfigurator";
 
 export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
 ) {
   return class SupportEventSupportedProcess extends Base {
+    #youtubeConfigurator: YouTubeConfigurator;
+
+    constructor(...args: any[]) {
+      super(...args);
+      this.#youtubeConfigurator = new YouTubeConfigurator();
+    }
+
     protected registerMainEventListeners() {
       const callbacks = super.registerMainEventListeners();
       return [
         ...callbacks,
+
+        this.on("uiReady", () => {
+          this.#emitYouTubeConnectionStatusEvent();
+        }),
 
         this.handle("requestHelp", (section, prop) => {
           return new Promise<void>((resolve) => {
@@ -62,8 +74,76 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
 
         this.handle("openExternalBrowser", (url) => {
           return shell.openExternal(url);
+        }),
+
+        this.handle("configureYouTube", () => {
+          return new Promise<void>((resolve) => {
+            this.on(
+              "youtubeConfiguratorModalClose",
+              () => {
+                this.#cleanupYouTubeConfigurator();
+                this.win.hideModalView();
+                resolve();
+              },
+              { once: true }
+            );
+            this.win.showModalView();
+            this.emitRendererEvent(
+              this.win.modalView,
+              "youtubeConfiguratorStart",
+              YouTubeConfigurator.getConnectionStatus()
+            );
+          });
+        }),
+
+        this.handle("startYouTubeConnect", () => {
+          this.#cleanupYouTubeConfigurator();
+          this.#youtubeConfigurator.on("verificationInfo", (info) => {
+            this.emitRendererEvent(
+              this.win.modalView,
+              "youtubeConnectVerificationInfo",
+              info
+            );
+          });
+          this.#youtubeConfigurator.on("end", (result) => {
+            this.emitRendererEvent(
+              this.win.modalView,
+              "youtubeConnectResult",
+              result
+            );
+            this.#emitYouTubeConnectionStatusEvent();
+            this.#cleanupYouTubeConfigurator();
+          });
+          this.#youtubeConfigurator.startConnect();
+        }),
+
+        this.handle("cancelYouTubeConnect", () => {
+          this.#cleanupYouTubeConfigurator();
+        }),
+
+        this.handle("disconnectYouTube", () => {
+          this.#youtubeConfigurator.resetConnectionStatus();
+          this.#emitYouTubeConnectionStatusEvent();
+          this.emitRendererEvent(
+            this.win.modalView,
+            "youtubeConfiguratorStart",
+            YouTubeConfigurator.getConnectionStatus()
+          );
         })
       ];
+    }
+
+    #emitYouTubeConnectionStatusEvent() {
+      this.emitRendererEvent(
+        this.win.editorView,
+        "youtubeConnectionStatus",
+        YouTubeConfigurator.getConnectionStatus()
+      );
+    }
+
+    #cleanupYouTubeConfigurator() {
+      this.#youtubeConfigurator.removeAllListeners();
+      this.#youtubeConfigurator.endConnect();
     }
   };
 }

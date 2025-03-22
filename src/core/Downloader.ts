@@ -8,6 +8,7 @@ import type {
 } from "patreon-dl";
 import { ChainLogger, ConsoleLogger, DateTime, FileLogger } from "patreon-dl";
 import { getDefaultFileLoggerOptions } from "./util/Config";
+import YouTubeConfigurator, { YT_CREDS_PATH } from "./util/YouTubeConfigurator";
 
 export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   const targetURL = uiConfig.downloader.target.browserValue?.value;
@@ -20,6 +21,7 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   const downloaderOptions: DownloaderOptions = {
     cookie: fileConfig.downloader["cookie"],
     pathToFFmpeg: fileConfig.downloader["path.to.ffmpeg"],
+    pathToYouTubeCredentials: uiConfig["patreon.dl.gui"]["connect.youtube"] && YouTubeConfigurator.getConnectionStatus().isConnected ? YT_CREDS_PATH : undefined,
     useStatusCache: uiConfig.downloader["use.status.cache"],
     stopOn: uiConfig.downloader["stop.on"],
     dryRun: uiConfig.downloader["dry.run"],

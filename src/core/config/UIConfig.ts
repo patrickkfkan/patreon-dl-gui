@@ -147,6 +147,9 @@ function convertPatreonDLOptionsToUIConfig(
       "date.time.format": fileLoggerOptions.dateTimeFormat,
       color: fileLoggerOptions.color
     },
+    "patreon.dl.gui": {
+      "connect.youtube": false
+    },
     "support.data": {
       browserObtainedValues: {
         target: null,

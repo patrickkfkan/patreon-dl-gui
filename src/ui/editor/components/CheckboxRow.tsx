@@ -7,11 +7,13 @@ import { useConfig } from "../../contexts/ConfigProvider";
 import { Col, Form, Row } from "react-bootstrap";
 import type { AccessibilityProps, HelpProps } from "./Common";
 import { createHelpIcon } from "./Common";
+import { JSX } from "react";
 
 type CheckboxRowProps<S extends UIConfigSectionWithPropsOf<boolean>> = {
   config: UIConfigSectionPropTuple<S, boolean>;
   label: string;
   onChange?: (value: boolean) => void;
+  appendElements?: JSX.Element[];
 } & HelpProps &
   AccessibilityProps;
 
@@ -19,7 +21,7 @@ function CheckboxRow<S extends UIConfigSectionWithPropsOf<boolean>>(
   props: CheckboxRowProps<S>
 ) {
   const { config, setConfigValue } = useConfig();
-  const { config: pConfig, label, ariaLabel, onChange } = props;
+  const { config: pConfig, label, ariaLabel, onChange, appendElements = [] } = props;
   const [section, prop] = pConfig;
   const value = config[section][prop] as boolean;
 
@@ -37,6 +39,7 @@ function CheckboxRow<S extends UIConfigSectionWithPropsOf<boolean>>(
           }}
           aria-label={ariaLabel || label}
         />
+        { ...appendElements }
         {createHelpIcon({ ...props, className: "ms-3" })}
       </Col>
     </Row>
