@@ -199,13 +199,13 @@ function IncludeBox() {
           >
             {options}
           </Form.Select>
-          {helpTooltip
-            ? createHelpIcon({
-                helpTooltip,
-                helpHasMoreInfo,
-                config: ["include", prop]
-              })
-            : null}
+          {helpTooltip ?
+            createHelpIcon({
+              helpTooltip,
+              helpHasMoreInfo,
+              config: ["include", prop]
+            })
+          : null}
         </div>
       );
 
@@ -384,21 +384,21 @@ function IncludeBox() {
                 { value: "any", label: "Any tier", default: true },
                 { value: "custom", label: "Select" }
               ],
-              customValues: (Array.isArray(tiers)
-                ? tiers.map((tier) => ({
-                    value: tier.id,
-                    label: tier.title
-                  }))
-                : []) as CreateCustomSelectRowArgs<"posts.in.tier">["customValues"],
+              customValues: (Array.isArray(tiers) ?
+                tiers.map((tier) => ({
+                  value: tier.id,
+                  label: tier.title
+                }))
+              : []) as CreateCustomSelectRowArgs<"posts.in.tier">["customValues"],
               alert:
-                tiers === null || tiers.length === 0 ? (
+                tiers === null || tiers.length === 0 ?
                   <div className="d-flex align-items-center fs-6">
                     <span className="fs-4 material-symbols-outlined pe-1 text-warning">
                       warning
                     </span>{" "}
                     No tier information available
                   </div>
-                ) : undefined,
+                : undefined,
               helpTooltip:
                 "Restrict posts downloaded by the tier(s) they belong to.",
               ariaLabel: "Include posts by tier"
@@ -452,12 +452,11 @@ function IncludeBox() {
                   className="py-2"
                   hidden={state.postsPublished.type === "anytime"}
                 >
-                  {state.postsPublished.type === "after" ? (
+                  {state.postsPublished.type === "after" ?
                     postsPublishedAfterPicker
-                  ) : state.postsPublished.type === "before" ? (
+                  : state.postsPublished.type === "before" ?
                     postsPublishedBeforePicker
-                  ) : (
-                    <>
+                  : <>
                       <InputGroup size="sm" className="mb-2">
                         <InputGroup.Text id="inputGroup-sizing-sm">
                           From
@@ -471,7 +470,7 @@ function IncludeBox() {
                         {postsPublishedBeforePicker}
                       </InputGroup>
                     </>
-                  )}
+                  }
                 </div>
               </Col>
             </Row>

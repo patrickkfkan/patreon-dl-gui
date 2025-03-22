@@ -40,7 +40,7 @@ function DownloadBox() {
 
   return useMemo(() => {
     return (
-      <Card className="mt-3 bg-transparent border border-secondary">
+      <Card className="bg-transparent border border-secondary">
         <Card.Header>Download</Card.Header>
         <Card.Body className="p-1">
           <Container fluid>

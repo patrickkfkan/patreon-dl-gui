@@ -1,54 +1,49 @@
 import type { Editor } from "./App";
 import type { FileLoggerConfig } from "patreon-dl";
 import type { FileConfig } from "./FileConfig";
-import type { PageInfo, UIConfig, UIConfigSection } from "./UIConfig";
+import type { PageInfo } from "./UIConfig";
 import type { DownloaderLogMessage } from "../core/DownloaderConsoleLogger";
-import type { OpenDialogOptions } from "electron";
 import type { RecentDocument } from "../core/util/RecentDocuments";
+import type { ApplyProxyResult } from "../core/MainWindow";
+import type {
+  YouTubeConnectionStatus,
+  YouTubeConnectResult,
+  YouTubeConnectVerificationInfo
+} from "../core/util/YouTubeConfigurator";
 
 export type MainProcessRendererEvent =
   | "editorCreated"
-  | "closeEditorResult"
-  | "openFileResult"
+  | "youtubeConnectionStatus"
   | "browserPageInfo"
-  | "fsChooserResult"
   | "previewInfo"
-  | "previewEnd"
   | "promptOverwriteOnSave"
-  | "saveResult"
   | "downloaderInit"
   | "downloaderStart"
   | "downloaderEnd"
   | "downloaderLogMessage"
-  | "downloadProcessEnd"
   | "execUICommand"
   | "requestHelpResult"
-  | "helpEnd"
   | "aboutInfo"
-  | "aboutEnd"
-  | "recentDocumentsInfo";
+  | "recentDocumentsInfo"
+  | "browserPageNavigated"
+  | "applyProxyResult"
+  | "youtubeConfiguratorStart"
+  | "youtubeConnectVerificationInfo"
+  | "youtubeConnectResult";
 
 export type MainProcessMainEvent =
   | "uiReady"
-  | "openFSChooser"
-  | "newEditor"
-  | "closeEditor"
-  | "preview"
-  | "endPreview"
-  | "openFile"
-  | "save"
+  | "viewBoundsChange"
+  | "activeEditorChange"
   | "confirmSave"
-  | "saveAs"
-  | "startDownload"
-  | "promptStartDownloadResult"
-  | "abortDownload"
-  | "endDownloadProcess"
-  | "modifiedEditorsInfo"
-  | "activeEditorInfo"
-  | "requestHelp"
-  | "endHelp"
-  | "requestAboutInfo"
-  | "endAbout";
+  | "confirmSaveModalClose"
+  | "modifiedEditorsChange"
+  | "previewModalClose"
+  | "helpModalClose"
+  | "aboutModalClose"
+  | "confirmStartDownload"
+  | "downloaderModalClose"
+  | "youtubeConfiguratorModalClose";
 
 export type UICommand =
   | "createEditor"
@@ -59,7 +54,8 @@ export type UICommand =
   | "saveAs"
   | "startDownload"
   | "showHelpIcons"
-  | "showAbout";
+  | "showAbout"
+  | "configureYouTube";
 
 export interface AboutInfo {
   appName: string;
@@ -67,45 +63,9 @@ export interface AboutInfo {
   appURL: string;
 }
 
-export type FSChooserResult =
-  | {
-      canceled: true;
-      filePath?: undefined;
-    }
-  | {
-      canceled: false;
-      filePath: string;
-    };
-
-export type CloseEditorResult =
-  | {
-      canceled: true;
-      editor?: undefined;
-    }
-  | {
-      canceled: false;
-      editor: Editor;
-    };
-
-export type OpenFileResult =
-  | {
-      canceled: true;
-      hasError?: undefined;
-      editor?: undefined;
-      isNewEditor?: undefined;
-    }
-  | {
-      canceled?: undefined;
-      hasError: true;
-      editor?: undefined;
-      isNewEditor?: undefined;
-    }
-  | {
-      canceled?: undefined;
-      hasError?: undefined;
-      editor: Editor;
-      isNewEditor: boolean;
-    };
+export interface ActiveEditorInfo {
+  editor: Editor | null;
+}
 
 export type SaveFileConfigResult =
   | {
@@ -165,16 +125,12 @@ export type DownloaderEndInfo =
       aborted: boolean;
     };
 
-export interface PromptStartDownloadResult {
+export interface ConfirmStartDownloadResult {
   confirmed: boolean;
 }
 
 export interface ModifiedEditorsInfo {
   editors: Editor[];
-}
-
-export interface ActiveEditorInfo {
-  editor: Editor | null;
 }
 
 export interface RequestHelpResult {
@@ -185,101 +141,62 @@ export interface RecentDocumentsInfo {
   entries: readonly RecentDocument[];
 }
 
-export type ExecUICommandParams<C extends UICommand> = C extends "showHelpIcons"
-  ? Parameters<(show: boolean) => void>
-  : C extends "openFile"
-    ? Parameters<(filePath?: string) => void>
-    : [];
+export type ExecUICommandParams<C extends UICommand> =
+  C extends "showHelpIcons" ? Parameters<(show: boolean) => void>
+  : C extends "openFile" ? Parameters<(filePath?: string) => void>
+  : [];
+
+export interface WebBrowserPageNavigatedInfo {
+  url: string;
+  canGoForward: boolean;
+  canGoBack: boolean;
+}
+
+export interface ViewBounds {
+  editorView: Electron.Rectangle;
+  webBrowserView: Electron.Rectangle;
+}
 
 export type MainProcessRendererEventListener<
   E extends MainProcessRendererEvent
-> = E extends "aboutInfo"
-  ? (info: AboutInfo) => void
-  : E extends "editorCreated"
-    ? (editor: Editor) => void
-    : E extends "closeEditorResult"
-      ? (result: CloseEditorResult) => void
-      : E extends "openFileResult"
-        ? (result: OpenFileResult) => void
-        : E extends "browserPageInfo"
-          ? (info: PageInfo) => void
-          : E extends "fsChooserResult"
-            ? (result: FSChooserResult) => void
-            : E extends "previewInfo"
-              ? (info: FileConfig) => void
-              : E extends "previewEnd"
-                ? () => void
-                : E extends "promptOverwriteOnSave"
-                  ? (config: FileConfig<"hasPath">) => void
-                  : E extends "saveResult"
-                    ? (result: SaveFileConfigResult) => void
-                    : E extends "downloaderInit"
-                      ? (info: DownloaderInitInfo) => void
-                      : E extends "downloaderStart"
-                        ? () => void
-                        : E extends "downloaderEnd"
-                          ? (info: DownloaderEndInfo) => void
-                          : E extends "downloaderLogMessage"
-                            ? (message: DownloaderLogMessage) => void
-                            : E extends "downloadProcessEnd"
-                              ? () => void
-                              : E extends "requestHelpResult"
-                                ? (result: RequestHelpResult) => void
-                                : E extends "helpEnd"
-                                  ? () => void
-                                  : E extends "aboutEnd"
-                                    ? () => void
-                                    : E extends "execUICommand"
-                                      ? <C extends UICommand>(
-                                          command: C,
-                                          ...params: ExecUICommandParams<C>
-                                        ) => void
-                                      : E extends "recentDocumentsInfo"
-                                        ? (info: RecentDocumentsInfo) => void
-                                        : never;
+> =
+  E extends "aboutInfo" ? (info: AboutInfo) => void
+  : E extends "editorCreated" ? (editor: Editor) => void
+  : E extends "youtubeConnectionStatus" ?
+    (status: YouTubeConnectionStatus) => void
+  : E extends "browserPageInfo" ? (info: PageInfo) => void
+  : E extends "previewInfo" ? (info: FileConfig) => void
+  : E extends "promptOverwriteOnSave" ? (config: FileConfig<"hasPath">) => void
+  : E extends "downloaderInit" ? (info: DownloaderInitInfo) => void
+  : E extends "downloaderStart" ? () => void
+  : E extends "downloaderEnd" ? (info: DownloaderEndInfo) => void
+  : E extends "downloaderLogMessage" ? (message: DownloaderLogMessage) => void
+  : E extends "requestHelpResult" ? (result: RequestHelpResult) => void
+  : E extends "execUICommand" ?
+    <C extends UICommand>(command: C, ...params: ExecUICommandParams<C>) => void
+  : E extends "recentDocumentsInfo" ? (info: RecentDocumentsInfo) => void
+  : E extends "browserPageNavigated" ?
+    (info: WebBrowserPageNavigatedInfo) => void
+  : E extends "applyProxyResult" ? (result: ApplyProxyResult) => void
+  : E extends "youtubeConfiguratorStart" ?
+    (status: YouTubeConnectionStatus) => void
+  : E extends "youtubeConnectVerificationInfo" ?
+    (info: YouTubeConnectVerificationInfo) => void
+  : E extends "youtubeConnectResult" ? (result: YouTubeConnectResult) => void
+  : never;
 
 export type MainProcessMainEventListener<E extends MainProcessMainEvent> =
-  E extends "uiReady"
-    ? () => void
-    : E extends "openFSChooser"
-      ? (dialogOptions: OpenDialogOptions) => void
-      : E extends "newEditor"
-        ? () => void
-        : E extends "closeEditor"
-          ? (editor: Editor) => void
-          : E extends "preview"
-            ? (editor: Editor) => void
-            : E extends "endPreview"
-              ? () => void
-              : E extends "openFile"
-                ? (currentEditors: Editor[], filePath?: string) => void
-                : E extends "save"
-                  ? (editor: Editor) => void
-                  : E extends "confirmSave"
-                    ? (result: ConfirmSaveResult) => void
-                    : E extends "saveAs"
-                      ? (editor: Editor) => void
-                      : E extends "startDownload"
-                        ? (editor: Editor) => void
-                        : E extends "promptStartDownloadResult"
-                          ? (result: PromptStartDownloadResult) => void
-                          : E extends "abortDownload"
-                            ? () => void
-                            : E extends "endDownloadProcess"
-                              ? () => void
-                              : E extends "modifiedEditorsInfo"
-                                ? (info: ModifiedEditorsInfo) => void
-                                : E extends "activeEditorInfo"
-                                  ? (info: ActiveEditorInfo) => void
-                                  : E extends "requestHelp"
-                                    ? <S extends UIConfigSection>(
-                                        section: S,
-                                        prop: keyof UIConfig[S]
-                                      ) => void
-                                    : E extends "endHelp"
-                                      ? () => void
-                                      : E extends "requestAboutInfo"
-                                        ? () => void
-                                        : E extends "endAbout"
-                                          ? () => void
-                                          : never;
+  E extends "uiReady" ? () => void
+  : E extends "viewBoundsChange" ? (bounds: ViewBounds) => void
+  : E extends "activeEditorChange" ? (info: ActiveEditorInfo) => void
+  : E extends "confirmSave" ? (result: ConfirmSaveResult) => void
+  : E extends "confirmSaveModalClose" ? () => void
+  : E extends "modifiedEditorsChange" ? (info: ModifiedEditorsInfo) => void
+  : E extends "previewModalClose" ? () => void
+  : E extends "helpModalClose" ? () => void
+  : E extends "aboutModalClose" ? () => void
+  : E extends "confirmStartDownload" ?
+    (result: ConfirmStartDownloadResult) => void
+  : E extends "downloaderModalClose" ? () => void
+  : E extends "youtubeConfiguratorModalClose" ? () => void
+  : never;

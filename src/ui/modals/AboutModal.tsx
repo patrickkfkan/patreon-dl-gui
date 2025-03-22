@@ -19,9 +19,12 @@ function AboutModal() {
     };
   }, []);
 
-  const endAbout = useCallback(() => {
-    window.mainAPI.emitMainEvent("endAbout");
+  const hide = useCallback(() => {
     setShow(false);
+  }, []);
+
+  const end = useCallback(() => {
+    window.mainAPI.emitMainEvent("aboutModalClose");
   }, []);
 
   if (!info) {
@@ -32,13 +35,19 @@ function AboutModal() {
 
   return (
     <>
-      <Modal show={show} onHide={endAbout} centered>
+      <Modal show={show} onHide={hide} onExited={end} centered>
         <Modal.Header className="bg-dark border-0" closeButton></Modal.Header>
         <Modal.Body className="d-flex p-5 pt-0 bg-dark align-items-center flex-column">
           <div className="fs-4">{appName}</div>
           <div>v{appVersion}</div>
           <div className="mt-3">
-            <a href={appURL} target="_blank" rel="noreferrer">
+            <a
+              href="#"
+              onClick={async (e) => {
+                e.preventDefault();
+                await window.mainAPI.invoke("openExternalBrowser", appURL);
+              }}
+            >
               {appURL}
             </a>
           </div>

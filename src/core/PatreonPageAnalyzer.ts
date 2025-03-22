@@ -1,7 +1,7 @@
 import type { Tier } from "../types/UIConfig";
 import { PATREON_URL } from "./Constants";
-import type { Page } from "puppeteer-core";
 import type { URLAnalysis } from "patreon-dl";
+import { load as cheerioLoad } from "cheerio";
 
 const PAGE_PATHNAME_FORMATS = {
   postsByUser: [
@@ -34,20 +34,27 @@ interface JSONWithPageBootstrap {
   };
 }
 
-export interface PatreonPageAnalysis {
-  normalizedURL: string | null;
-  target: (URLAnalysis & { description: string }) | null;
-  tiers: Tier[] | null;
-}
+export type PatreonPageAnalysis =
+  | {
+      status: "complete";
+      normalizedURL: string | null;
+      target: (URLAnalysis & { description: string }) | null;
+      tiers: Tier[] | null;
+    }
+  | {
+      status: "bootstrapNotFound";
+    };
 
 export default class PatreonPageAnalyzer {
   static async analyze(
-    page: Page,
+    html: string,
     signal: AbortSignal
-  ): Promise<PatreonPageAnalysis | null> {
-    const json = await this.#getJSONWithPageBootstrap(page);
+  ): Promise<PatreonPageAnalysis> {
+    const json = await this.#getJSONWithPageBootstrap(html);
     if (!json) {
-      return null;
+      return {
+        status: "bootstrapNotFound"
+      };
     }
     if (signal.aborted) {
       console.debug("PatreonPageAnalyzer: aborted");
@@ -55,50 +62,54 @@ export default class PatreonPageAnalyzer {
       abortError.name = "AbortError";
       throw abortError;
     }
-    const { normalizedURL = null, target = null } =
-      this.#analyzePage(json) || {};
+    const an = this.#analyzePage(json);
     const tiers = this.#getTiers(json);
     return {
-      normalizedURL,
-      target,
+      status: "complete",
+      normalizedURL: an?.normalizedURL || null,
+      target: an?.target || null,
       tiers
     };
   }
 
   static async #getJSONWithPageBootstrap(
-    page: Page
+    html: string
   ): Promise<JSONWithPageBootstrap | null> {
-    return await page.evaluate(() => {
-      for (const script of document.getElementsByTagName("script")) {
-        if (script.type === "application/json") {
-          try {
-            const json = JSON.parse(script.innerText);
-            const bs = json?.props?.pageProps?.bootstrapEnvelope?.pageBootstrap;
-            if (bs && typeof bs === "object") {
-              return json;
-            }
-          } catch (_e: unknown) {
-            // Do nothing
+    const $ = cheerioLoad(html);
+    const scripts = $('script[id="__NEXT_DATA__"]').toArray();
+    for (const scriptEl of scripts) {
+      const script = $(scriptEl);
+      if (script.attr("type") === "application/json") {
+        try {
+          const json = JSON.parse(script.text());
+          const bs = json?.props?.pageProps?.bootstrapEnvelope?.pageBootstrap;
+          if (bs && typeof bs === "object") {
+            return json;
           }
+        } catch (_error: unknown) {
+          // Do nothing
         }
       }
-      return null;
-    });
+    }
+    return null;
   }
 
   static #analyzePage(
-    json: JSONWithPageBootstrap | null
-  ): Pick<PatreonPageAnalysis, "normalizedURL" | "target"> | null {
+    json: JSONWithPageBootstrap
+  ): Pick<
+    PatreonPageAnalysis & { status: "complete" },
+    "normalizedURL" | "target"
+  > | null {
     /**
      * Perform our own analysis based on pageBootStrap,
      * This gives more accurate result than patreon-dl's URLHelper.analyzeURL().
      * Unfortunately, we can't perform the same analysis in patreon-dl
-     * because we don't have puppeteer there to provide pageBootstrap, and
+     * because we don't have a browser there to capture pageBootstrap, and
      * using fetch() to grab contents from URL will in most cases return
      * a "Loading" page where code is then executed to provide the actual content,
      * or otherwise a Google captcha challenge triggered by bot detection.
      */
-    const page = json?.page;
+    const page = json.page;
     if (!page || typeof page !== "string") {
       return null;
     }
@@ -240,9 +251,9 @@ export default class PatreonPageAnalyzer {
     const tiers = ids.reduce<Tier[]>((result, id) => {
       included.forEach((inc) => {
         const incId =
-          typeof inc === "object" && Reflect.has(inc, "id")
-            ? String(inc.id)
-            : null;
+          typeof inc === "object" && Reflect.has(inc, "id") ?
+            String(inc.id)
+          : null;
         if (incId === id && Reflect.get(inc, "type") === "reward") {
           const attr = Reflect.get(inc, "attributes");
           if (typeof attr === "object") {

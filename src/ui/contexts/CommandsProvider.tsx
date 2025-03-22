@@ -1,12 +1,18 @@
 import { useEditor } from "./EditorContextProvider";
 import type {
   ExecUICommandParams,
-  MainProcessRendererEvent,
+  SaveFileConfigResult,
   UICommand
 } from "../../types/MainEvents";
-import { createContext, useCallback, useContext, useEffect } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo
+} from "react";
 import type { UIConfig, UIConfigSection } from "../../types/UIConfig";
+import { showToast } from "../helpers/Toast";
 
 export type CommandsContextValue = {
   [C in UICommand]: (...params: ExecUICommandParams<C>) => void;
@@ -15,6 +21,12 @@ export type CommandsContextValue = {
     section: S,
     prop: keyof UIConfig[S]
   ) => void;
+  webBrowser: {
+    gotoURL: (url: string) => void;
+    gotoHome: () => void;
+    goBack: () => void;
+    goForward: () => void;
+  };
 };
 
 const CommandsContext = createContext<CommandsContextValue>(
@@ -31,163 +43,94 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
     setEditorProp,
     setShowHelpIcons
   } = useEditor();
-  const { setActionPending } = useEditor();
 
-  const startAction = useCallback(
-    async (action: () => void, result: Promise<unknown>) => {
-      setActionPending(true);
-      action();
-      await result;
-      setActionPending(false);
+  const handleSaveResult = useCallback(
+    (result: SaveFileConfigResult) => {
+      if (!result.canceled && !result.hasError) {
+        const editor = editors.find((ed) => ed.id === result.config.editorId);
+        if (editor) {
+          setEditorProp(editor, {
+            name: result.config.name,
+            filePath: result.config.filePath,
+            loadAlerts: undefined,
+            modified: false,
+            promptOnSave: false
+          });
+        } else {
+          console.error(
+            `No matching editor for ID ${result.config.editorId} in saveResult`
+          );
+        }
+        showToast("success", "Config saved");
+      }
     },
-    [setActionPending]
+    [editors, setEditorProp]
   );
 
-  const waitForSaveResult = useCallback(() => {
-    return new Promise<void>((resolve) => {
-      window.mainAPI.on(
-        "saveResult",
-        (result) => {
-          if (!result.canceled && !result.hasError) {
-            const editor = editors.find(
-              (ed) => ed.id === result.config.editorId
-            );
-            if (editor) {
-              setEditorProp(editor, {
-                name: result.config.name,
-                filePath: result.config.filePath,
-                loadAlerts: undefined,
-                modified: false,
-                promptOnSave: false
-              });
-            } else {
-              console.error(
-                `No matching editor for ID ${result.config.editorId} in saveResult`
-              );
-            }
-            toast("Config saved", {
-              type: "success",
-              position: "bottom-center",
-              theme: "dark"
-            });
-          }
-          resolve();
-        },
-        { once: true }
-      );
-    });
-  }, [editors, setEditorProp]);
-
-  const waitForOpenFileResult = useCallback(() => {
-    return new Promise<void>((resolve) => {
-      window.mainAPI.on(
-        "openFileResult",
-        (result) => {
-          if (!result.canceled && !result.hasError) {
-            const openedEditor = result.editor;
-            if (result.isNewEditor) {
-              addEditor(openedEditor);
-            } else {
-              const editor = editors.find((ed) => ed.id === openedEditor.id);
-              if (editor) {
-                setActiveEditor(editor);
-              } else {
-                console.error(
-                  `No matching editor for ID ${openedEditor.id} in openFileResult`
-                );
-              }
-            }
-          }
-          resolve();
-        },
-        { once: true }
-      );
-    });
-  }, [editors, addEditor, setActiveEditor]);
-
-  const waitForCloseEditorResult = useCallback(() => {
-    return new Promise<void>((resolve) => {
-      window.mainAPI.on(
-        "closeEditorResult",
-        (result) => {
-          if (!result.canceled) {
-            doCloseEditor(result.editor);
-          }
-          resolve();
-        },
-        { once: true }
-      );
-    });
-  }, [doCloseEditor]);
-
-  const waitForEvent = useCallback((eventName: MainProcessRendererEvent) => {
-    return new Promise<void>((resolve) => {
-      window.mainAPI.on(
-        eventName,
-        () => {
-          resolve();
-        },
-        { once: true }
-      );
-    });
-  }, []);
-
-  const createEditor = useCallback(() => {
-    window.mainAPI.emitMainEvent("newEditor");
+  const createEditor = useCallback(async () => {
+    await window.mainAPI.invoke("newEditor");
   }, []);
 
   const openFile = useCallback(
-    (filePath?: string) => {
-      startAction(() => {
-        window.mainAPI.emitMainEvent("openFile", editors, filePath);
-      }, waitForOpenFileResult());
+    async (filePath?: string) => {
+      const result = await window.mainAPI.invoke("openFile", editors, filePath);
+      if (!result.canceled && !result.hasError) {
+        const openedEditor = result.editor;
+        if (result.isNewEditor) {
+          addEditor(openedEditor);
+        } else {
+          const editor = editors.find((ed) => ed.id === openedEditor.id);
+          if (editor) {
+            setActiveEditor(editor);
+          } else {
+            console.error(
+              `No matching editor for ID ${openedEditor.id} in openFileResult`
+            );
+          }
+        }
+      }
     },
-    [startAction, editors, waitForOpenFileResult]
+    [editors, addEditor, setActiveEditor]
   );
 
-  const closeActiveEditor = useCallback(() => {
+  const closeActiveEditor = useCallback(async () => {
     if (!activeEditor) {
       return;
     }
-    startAction(() => {
-      window.mainAPI.emitMainEvent("closeEditor", activeEditor);
-    }, waitForCloseEditorResult());
-  }, [startAction, activeEditor, waitForCloseEditorResult]);
+    const result = await window.mainAPI.invoke("closeEditor", activeEditor);
+    if (!result.canceled) {
+      doCloseEditor(result.editor);
+    }
+  }, [activeEditor, doCloseEditor]);
 
-  const save = useCallback(() => {
+  const save = useCallback(async () => {
     if (!activeEditor) {
       return;
     }
-    startAction(() => {
-      window.mainAPI.emitMainEvent("save", activeEditor);
-    }, waitForSaveResult());
-  }, [activeEditor, setActionPending, startAction]);
+    const result = await window.mainAPI.invoke("save", activeEditor);
+    handleSaveResult(result);
+  }, [activeEditor, handleSaveResult]);
 
-  const saveAs = useCallback(() => {
+  const saveAs = useCallback(async () => {
     if (!activeEditor) {
       return;
     }
-    startAction(() => {
-      window.mainAPI.emitMainEvent("saveAs", activeEditor);
-    }, waitForSaveResult());
-  }, [setActionPending, activeEditor, startAction]);
+    const result = await window.mainAPI.invoke("saveAs", activeEditor);
+    handleSaveResult(result);
+  }, [activeEditor, handleSaveResult]);
 
-  const preview = useCallback(() => {
+  const preview = useCallback(async () => {
     if (!activeEditor) {
       return;
     }
-    startAction(() => {
-      window.mainAPI.emitMainEvent("preview", activeEditor);
-    }, waitForEvent("previewEnd"));
+    await window.mainAPI.invoke("preview", activeEditor);
   }, [activeEditor]);
 
-  const startDownload = useCallback(() => {
+  const startDownload = useCallback(async () => {
     if (!activeEditor) {
       return;
     }
-    startAction(() => {
-      window.mainAPI.emitMainEvent("startDownload", activeEditor);
-    }, waitForEvent("downloadProcessEnd"));
+    await window.mainAPI.invoke("startDownload", activeEditor);
   }, [activeEditor]);
 
   const showHelpIcons = useCallback(
@@ -198,19 +141,37 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   const requestHelp = useCallback(
-    <S extends UIConfigSection>(section: S, prop: keyof UIConfig[S]) => {
-      startAction(() => {
-        window.mainAPI.emitMainEvent("requestHelp", section, prop as never);
-      }, waitForEvent("helpEnd"));
+    async <S extends UIConfigSection>(section: S, prop: keyof UIConfig[S]) => {
+      await window.mainAPI.invoke("requestHelp", section, prop as never);
     },
     []
   );
 
-  const showAbout = useCallback(() => {
-    startAction(() => {
-      window.mainAPI.emitMainEvent("requestAboutInfo");
-    }, waitForEvent("aboutEnd"));
+  const showAbout = useCallback(async () => {
+    await window.mainAPI.invoke("requestAboutInfo");
   }, []);
+
+  const configureYouTube = useCallback(async () => {
+    await window.mainAPI.invoke("configureYouTube");
+  }, []);
+
+  const webBrowser = useMemo(
+    () => ({
+      gotoURL: (url: string) => {
+        window.mainAPI.invoke("setWebBrowserURL", url);
+      },
+      gotoHome: () => {
+        window.mainAPI.invoke("setWebBrowserURLToHome");
+      },
+      goBack: () => {
+        window.mainAPI.invoke("webBrowserBack");
+      },
+      goForward: () => {
+        window.mainAPI.invoke("webBrowserForward");
+      }
+    }),
+    []
+  );
 
   const context = {
     createEditor,
@@ -222,7 +183,9 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
     startDownload,
     showHelpIcons,
     requestHelp,
-    showAbout
+    showAbout,
+    configureYouTube,
+    webBrowser
   };
 
   useEffect(() => {
@@ -240,7 +203,6 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <CommandsContext.Provider value={context}>
       {children}
-      <ToastContainer />
     </CommandsContext.Provider>
   );
 };

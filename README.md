@@ -12,14 +12,13 @@ If you are going to download videos, you should also install [FFmpeg](https://ww
 
 ## Quick start guide
 
-- On first run, the app will prompt you for installation of the Chrome web browser.
-- After installation, the app launches with the main window and a web browser window opened.
-- In the web browser window, go to the Patreon page you want to download content from. For content that is accessible only through subscription (which you need to have), ensure you are logged in. Content that is downloadable includes:
+- The UI consists of two major components: the editor and an embedded web browser.
+- In the embedded web browser, go to the Patreon page you want to download content from. For content that is accessible only through subscription (which you need to have), ensure you are logged in. Content that is downloadable includes:
   - Posts by a creator
   - A single post
   - Posts in a collection
   - Product purchased from a creator's shop
-- When you visit a Patreon page, the app checks whether it contains content that is downloadable. Identified *targets* are shown in the main window, along with crucial data such as *cookie* which is required to download patron-only content.
+- When you visit a Patreon page, the app checks whether it contains content that is downloadable. Identified *targets* are shown in the Download section of the editor, along with crucial data such as *cookie* which is required to download patron-only content.
 - Once a target is identified, you can configure the options to suit your needs. To get help about an option, select the "Show Help Icons" item in the Help menu.
 - To begin downloading the target, click the "play" button in the toolbar. You may also save the configuration to file and open it on another occasion.
 
@@ -27,18 +26,22 @@ If you are going to download videos, you should also install [FFmpeg](https://ww
 
 `patreon-dl-gui` is a standalone app that utilizes the `patreon-dl` library to download Patreon content. On the other hand, `patreon-dl` comes with a CLI tool that has the option to read downloader options from a config file.
 
-Generally speaking, config files saved in `patreon-dl-gui` can be passed to the `patreon-dl` CLI tool without issue. However, you should note that the config schema accepted by `patreon-dl` CLI is broader than that for `patreon-dl-gui`. This means, if you have a config file manually created for use by `patreon-dl` CLI, opening it in `patreon-dl-gui` will not necessarily import all the options therein. In particular:
+Generally speaking, config files saved in `patreon-dl-gui` can be passed to the `patreon-dl` CLI tool without issue, subject to the following exception:
+
+- The "Connect to YouTube account" option found in `patreon-dl-gui` has no equivalent in `patreon-dl` CLI config. You would have to connect to your YouTube account separately through executing `patreon-dl --configure-youtube`.
+
+What about the other way round? You should note that the config schema accepted by `patreon-dl` CLI is broader than that for `patreon-dl-gui`. This means, if you have a config file manually created for use by `patreon-dl` CLI, opening it in `patreon-dl-gui` will not necessarily import all the options therein. In particular:
 
 - Multiple targets are not supported.
 - For file logger configuration, sections other than `[logger.file.1]` are ignored. `patreon-dl-gui` only supports a single file logger configuration.
 
 When you open a config file, the app will notify you of any omitted or unsupported options.
 
-If you intend to create a config file in `patreon-dl-gui` for use with `patreon-dl` CLI, you should ensure that the version of `patreon-dl` used by the app matches that of the CLI:
+If you intend to create a config file in `patreon-dl-gui` for use with `patreon-dl` CLI, you should also ensure that the version of `patreon-dl` used by the app matches that of the CLI:
 
 | `patreon-dl-gui` version | `patreon-dl` version used |
 |--------------------------|---------------------------|
-| v1.0.0                   | v2.4.1                    |
+| v1.0.0 - v2.0.0          | v2.4.1                    |
 
 ## Running / packaging the app from source
 
@@ -59,7 +62,19 @@ To package the app for your OS:
 $ npm run make
 ```
 
+## Technical notes
+
+This project uses a customized version of the [proxy-chain](https://github.com/apify/proxy-chain) library to set proxy in web browser sessions. The customizations have been submitted to the `proxy-chain` repo in [PR #577](https://github.com/apify/proxy-chain/pull/577).
+
 ## Changelog
+
+v2.0.0
+- Major UI overhaul: web browser is now embedded into the main window
+- Remove the need to download web browser dependency
+- One-click to apply proxy settings to web browser session
+- Add option to connect to YouTube acount for embedded YouTube videos
+- File logger is disabled by default
+- Bugfixes
 
 v1.0.0
 - Initial release

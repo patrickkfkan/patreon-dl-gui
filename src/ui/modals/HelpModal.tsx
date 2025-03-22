@@ -4,19 +4,6 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 
-function LinkRenderer(
-  props: React.DetailedHTMLProps<
-    React.AnchorHTMLAttributes<HTMLAnchorElement>,
-    HTMLAnchorElement
-  >
-) {
-  return (
-    <a href={props.href} target="_blank" rel="noreferrer">
-      {props.children}
-    </a>
-  );
-}
-
 function HelpModal() {
   const [contents, setContents] = useState<string | null>(null);
   const [show, setShow] = useState(false);
@@ -34,9 +21,42 @@ function HelpModal() {
     };
   }, []);
 
-  const endHelp = useCallback(() => {
-    window.mainAPI.emitMainEvent("endHelp");
+  const openExternalBrowser = useCallback(async (url?: string) => {
+    if (url) {
+      await window.mainAPI.invoke("openExternalBrowser", url);
+    }
+  }, []);
+
+  const renderLink = useCallback(
+    (
+      props: React.DetailedHTMLProps<
+        React.AnchorHTMLAttributes<HTMLAnchorElement>,
+        HTMLAnchorElement
+      >
+    ) => {
+      return (
+        <a
+          href="#"
+          target="_blank"
+          rel="noreferrer"
+          onClick={async (e) => {
+            e.preventDefault();
+            await openExternalBrowser(props.href);
+          }}
+        >
+          {props.children}
+        </a>
+      );
+    },
+    [openExternalBrowser]
+  );
+
+  const hide = useCallback(() => {
     setShow(false);
+  }, []);
+
+  const end = useCallback(() => {
+    window.mainAPI.emitMainEvent("helpModalClose");
   }, []);
 
   if (!contents) {
@@ -45,12 +65,19 @@ function HelpModal() {
 
   return (
     <>
-      <Modal show={show} onHide={endHelp} scrollable={true} size="xl" centered>
+      <Modal
+        show={show}
+        onHide={hide}
+        onExited={end}
+        scrollable={true}
+        size="xl"
+        centered
+      >
         <Modal.Body className="p-3 flex-grow-1 overflow-auto bg-dark help-modal-body">
           <Markdown
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeRaw]}
-            components={{ a: LinkRenderer }}
+            components={{ a: renderLink }}
           >
             {contents}
           </Markdown>

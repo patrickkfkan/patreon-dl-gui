@@ -1,10 +1,10 @@
 // https://stackoverflow.com/questions/69676439/create-constant-array-type-from-an-object-type/69676731#69676731
-export type UnionToTuple<U extends string, R extends unknown[] = []> = {
-  [S in U]: Exclude<U, S> extends never
-    ? [...R, S]
+export type UnionToTuple<U extends string, R extends unknown[] = []> =
+  {
+    [S in U]: Exclude<U, S> extends never ? [...R, S]
     : UnionToTuple<Exclude<U, S>, [...R, S]>;
-}[U] extends infer S extends unknown[]
-  ? S
+  }[U] extends infer S extends unknown[] ?
+    S
   : never;
 
 /**
@@ -21,12 +21,12 @@ export type UnionToObjectTuple<
   V extends object = object,
   VK extends string = "value",
   R extends unknown[] = []
-> = {
-  [S in U]: Exclude<U, S> extends never
-    ? [...R, V & { [key in VK]: S }]
+> =
+  {
+    [S in U]: Exclude<U, S> extends never ? [...R, V & { [key in VK]: S }]
     : UnionToObjectTuple<Exclude<U, S>, V, VK, [...R, V & { [key in VK]: S }]>;
-}[U] extends infer S extends (V & { [key in VK]: string })[]
-  ? S
+  }[U] extends infer S extends (V & { [key in VK]: string })[] ?
+    S
   : never;
 
 export type ObjectKeysByValueType<S extends object, T> = {

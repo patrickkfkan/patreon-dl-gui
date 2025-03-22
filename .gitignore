@@ -53,6 +53,7 @@ typings/
 
 # Output of 'npm pack'
 *.tgz
+!proxy-chain-2.5.7-custom.tgz
 
 # Yarn Integrity file
 .yarn-integrity
