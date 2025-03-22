@@ -1,4 +1,5 @@
 import type { Editor } from "../../types/App";
+import type { YouTubeConnectionStatus } from "../../core/util/YouTubeConfigurator";
 import type React from "react";
 import {
   createContext,
@@ -28,12 +29,15 @@ interface EditorContextValue {
   closeEditor: (editor: Editor) => void;
   showHelpIcons: boolean;
   setShowHelpIcons: (value: boolean) => void;
+  youtubeConnectionStatus: YouTubeConnectionStatus | null;
 }
 const EditorContext = createContext({} as EditorContextValue);
 
 const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [editors, setEditors] = useState<Editor[]>([]);
   const [activeEditor, setActiveEditor] = useState<Editor | null>(null);
+  const [youtubeConnectionStatus, setYouTubeConnectionStatus] =
+      useState<YouTubeConnectionStatus | null>(null);
   const [actionPending, setActionPending] = useState(false);
   const [showHelpIcons, setShowHelpIcons] = useState(false);
   const [, setRefreshToken] = useState(new Date().getMilliseconds());
@@ -78,6 +82,9 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
     const removeListenerCallbacks = [
       window.mainAPI.on("editorCreated", (editor) => {
         addEditor(editor);
+      }),
+      window.mainAPI.on("youtubeConnectionStatus", (status) => {
+        setYouTubeConnectionStatus(status);
       })
     ];
 
@@ -137,7 +144,8 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
         setEditorProp,
         closeEditor,
         showHelpIcons,
-        setShowHelpIcons
+        setShowHelpIcons,
+        youtubeConnectionStatus
       }}
     >
       {children}

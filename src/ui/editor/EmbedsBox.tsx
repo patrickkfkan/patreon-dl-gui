@@ -4,11 +4,11 @@ import SelectRow from "./components/SelectRow";
 import TextInputRow from "./components/TextInputRow";
 import { Button, Container } from "react-bootstrap";
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import _ from "lodash";
 import CheckboxRow from "./components/CheckboxRow";
 import { useCommands } from "../contexts/CommandsProvider";
-import type { YouTubeConnectionStatus } from "../../core/util/YouTubeConfigurator";
+import { useEditor } from "../contexts/EditorContextProvider";
 
 interface EmbedsBoxState {
   embedDownloaderYouTube: UIConfig["embed.downloader.youtube"];
@@ -45,31 +45,18 @@ const EXEC_INSERTABLES = [
 
 function EmbedsBox() {
   const { config } = useConfig();
+  const { youtubeConnectionStatus } = useEditor();
   const { configureYouTube } = useCommands();
-  const [ytConnectionStatus, setYTConnectionStatus] =
-    useState<YouTubeConnectionStatus | null>(null);
   const state = getEmbedsBoxState(config);
 
-  useEffect(() => {
-    const removeListenerCallbacks = [
-      window.mainAPI.on("youtubeConnectionStatus", (status) => {
-        setYTConnectionStatus(status);
-      })
-    ];
-
-    return () => {
-      removeListenerCallbacks.forEach((cb) => cb);
-    };
-  }, []);
-
   const ytConnectionStatusEl = useMemo(() => {
-    if (!ytConnectionStatus) {
+    if (!youtubeConnectionStatus) {
       return null;
     }
 
     let label: string;
     let icon: { className: string; style?: CSSProperties; symbol: string };
-    if (ytConnectionStatus.isConnected) {
+    if (youtubeConnectionStatus.isConnected) {
       label = "Connected";
       icon = { className: "text-success", symbol: "check_circle" };
     } else {
@@ -114,7 +101,7 @@ function EmbedsBox() {
         </Button>
       </div>
     );
-  }, [ytConnectionStatus]);
+  }, [youtubeConnectionStatus]);
 
   return useMemo(() => {
     const { embedDownloaderYouTube } = state;
