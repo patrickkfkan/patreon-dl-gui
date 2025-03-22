@@ -2,12 +2,13 @@ import type { UIConfig } from "../../types/UIConfig";
 import { useConfig } from "../contexts/ConfigProvider";
 import SelectRow from "./components/SelectRow";
 import TextInputRow from "./components/TextInputRow";
-import { Button, Container, Form, InputGroup } from "react-bootstrap";
-import { CSSProperties, useEffect, useMemo, useState } from "react";
+import { Button, Container } from "react-bootstrap";
+import type { CSSProperties} from "react";
+import { useEffect, useMemo, useState } from "react";
 import _ from "lodash";
 import CheckboxRow from "./components/CheckboxRow";
 import { useCommands } from "../contexts/CommandsProvider";
-import { YouTubeConnectionStatus } from "../../core/util/YouTubeConfigurator";
+import type { YouTubeConnectionStatus } from "../../core/util/YouTubeConfigurator";
 
 interface EmbedsBoxState {
   embedDownloaderYouTube: UIConfig["embed.downloader.youtube"];

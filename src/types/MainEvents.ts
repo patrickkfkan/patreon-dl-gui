@@ -5,7 +5,7 @@ import type { PageInfo } from "./UIConfig";
 import type { DownloaderLogMessage } from "../core/DownloaderConsoleLogger";
 import type { RecentDocument } from "../core/util/RecentDocuments";
 import type { ApplyProxyResult } from "../core/MainWindow";
-import { YouTubeConnectionStatus, YouTubeConnectResult, YouTubeConnectVerificationInfo } from "../core/util/YouTubeConfigurator";
+import type { YouTubeConnectionStatus, YouTubeConnectResult, YouTubeConnectVerificationInfo } from "../core/util/YouTubeConfigurator";
 
 export type MainProcessRendererEvent =
   | "editorCreated"

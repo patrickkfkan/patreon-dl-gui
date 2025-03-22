@@ -7,7 +7,7 @@ import { useConfig } from "../../contexts/ConfigProvider";
 import { Col, Form, Row } from "react-bootstrap";
 import type { AccessibilityProps, HelpProps } from "./Common";
 import { createHelpIcon } from "./Common";
-import { JSX } from "react";
+import type { JSX } from "react";
 
 type CheckboxRowProps<S extends UIConfigSectionWithPropsOf<boolean>> = {
   config: UIConfigSectionPropTuple<S, boolean>;

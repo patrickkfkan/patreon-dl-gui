@@ -81,13 +81,15 @@ export default class YouTubeConfigurator extends EventEmitter {
 
   emit(eventName: 'end', result: YouTubeConnectResult): boolean;
   emit(eventName: 'verificationInfo', info: YouTubeConnectVerificationInfo): boolean;
-  emit<K>(eventName: string | symbol, ...args: any[]): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  emit(eventName: string | symbol, ...args: any[]): boolean {
     return super.emit(eventName, ...args);
   }
 
   on(eventName: 'end', listener: (result: YouTubeConnectResult) => void): this;
   on(eventName: 'verificationInfo', listener: (info: YouTubeConnectVerificationInfo) => void): this;
-  on<K>(eventName: string | symbol, listener: (...args: any[]) => void): this {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  on(eventName: string | symbol, listener: (...args: any[]) => void): this {
     return super.on(eventName, listener);
   }
 }

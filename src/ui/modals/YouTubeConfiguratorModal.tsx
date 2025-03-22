@@ -1,4 +1,5 @@
-import { CSSProperties, JSX, useCallback, useEffect, useMemo, useState } from "react";
+import type { CSSProperties, JSX} from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Spinner } from "react-bootstrap";
 import type {
   YouTubeConnectionStatus,
@@ -125,7 +126,7 @@ function YouTubeConfiguratorModal() {
           </div>
         ),
         buttons: [
-          <Button variant="secondary" onClick={hide}>
+          <Button key="close.button" variant="secondary" onClick={hide}>
             Close
           </Button>,
           primaryButton
@@ -173,7 +174,7 @@ function YouTubeConfiguratorModal() {
       return {
         contents,
         buttons: [
-          <Button variant="secondary" onClick={cancelConnect}>
+          <Button key="cancel.button" variant="secondary" onClick={cancelConnect}>
             Cancel
           </Button>
         ]
@@ -189,7 +190,7 @@ function YouTubeConfiguratorModal() {
               You are now connected to YouTube.
             </div>
           ),
-          buttons: [<Button onClick={hide}>Close</Button>]
+          buttons: [<Button key="close.button.1" onClick={hide}>Close</Button>]
         };
       } else if (state.result.status === "error") {
         return {
@@ -204,7 +205,7 @@ function YouTubeConfiguratorModal() {
               <div className="mt-1">{state.result.error}</div>
             </>
           ),
-          buttons: [<Button onClick={hide}>Close</Button>]
+          buttons: [<Button key="close.button.2" onClick={hide}>Close</Button>]
         };
       }
     }

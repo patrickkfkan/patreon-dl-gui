@@ -10,6 +10,7 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
   return class SupportEventSupportedProcess extends Base {
     #youtubeConfigurator: YouTubeConfigurator;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructor(...args: any[]) {
       super(...args);
       this.#youtubeConfigurator = new YouTubeConfigurator();
