@@ -404,7 +404,7 @@ function DownloaderModal() {
           }}
           onScroll={onContentsScroll}
         ></Modal.Body>
-        <Modal.Footer className="bg-dark">{footerButtons}</Modal.Footer>
+        <Modal.Footer className="bg-dark justify-content-center">{footerButtons}</Modal.Footer>
       </Modal>
     </>
   );
