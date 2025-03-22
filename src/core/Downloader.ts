@@ -23,6 +23,7 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
     pathToFFmpeg: fileConfig.downloader["path.to.ffmpeg"],
     pathToYouTubeCredentials:
       (
+        uiConfig['embed.downloader.youtube'].type === 'default' &&
         uiConfig["patreon.dl.gui"]["connect.youtube"] &&
         YouTubeConfigurator.getConnectionStatus().isConnected
       ) ?
