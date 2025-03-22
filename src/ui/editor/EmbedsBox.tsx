@@ -3,7 +3,7 @@ import { useConfig } from "../contexts/ConfigProvider";
 import SelectRow from "./components/SelectRow";
 import TextInputRow from "./components/TextInputRow";
 import { Button, Container } from "react-bootstrap";
-import type { CSSProperties} from "react";
+import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import _ from "lodash";
 import CheckboxRow from "./components/CheckboxRow";
@@ -13,7 +13,7 @@ import type { YouTubeConnectionStatus } from "../../core/util/YouTubeConfigurato
 interface EmbedsBoxState {
   embedDownloaderYouTube: UIConfig["embed.downloader.youtube"];
   embedDownloaderVimeo: UIConfig["embed.downloader.vimeo"];
-  connectYouTube: UIConfig['patreon.dl.gui']['connect.youtube'];
+  connectYouTube: UIConfig["patreon.dl.gui"]["connect.youtube"];
 }
 
 let oldState: EmbedsBoxState | null = null;
@@ -22,7 +22,7 @@ function getEmbedsBoxState(config: UIConfig): EmbedsBoxState {
   const state: EmbedsBoxState = {
     embedDownloaderYouTube: config["embed.downloader.youtube"],
     embedDownloaderVimeo: config["embed.downloader.vimeo"],
-    connectYouTube: config['patreon.dl.gui']['connect.youtube']
+    connectYouTube: config["patreon.dl.gui"]["connect.youtube"]
   };
   if (oldState && _.isEqual(oldState, state)) {
     return oldState;
@@ -46,12 +46,13 @@ const EXEC_INSERTABLES = [
 function EmbedsBox() {
   const { config } = useConfig();
   const { configureYouTube } = useCommands();
-  const [ytConnectionStatus, setYTConnectionStatus] = useState<YouTubeConnectionStatus | null>(null);
+  const [ytConnectionStatus, setYTConnectionStatus] =
+    useState<YouTubeConnectionStatus | null>(null);
   const state = getEmbedsBoxState(config);
 
   useEffect(() => {
     const removeListenerCallbacks = [
-      window.mainAPI.on('youtubeConnectionStatus', (status) => {
+      window.mainAPI.on("youtubeConnectionStatus", (status) => {
         setYTConnectionStatus(status);
       })
     ];
@@ -62,33 +63,58 @@ function EmbedsBox() {
   }, []);
 
   const ytConnectionStatusEl = useMemo(() => {
-
     if (!ytConnectionStatus) {
       return null;
     }
 
     let label: string;
-    let icon: { className: string; style?: CSSProperties; symbol: string; };
+    let icon: { className: string; style?: CSSProperties; symbol: string };
     if (ytConnectionStatus.isConnected) {
-      label = 'Connected';
-      icon = { className: 'text-success', symbol: 'check_circle' };
-    }
-    else {
-      label = 'Not connected';
-      icon = { className: 'text-danger', style:{position: 'relative', top: '0.05rem'}, symbol: 'cancel' };
+      label = "Connected";
+      icon = { className: "text-success", symbol: "check_circle" };
+    } else {
+      label = "Not connected";
+      icon = {
+        className: "text-danger",
+        style: { position: "relative", top: "0.05rem" },
+        symbol: "cancel"
+      };
     }
 
     return (
-      <div className="ms-2 ps-1 d-flex align-items-center bg-secondary" style={{borderRadius: 'var(--bs-border-radius)'}}>
-        <span className={`material-symbols-outlined me-2 ${icon.className}`} style={{fontSize: 'large', ...icon.style}}>{icon.symbol}</span>
-        <span style={{fontSize: 'smaller', position: 'relative', top: '0.05rem'}}>{label}</span>
-        <Button size="sm" className="ms-2" style={{borderTopLeftRadius: '0', borderBottomLeftRadius: '0'}} onClick={configureYouTube} title="Open YouTube Configurator" aria-label="Open YouTube Configurator">
-          <span className='material-symbols-outlined' style={{fontSize: 'large', lineHeight: 'inherit'}}>settings</span>
+      <div
+        className="ms-2 ps-1 d-flex align-items-center bg-secondary"
+        style={{ borderRadius: "var(--bs-border-radius)" }}
+      >
+        <span
+          className={`material-symbols-outlined me-2 ${icon.className}`}
+          style={{ fontSize: "large", ...icon.style }}
+        >
+          {icon.symbol}
+        </span>
+        <span
+          style={{ fontSize: "smaller", position: "relative", top: "0.05rem" }}
+        >
+          {label}
+        </span>
+        <Button
+          size="sm"
+          className="ms-2"
+          style={{ borderTopLeftRadius: "0", borderBottomLeftRadius: "0" }}
+          onClick={configureYouTube}
+          title="Open YouTube Configurator"
+          aria-label="Open YouTube Configurator"
+        >
+          <span
+            className="material-symbols-outlined"
+            style={{ fontSize: "large", lineHeight: "inherit" }}
+          >
+            settings
+          </span>
         </Button>
       </div>
-    )
+    );
   }, [ytConnectionStatus]);
-
 
   return useMemo(() => {
     const { embedDownloaderYouTube } = state;
@@ -102,16 +128,16 @@ function EmbedsBox() {
             { value: "custom", label: "Use external downloader" }
           ]}
         />
-        {
-          embedDownloaderYouTube.type === 'default' ?
-            <CheckboxRow
-              config={["patreon.dl.gui", "connect.youtube"]}
-              label="Connect to YouTube account"
-              helpTooltip="If you have a YouTube Premium account, connecting to it allows you to download videos at higher qualities where available."
-              appendElements={ytConnectionStatusEl ? [ytConnectionStatusEl] : undefined}
-            />
-          : null
-        }
+        {embedDownloaderYouTube.type === "default" ?
+          <CheckboxRow
+            config={["patreon.dl.gui", "connect.youtube"]}
+            label="Connect to YouTube account"
+            helpTooltip="If you have a YouTube Premium account, connecting to it allows you to download videos at higher qualities where available."
+            appendElements={
+              ytConnectionStatusEl ? [ytConnectionStatusEl] : undefined
+            }
+          />
+        : null}
         {embedDownloaderYouTube.type === "custom" ?
           <TextInputRow
             config={["embed.downloader.youtube", "exec"]}

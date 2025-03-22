@@ -1,4 +1,4 @@
-import type { CSSProperties, JSX} from "react";
+import type { CSSProperties, JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Modal, Spinner } from "react-bootstrap";
 import type {
@@ -103,10 +103,15 @@ function YouTubeConfiguratorModal() {
         state.status.isConnected ?
           "You are currently connected to YouTube."
         : "You are not connected to YouTube.";
-      const icon: { className: string; style?: CSSProperties; symbol: string; } =
-        state.status.isConnected ?
-          { className: "text-success", symbol: "check_circle" }
-        : { className: "text-danger", style:{position: 'relative', top: '0.1rem'}, symbol: "cancel" };
+      const icon: { className: string; style?: CSSProperties; symbol: string } =
+
+          state.status.isConnected ?
+            { className: "text-success", symbol: "check_circle" }
+          : {
+              className: "text-danger",
+              style: { position: "relative", top: "0.1rem" },
+              symbol: "cancel"
+            };
       const primaryButton =
         state.status.isConnected ?
           <Button variant="danger" onClick={disconnect}>
@@ -135,7 +140,12 @@ function YouTubeConfiguratorModal() {
     } else if (state.phase === "connecting") {
       let contents: JSX.Element;
       if (!state.info) {
-        contents = <div className="py-2 d-flex align-items-center"><Spinner size="sm" className="me-2"/>Please wait...</div>;
+        contents = (
+          <div className="py-2 d-flex align-items-center">
+            <Spinner size="sm" className="me-2" />
+            Please wait...
+          </div>
+        );
       } else {
         const { verificationURL, code } = state.info;
         const link = (
@@ -174,7 +184,11 @@ function YouTubeConfiguratorModal() {
       return {
         contents,
         buttons: [
-          <Button key="cancel.button" variant="secondary" onClick={cancelConnect}>
+          <Button
+            key="cancel.button"
+            variant="secondary"
+            onClick={cancelConnect}
+          >
             Cancel
           </Button>
         ]
@@ -190,7 +204,11 @@ function YouTubeConfiguratorModal() {
               You are now connected to YouTube.
             </div>
           ),
-          buttons: [<Button key="close.button.1" onClick={hide}>Close</Button>]
+          buttons: [
+            <Button key="close.button.1" onClick={hide}>
+              Close
+            </Button>
+          ]
         };
       } else if (state.result.status === "error") {
         return {
@@ -205,7 +223,11 @@ function YouTubeConfiguratorModal() {
               <div className="mt-1">{state.result.error}</div>
             </>
           ),
-          buttons: [<Button key="close.button.2" onClick={hide}>Close</Button>]
+          buttons: [
+            <Button key="close.button.2" onClick={hide}>
+              Close
+            </Button>
+          ]
         };
       }
     }

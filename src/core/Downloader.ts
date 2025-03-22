@@ -21,7 +21,13 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   const downloaderOptions: DownloaderOptions = {
     cookie: fileConfig.downloader["cookie"],
     pathToFFmpeg: fileConfig.downloader["path.to.ffmpeg"],
-    pathToYouTubeCredentials: uiConfig["patreon.dl.gui"]["connect.youtube"] && YouTubeConfigurator.getConnectionStatus().isConnected ? YT_CREDS_PATH : undefined,
+    pathToYouTubeCredentials:
+      (
+        uiConfig["patreon.dl.gui"]["connect.youtube"] &&
+        YouTubeConfigurator.getConnectionStatus().isConnected
+      ) ?
+        YT_CREDS_PATH
+      : undefined,
     useStatusCache: uiConfig.downloader["use.status.cache"],
     stopOn: uiConfig.downloader["stop.on"],
     dryRun: uiConfig.downloader["dry.run"],

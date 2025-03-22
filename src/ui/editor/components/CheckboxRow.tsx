@@ -21,7 +21,13 @@ function CheckboxRow<S extends UIConfigSectionWithPropsOf<boolean>>(
   props: CheckboxRowProps<S>
 ) {
   const { config, setConfigValue } = useConfig();
-  const { config: pConfig, label, ariaLabel, onChange, appendElements = [] } = props;
+  const {
+    config: pConfig,
+    label,
+    ariaLabel,
+    onChange,
+    appendElements = []
+  } = props;
   const [section, prop] = pConfig;
   const value = config[section][prop] as boolean;
 
@@ -39,7 +45,7 @@ function CheckboxRow<S extends UIConfigSectionWithPropsOf<boolean>>(
           }}
           aria-label={ariaLabel || label}
         />
-        { ...appendElements }
+        {...appendElements}
         {createHelpIcon({ ...props, className: "ms-3" })}
       </Col>
     </Row>

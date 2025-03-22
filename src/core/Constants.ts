@@ -89,7 +89,5 @@ export const FILE_CONFIG_SECTION_PROPS = {
     "date.time.format",
     "color"
   ],
-  "patreon.dl.gui": [
-    "connect.youtube"
-  ]
+  "patreon.dl.gui": ["connect.youtube"]
 } as const;

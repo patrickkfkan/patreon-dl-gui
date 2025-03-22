@@ -5,7 +5,11 @@ import type { PageInfo } from "./UIConfig";
 import type { DownloaderLogMessage } from "../core/DownloaderConsoleLogger";
 import type { RecentDocument } from "../core/util/RecentDocuments";
 import type { ApplyProxyResult } from "../core/MainWindow";
-import type { YouTubeConnectionStatus, YouTubeConnectResult, YouTubeConnectVerificationInfo } from "../core/util/YouTubeConfigurator";
+import type {
+  YouTubeConnectionStatus,
+  YouTubeConnectResult,
+  YouTubeConnectVerificationInfo
+} from "../core/util/YouTubeConfigurator";
 
 export type MainProcessRendererEvent =
   | "editorCreated"
@@ -158,7 +162,8 @@ export type MainProcessRendererEventListener<
 > =
   E extends "aboutInfo" ? (info: AboutInfo) => void
   : E extends "editorCreated" ? (editor: Editor) => void
-  : E extends "youtubeConnectionStatus" ? (status: YouTubeConnectionStatus) => void
+  : E extends "youtubeConnectionStatus" ?
+    (status: YouTubeConnectionStatus) => void
   : E extends "browserPageInfo" ? (info: PageInfo) => void
   : E extends "previewInfo" ? (info: FileConfig) => void
   : E extends "promptOverwriteOnSave" ? (config: FileConfig<"hasPath">) => void
@@ -173,8 +178,10 @@ export type MainProcessRendererEventListener<
   : E extends "browserPageNavigated" ?
     (info: WebBrowserPageNavigatedInfo) => void
   : E extends "applyProxyResult" ? (result: ApplyProxyResult) => void
-  : E extends "youtubeConfiguratorStart" ? (status: YouTubeConnectionStatus) => void
-  : E extends "youtubeConnectVerificationInfo" ? (info: YouTubeConnectVerificationInfo) => void
+  : E extends "youtubeConfiguratorStart" ?
+    (status: YouTubeConnectionStatus) => void
+  : E extends "youtubeConnectVerificationInfo" ?
+    (info: YouTubeConnectVerificationInfo) => void
   : E extends "youtubeConnectResult" ? (result: YouTubeConnectResult) => void
   : never;
 
