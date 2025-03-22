@@ -133,6 +133,7 @@ function EmbedsBox() {
             config={["patreon.dl.gui", "connect.youtube"]}
             label="Connect to YouTube account"
             helpTooltip="If you have a YouTube Premium account, connecting to it allows you to download videos at higher qualities where available."
+            helpHasMoreInfo
             appendElements={
               ytConnectionStatusEl ? [ytConnectionStatusEl] : undefined
             }
