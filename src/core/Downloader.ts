@@ -82,6 +82,23 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
     }
   };
 
+  const embedDownloaders: DownloaderOptions['embedDownloaders'] = [];
+  if (uiConfig["embed.downloader.youtube"].type === 'custom' && uiConfig["embed.downloader.youtube"].exec.trim()) {
+    embedDownloaders.push({
+      provider: 'youtube',
+      exec: uiConfig['embed.downloader.youtube'].exec.trim()
+    });
+  }
+  if (uiConfig['embed.downloader.vimeo'].exec.trim()) {
+    embedDownloaders.push({
+      provider: 'vimeo',
+      exec: uiConfig['embed.downloader.vimeo'].exec.trim()
+    });
+  }
+  if (embedDownloaders.length > 0) {
+    downloaderOptions.embedDownloaders = embedDownloaders;
+  }
+
   const consoleLoggerOptions: ConsoleLoggerOptions = {
     ...ConsoleLogger.getDefaultConfig(),
     enabled: uiConfig["logger.console"].enabled,
