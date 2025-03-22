@@ -55,8 +55,8 @@ function HelpModal() {
     setShow(false);
   }, []);
 
-  const end = useCallback(async () => {
-    await window.mainAPI.emitMainEvent("helpModalClose");
+  const end = useCallback(() => {
+    window.mainAPI.emitMainEvent("helpModalClose");
   }, []);
 
   if (!contents) {

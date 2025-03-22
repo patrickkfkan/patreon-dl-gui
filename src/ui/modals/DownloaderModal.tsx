@@ -146,8 +146,8 @@ function DownloaderModal() {
     setShow(false);
   }, []);
 
-  const end = useCallback(async () => {
-    await window.mainAPI.emitMainEvent("downloaderModalClose");
+  const end = useCallback(() => {
+    window.mainAPI.emitMainEvent("downloaderModalClose");
   }, []);
 
   const confirmStartDownload = useCallback(

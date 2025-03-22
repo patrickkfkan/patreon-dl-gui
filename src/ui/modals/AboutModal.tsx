@@ -23,8 +23,8 @@ function AboutModal() {
     setShow(false);
   }, []);
 
-  const end = useCallback(async () => {
-    await window.mainAPI.emitMainEvent("aboutModalClose");
+  const end = useCallback(() => {
+    window.mainAPI.emitMainEvent("aboutModalClose");
   }, []);
 
   if (!info) {
