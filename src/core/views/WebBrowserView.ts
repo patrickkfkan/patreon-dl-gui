@@ -127,7 +127,11 @@ export default class WebBrowserView extends WebContentsView {
     this.webContents.on(
       "did-fail-load",
       async (e, code, description, url, isMainFrame) => {
-        if (!isMainFrame) {
+        // Ignore code -3 that is thrown occasionally when loading Patreon
+        // homepage (when not logged in). This is possibly due to the reloading
+        // mechanism in `did-navigate-page`, leading to some scripts
+        // trying to send data through closed requests.
+        if (!isMainFrame || code === -3) {
           return;
         }
         e.preventDefault();
