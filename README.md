@@ -62,10 +62,6 @@ To package the app for your OS:
 $ npm run make
 ```
 
-## Technical notes
-
-This project uses a customized version of the [proxy-chain](https://github.com/apify/proxy-chain) library to set proxy in web browser sessions. The customizations have been submitted to the `proxy-chain` repo in [PR #577](https://github.com/apify/proxy-chain/pull/577).
-
 ## Changelog
 
 v2.0.0
