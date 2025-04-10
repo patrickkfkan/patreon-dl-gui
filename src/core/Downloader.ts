@@ -30,7 +30,7 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
     pathToFFmpeg: fileConfig.downloader["path.to.ffmpeg"],
     pathToYouTubeCredentials:
       (
-        uiConfig['embed.downloader.youtube'].type === 'default' &&
+        uiConfig["embed.downloader.youtube"].type === "default" &&
         uiConfig["patreon.dl.gui"]["connect.youtube"] &&
         YouTubeConfigurator.getConnectionStatus().isConnected
       ) ?
@@ -89,11 +89,14 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
     }
   };
 
-  const embedDownloaders: DownloaderOptions['embedDownloaders'] = [];
-  if (uiConfig["embed.downloader.youtube"].type === 'custom' && uiConfig["embed.downloader.youtube"].exec.trim()) {
+  const embedDownloaders: DownloaderOptions["embedDownloaders"] = [];
+  if (
+    uiConfig["embed.downloader.youtube"].type === "custom" &&
+    uiConfig["embed.downloader.youtube"].exec.trim()
+  ) {
     embedDownloaders.push({
-      provider: 'youtube',
-      exec: uiConfig['embed.downloader.youtube'].exec.trim()
+      provider: "youtube",
+      exec: uiConfig["embed.downloader.youtube"].exec.trim()
     });
   }
   if (uiConfig["embed.downloader.vimeo"].type === "helper") {
@@ -103,8 +106,8 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
     });
   } else if (uiConfig["embed.downloader.vimeo"].exec.trim()) {
     embedDownloaders.push({
-      provider: 'vimeo',
-      exec: uiConfig['embed.downloader.vimeo'].exec.trim()
+      provider: "vimeo",
+      exec: uiConfig["embed.downloader.vimeo"].exec.trim()
     });
   }
   if (embedDownloaders.length > 0) {
