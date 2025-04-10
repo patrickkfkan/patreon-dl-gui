@@ -42,6 +42,7 @@ If you intend to create a config file in `patreon-dl-gui` for use with `patreon-
 | `patreon-dl-gui` version | `patreon-dl` version used |
 |--------------------------|---------------------------|
 | v1.0.0 - v2.0.0          | v2.4.1                    |
+| v2.1.0                   | v2.4.2                    |
 
 ## Running / packaging the app from source
 
@@ -63,6 +64,11 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.1.0
+- Update `patreon-dl` library to v2.4.2 (mainly fixes YouTube download issues)
+- Fix compatibility with Node JS v23 ([#2](https://github.com/patrickkfkan/patreon-dl-gui/issues/2))
+- Simplify downloading embedded Vimeo videos through helper script
 
 v2.0.0
 - Major UI overhaul: web browser is now embedded into the main window
