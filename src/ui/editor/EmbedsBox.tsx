@@ -2,7 +2,7 @@ import type { UIConfig } from "../../types/UIConfig";
 import { useConfig } from "../contexts/ConfigProvider";
 import SelectRow from "./components/SelectRow";
 import TextInputRow from "./components/TextInputRow";
-import { Button, Container } from "react-bootstrap";
+import { Button, Container, Tab, Tabs } from "react-bootstrap";
 import type { CSSProperties } from "react";
 import { useMemo } from "react";
 import _ from "lodash";
@@ -104,45 +104,92 @@ function EmbedsBox() {
   }, [youtubeConnectionStatus]);
 
   return useMemo(() => {
-    const { embedDownloaderYouTube } = state;
+    const { embedDownloaderYouTube, embedDownloaderVimeo } = state;
     return (
-      <Container fluid className="pt-3">
-        <SelectRow
-          config={["embed.downloader.youtube", "type"]}
-          label="YouTube"
-          options={[
-            { value: "default", label: "Use built-in downloader" },
-            { value: "custom", label: "Use external downloader" }
-          ]}
-        />
-        {embedDownloaderYouTube.type === "default" ?
-          <CheckboxRow
-            config={["patreon.dl.gui", "connect.youtube"]}
-            label="Connect to YouTube account"
-            helpTooltip="If you have a YouTube Premium account, connecting to it allows you to download videos at higher qualities where available."
-            helpHasMoreInfo
-            appendElements={
-              ytConnectionStatusEl ? [ytConnectionStatusEl] : undefined
-            }
-          />
-        : null}
-        {embedDownloaderYouTube.type === "custom" ?
-          <TextInputRow
-            config={["embed.downloader.youtube", "exec"]}
-            label="YouTube download command"
-            insertables={EXEC_INSERTABLES}
-            helpTooltip="Command to download embedded YouTube videos."
-            helpHasMoreInfo
-          />
-        : null}
-        <TextInputRow
-          config={["embed.downloader.vimeo", "exec"]}
-          label="Vimeo download command"
-          insertables={EXEC_INSERTABLES}
-          helpTooltip="Command to download embedded Vimeo videos."
-          helpHasMoreInfo
-        />
-      </Container>
+      <Tabs
+        defaultActiveKey="embed-downloader-youtube"
+        variant="underline"
+        className="mb-2 py-1 px-3"
+      >
+        <Tab
+          className="pb-2"
+          eventKey="embed-downloader-youtube"
+          title="YouTube"
+        >
+          <Container fluid>
+            <SelectRow
+              config={["embed.downloader.youtube", "type"]}
+              label="Download method"
+              options={[
+                { value: "default", label: "Use built-in downloader" },
+                { value: "custom", label: "Run external command" }
+              ]}
+            />
+            {embedDownloaderYouTube.type === "default" ?
+              <CheckboxRow
+                config={["patreon.dl.gui", "connect.youtube"]}
+                label="Connect to YouTube account"
+                helpTooltip="If you have a YouTube Premium account, connecting to it allows you to download videos at higher qualities where available."
+                helpHasMoreInfo
+                appendElements={
+                  ytConnectionStatusEl ? [ytConnectionStatusEl] : undefined
+                }
+              />
+            : null}
+            {embedDownloaderYouTube.type === "custom" ?
+              <TextInputRow
+                config={["embed.downloader.youtube", "exec"]}
+                label="External command"
+                insertables={EXEC_INSERTABLES}
+                helpTooltip="Command to download embedded YouTube videos."
+                helpHasMoreInfo
+              />
+            : null}
+          </Container>
+        </Tab>
+        <Tab className="pb-2" eventKey="embed-downloader-vimeo" title="Vimeo">
+          <Container fluid>
+            <SelectRow
+              config={["embed.downloader.vimeo", "type"]}
+              label="Download method"
+              options={[
+                {
+                  value: "helper",
+                  label: "Use helper script (requires yt-dlp)"
+                },
+                { value: "custom", label: "Run external command" }
+              ]}
+              helpTooltip="Method to download embedded Vimeo videos."
+              helpHasMoreInfo
+            />
+            {embedDownloaderVimeo.type === "helper" ?
+              <>
+                <TextInputRow
+                  type="file"
+                  config={["embed.downloader.vimeo", "helper.ytdlp.path"]}
+                  label="Path to yt-dlp"
+                  helpTooltip="Path to yt-dlp executable."
+                  helpHasMoreInfo
+                />
+                <TextInputRow
+                  config={["embed.downloader.vimeo", "helper.password"]}
+                  label="Private video password"
+                  helpTooltip="Password for protected Vimeo videos"
+                />
+              </>
+            : null}
+            {embedDownloaderVimeo.type === "custom" ?
+              <TextInputRow
+                config={["embed.downloader.vimeo", "exec"]}
+                label="External command"
+                insertables={EXEC_INSERTABLES}
+                helpTooltip="Command to download embedded Vimeo videos."
+                helpHasMoreInfo
+              />
+            : null}
+          </Container>
+        </Tab>
+      </Tabs>
     );
   }, [state, ytConnectionStatusEl]);
 }

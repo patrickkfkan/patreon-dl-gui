@@ -9,6 +9,13 @@ import type {
 import { ChainLogger, ConsoleLogger, DateTime, FileLogger } from "patreon-dl";
 import { getDefaultFileLoggerOptions } from "./util/Config";
 import YouTubeConfigurator, { YT_CREDS_PATH } from "./util/YouTubeConfigurator";
+import {
+  VIMEO_HELPER_SCRIPT_EXEC_ARGS,
+  VIMEO_HELPER_SCRIPT_PATH
+} from "./Constants";
+import { Shescape } from "shescape";
+
+const shescape = new Shescape({ shell: true });
 
 export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   const targetURL = uiConfig.downloader.target.browserValue?.value;
@@ -89,7 +96,12 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
       exec: uiConfig['embed.downloader.youtube'].exec.trim()
     });
   }
-  if (uiConfig['embed.downloader.vimeo'].exec.trim()) {
+  if (uiConfig["embed.downloader.vimeo"].type === "helper") {
+    embedDownloaders.push({
+      provider: "vimeo",
+      exec: getVimeoHelperExec(uiConfig["embed.downloader.vimeo"])
+    });
+  } else if (uiConfig["embed.downloader.vimeo"].exec.trim()) {
     embedDownloaders.push({
       provider: 'vimeo',
       exec: uiConfig['embed.downloader.vimeo'].exec.trim()
@@ -174,4 +186,18 @@ function toDateTime(value: string): DateTime | null {
     );
     return null;
   }
+}
+
+function getVimeoHelperExec(config: UIConfig["embed.downloader.vimeo"]) {
+  const args = [...VIMEO_HELPER_SCRIPT_EXEC_ARGS];
+  if (config["helper.ytdlp.path"].trim()) {
+    args.push("--yt-dlp", shescape.quote(config["helper.ytdlp.path"].trim()));
+  }
+  if (config["helper.password"].trim()) {
+    args.push(
+      "--video-password",
+      shescape.quote(config["helper.password"].trim())
+    );
+  }
+  return [shescape.quote(VIMEO_HELPER_SCRIPT_PATH), ...args].join(" ");
 }

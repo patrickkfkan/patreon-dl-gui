@@ -143,7 +143,12 @@ export function convertUIConfigToFileContents(config: UIConfig) {
     "patreon.dl.gui": {
       "connect.youtube": booleanToString(
         config["patreon.dl.gui"]["connect.youtube"]
-      )
+      ),
+      "vimeo.downloader.type": config["embed.downloader.vimeo"].type,
+      "vimeo.helper.ytdlp.path":
+        config["embed.downloader.vimeo"]["helper.ytdlp.path"].trim() || "",
+      "vimeo.helper.password":
+        config["embed.downloader.vimeo"]["helper.password"].trim() || ""
     }
   };
 

@@ -1,5 +1,4 @@
 import { FileLogger } from "patreon-dl";
-import path from "path";
 
 export type ValidateProxyURLResult =
   | {
