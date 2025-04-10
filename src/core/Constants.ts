@@ -99,10 +99,11 @@ export const FILE_CONFIG_SECTION_PROPS = {
 } as const;
 
 const isDevMode = !app.isPackaged;
+const vimeoHelperScriptFile = `patreon-dl-vimeo${process.platform === "win32" ? ".exe" : ""}`;
 export const VIMEO_HELPER_SCRIPT_PATH =
   isDevMode ?
-    path.join(__dirname, "../../resources_out/patreon-dl-vimeo")
-  : path.join(process.resourcesPath, "/patreon-dl-vimeo");
+    path.join(__dirname, `../../resources_out/bin/${vimeoHelperScriptFile}`)
+  : path.join(process.resourcesPath, `/bin/${vimeoHelperScriptFile}`);
 
 export const VIMEO_HELPER_SCRIPT_EXEC_ARGS = [
   "-o",

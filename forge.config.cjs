@@ -14,7 +14,7 @@ const { rendererConfig } = require('./webpack.renderer.config');
 const config = {
   packagerConfig: {
     asar: true,
-    extraResource: ['./resources_out/patreon-dl-vimeo']
+    extraResource: ['./resources_out/bin']
   },
   rebuildConfig: {},
   makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({
