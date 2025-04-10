@@ -37,7 +37,7 @@ const EditorContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [editors, setEditors] = useState<Editor[]>([]);
   const [activeEditor, setActiveEditor] = useState<Editor | null>(null);
   const [youtubeConnectionStatus, setYouTubeConnectionStatus] =
-      useState<YouTubeConnectionStatus | null>(null);
+    useState<YouTubeConnectionStatus | null>(null);
   const [actionPending, setActionPending] = useState(false);
   const [showHelpIcons, setShowHelpIcons] = useState(false);
   const [, setRefreshToken] = useState(new Date().getMilliseconds());
