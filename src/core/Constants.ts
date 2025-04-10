@@ -1,5 +1,6 @@
 import { app } from "electron";
 import envPaths from "env-paths";
+import path from "path";
 import type { MainWindowProps } from "./MainWindow";
 import type { DeepRequired } from "patreon-dl";
 
@@ -89,5 +90,25 @@ export const FILE_CONFIG_SECTION_PROPS = {
     "date.time.format",
     "color"
   ],
-  "patreon.dl.gui": ["connect.youtube"]
+  "patreon.dl.gui": [
+    "connect.youtube",
+    "vimeo.downloader.type",
+    "vimeo.helper.ytdlp.path",
+    "vimeo.helper.password"
+  ]
 } as const;
+
+const isDevMode = !app.isPackaged;
+export const VIMEO_HELPER_SCRIPT_PATH =
+  isDevMode ?
+    path.join(__dirname, "../../resources_out/patreon-dl-vimeo")
+  : path.join(process.resourcesPath, "/patreon-dl-vimeo");
+
+export const VIMEO_HELPER_SCRIPT_EXEC_ARGS = [
+  "-o",
+  `"{dest.dir}${path.sep}%(title)s.%(ext)s"`,
+  "--embed-html",
+  '"{embed.html}"',
+  "--embed-url",
+  '"{embed.url}"'
+];

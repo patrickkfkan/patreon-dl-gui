@@ -1,3 +1,4 @@
+const path = require('path');
 const { MakerSquirrel } = require('@electron-forge/maker-squirrel');
 const { MakerZIP } = require('@electron-forge/maker-zip');
 const { MakerDeb } = require('@electron-forge/maker-deb');
@@ -13,9 +14,20 @@ const { rendererConfig } = require('./webpack.renderer.config');
 const config = {
   packagerConfig: {
     asar: true,
+    extraResource: ['./resources_out/patreon-dl-vimeo']
   },
   rebuildConfig: {},
-  makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
+  makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({
+    options: {
+      /**
+       * Note: we override maker-rpm package with latest version, and set 
+       * `specTemplate` to point to our custom spec file. The custom spec
+       * disables stripping of the patreon-dl-vimeo binary, which would otherwise 
+       * throw "Pkg: Error reading from file" when executed.
+       */
+      specTemplate: path.join(__dirname, '/misc/rpm_spec.ejs')
+    }
+  }), new MakerDeb({})],
   plugins: [
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
@@ -40,7 +52,7 @@ const config = {
             },
           }
         ],
-      },
+      },               
       devContentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:;"
     }),
     new FusesPlugin({
