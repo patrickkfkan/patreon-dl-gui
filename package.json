@@ -5,7 +5,7 @@
   "description": "GUI for patreon-dl",
   "main": ".webpack/main",
   "scripts": {
-    "prepare": "rimraf ./resources_out && npx pkg --targets node20 --out-path ./resources_out ./src/resources/patreon-dl-vimeo.js",
+    "prepare": "rimraf ./resources_out && npx pkg --targets node20 --out-path ./resources_out/bin ./src/resources/patreon-dl-vimeo.js",
     "start": "npm run prepare && electron-forge start",
     "package": "npm run prepare && electron-forge package",
     "make": "npm run prepare && electron-forge make",
