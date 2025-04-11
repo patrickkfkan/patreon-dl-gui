@@ -711,10 +711,32 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
       )
     },
     "embed.downloader.vimeo": {
+      type: __fromFileConfigValue(
+        "patreon.dl.gui",
+        "vimeo.downloader.type",
+        defaultConfig["embed.downloader.vimeo"]["type"],
+        (value) =>
+          toOneOf<UIConfig["embed.downloader.vimeo"]["type"]>(value, [
+            "helper",
+            "custom"
+          ])
+      ),
       exec: __fromFileConfigValue(
         "embed.downloader.vimeo",
         "exec",
         defaultConfig["embed.downloader.vimeo"]["exec"],
+        toString
+      ),
+      "helper.ytdlp.path": __fromFileConfigValue(
+        "patreon.dl.gui",
+        "vimeo.helper.ytdlp.path",
+        defaultConfig["embed.downloader.vimeo"]["helper.ytdlp.path"],
+        toString
+      ),
+      "helper.password": __fromFileConfigValue(
+        "patreon.dl.gui",
+        "vimeo.helper.password",
+        defaultConfig["embed.downloader.vimeo"]["helper.password"],
         toString
       )
     },

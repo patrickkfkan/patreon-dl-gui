@@ -90,7 +90,11 @@ export interface UIConfig {
     exec: string;
   };
   "embed.downloader.vimeo": {
+    type: "helper" | "custom";
     exec: string;
+    // Helper params
+    "helper.ytdlp.path": string;
+    "helper.password": string;
   };
   "logger.console": {
     enabled: boolean;
