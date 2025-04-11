@@ -122,7 +122,10 @@ function convertPatreonDLOptionsToUIConfig(
       exec: ""
     },
     "embed.downloader.vimeo": {
-      exec: ""
+      type: "custom",
+      exec: "",
+      "helper.ytdlp.path": "",
+      "helper.password": ""
     },
     "logger.console": {
       enabled: consoleLoggerOptions.enabled,
@@ -171,7 +174,7 @@ function convertPatreonDLOptionsToUIConfig(
         }
         break;
       case "vimeo":
-        conf["embed.downloader.youtube"]["exec"] = exec;
+        conf["embed.downloader.vimeo"]["exec"] = exec;
         break;
     }
   }
