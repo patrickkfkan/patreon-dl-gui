@@ -4,11 +4,29 @@
 
 An Electron app that provides a GUI for [patreon-dl](https://github.com/patrickkfkan/patreon-dl).
 
+## Features
+
+- Download posts by a creator, in a collection or single post. Includes patron-only content provided you have a subscription to access it.
+- Download products purchased from a creator's shop.
+- Items included in downloads:
+  - videos
+  - images
+  - audio
+  - attachments
+  - embedded YouTube and Vimeo videos
+- Save campaign and content info
+- Extensively configurable, e.g.:
+  - Download only certain types of media
+  - Filter posts by tier, date published, type of media contained
+  - Download through proxy server
+
 ## Installation
 
 [Download](https://github.com/patrickkfkan/patreon-dl-gui/releases) and install the package suitable for your system. Linux (RPM and DEB) and Windows x64 versions are provided. If you are on a different system, you may [run or package the app from source](#running--packaging-the-app-from-source).
 
 If you are going to download videos, you should also install [FFmpeg](https://www.ffmpeg.org/). This is required for most videos found on Patreon.
+
+Furthermore, if you intend to download embedded Vimeo videos, you are recommended to install [yt-dlp](https://github.com/yt-dlp/yt-dlp) and use the bundled helper script. See [Downloading embedded Vimeo videos using helper script](#downloading-embedded-vimeo-videos-using-helper-script).
 
 ## Quick start guide
 
@@ -22,13 +40,22 @@ If you are going to download videos, you should also install [FFmpeg](https://ww
 - Once a target is identified, you can configure the options to suit your needs. To get help about an option, select the "Show Help Icons" item in the Help menu.
 - To begin downloading the target, click the "play" button in the toolbar. You may also save the configuration to file and open it on another occasion.
 
+### Downloading embedded Vimeo videos using helper script
+
+`patreon-dl-gui` provides a helper script to facilitate downloading of embedded Vimeo videos. The script uses [yt-dlp](https://github.com/yt-dlp/yt-dlp) in the process. The easiest way to set things up would be to:
+1. Download a [precompiled binary](https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#release-files) of `yt-dlp` suitable for your system.
+2. Then, in `patreon-dl-gui`, go to "Embeds" -> "Vimeo".
+3. Select "Use helper script" for "Download method".
+4. Click the folder icon for "Path to yt-dlp" and select the downloaded binary.
+
 ## Interoperability with `patreon-dl` CLI
 
 `patreon-dl-gui` is a standalone app that utilizes the `patreon-dl` library to download Patreon content. On the other hand, `patreon-dl` comes with a CLI tool that has the option to read downloader options from a config file.
 
-Generally speaking, config files saved in `patreon-dl-gui` can be passed to the `patreon-dl` CLI tool without issue, subject to the following exception:
+Generally speaking, config files saved in `patreon-dl-gui` can be passed to the `patreon-dl` CLI tool without issue, subject to the following exceptions:
 
 - The "Connect to YouTube account" option found in `patreon-dl-gui` has no equivalent in `patreon-dl` CLI config. You would have to connect to your YouTube account separately through executing `patreon-dl --configure-youtube`.
+- Like `patreon-dl-gui`, `patreon-dl` provides a helper script for downloading embedded Vimeo videos, but you would have to set it up yourself in the config (see [example](https://github.com/patrickkfkan/patreon-dl/blob/23868152f3e37711e0964a7b909d2a41eb464759/example-embed.conf)).
 
 What about the other way round? You should note that the config schema accepted by `patreon-dl` CLI is broader than that for `patreon-dl-gui`. This means, if you have a config file manually created for use by `patreon-dl` CLI, opening it in `patreon-dl-gui` will not necessarily import all the options therein. In particular:
 
