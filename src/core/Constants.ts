@@ -11,7 +11,7 @@ export const APP_DATA_PATH = envPaths(app.getName(), {
 export const APP_URL = "https://github.com/patrickkfkan/patreon-dl-gui";
 
 export const USER_AGENT =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0";
 export const PATREON_URL = "https://www.patreon.com";
 
 export const DEFAULT_MAIN_WINDOW_PROPS: MainWindowProps &
