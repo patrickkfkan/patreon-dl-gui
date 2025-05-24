@@ -28,6 +28,7 @@ interface JSONWithPageBootstrap {
   page?: string;
   query?: {
     vanity?: string;
+    u?: string;
     productId?: string; // {slug}-{id}
     postId?: string; // {slug}-{id}
     collectionId?: string; // {id}
@@ -114,8 +115,13 @@ export default class PatreonPageAnalyzer {
       return null;
     }
 
-    const { vanity, postId, collectionId, productId } =
-      json.query && typeof json.query === "object" ? json.query : {};
+    const {
+      vanity,
+      u: userId,
+      postId,
+      collectionId,
+      productId
+    } = json.query && typeof json.query === "object" ? json.query : {};
 
     const __parseSlugId = (s: string) => {
       const match = /(.+)-(\d+)$/.exec(s);
@@ -128,6 +134,22 @@ export default class PatreonPageAnalyzer {
       return { slug: null, id: null };
     };
 
+    if (
+      PAGE_PATHNAME_FORMATS.postsByUser.includes(page) &&
+      typeof userId === "string"
+    ) {
+      const an: URLAnalysis = {
+        type: "postsByUserId",
+        userId
+      };
+      return {
+        normalizedURL: `${PATREON_URL}/user/posts?u=${userId}`,
+        target: {
+          ...an,
+          description: this.#getTargetDesc(an)
+        }
+      };
+    }
     if (
       PAGE_PATHNAME_FORMATS.postsByUser.includes(page) &&
       typeof vanity === "string"
