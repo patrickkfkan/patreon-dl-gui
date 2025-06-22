@@ -121,7 +121,7 @@ function TextInputRow<
       break;
   }
 
-  const insertField = (value: string) => {
+  const insertField = useCallback((value: string) => {
     const textbox = textboxRef.current;
     if (!textbox) {
       return;
@@ -130,7 +130,9 @@ function TextInputRow<
     textbox.setRangeText(value);
     textbox.selectionEnd = textbox.selectionStart = currentStart + value.length;
     textbox.focus();
-  };
+    const event = new Event('change', { bubbles: true });
+    textbox.dispatchEvent(event);
+  }, []);
 
   const insertableLinks = insertables?.map(({ value, label }) => (
     <a
