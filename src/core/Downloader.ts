@@ -4,7 +4,8 @@ import DownloaderConsoleLogger from "./DownloaderConsoleLogger";
 import type {
   ConsoleLoggerOptions,
   DownloaderOptions,
-  FileLoggerOptions
+  FileLoggerOptions,
+  FileLoggerType
 } from "patreon-dl";
 import { ChainLogger, ConsoleLogger, DateTime, FileLogger } from "patreon-dl";
 import { getDefaultFileLoggerOptions } from "./util/Config";
@@ -130,8 +131,12 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
 
   const consoleLogger = new DownloaderConsoleLogger(consoleLoggerOptions);
 
-  const fileLoggerOptions: FileLoggerOptions = {
+  const fileLoggerOptions: FileLoggerOptions<FileLoggerType.Downloader> = {
     ...getDefaultFileLoggerOptions(),
+    init: {
+      targetURL,
+      outDir: fileConfig.output["out.dir"]
+    },
     enabled: uiConfig["logger.file.1"].enabled,
     logLevel: uiConfig["logger.file.1"]["log.level"],
     logDir: fileConfig["logger.file.1"]["log.dir"],
@@ -148,10 +153,6 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   };
 
   const fileLogger = new FileLogger(
-    {
-      targetURL,
-      outDir: fileConfig.output["out.dir"]
-    },
     fileLoggerOptions
   );
 
