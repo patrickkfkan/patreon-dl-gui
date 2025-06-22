@@ -15,7 +15,7 @@ import {
 } from "./Constants";
 import { Shescape } from "shescape";
 
-const shescape = new Shescape({ shell: true });
+const shescape = new Shescape({ shell: process.platform === 'darwin' ? 'zsh' : true });
 
 export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   const targetURL = uiConfig.downloader.target.browserValue?.value;
