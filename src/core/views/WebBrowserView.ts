@@ -58,15 +58,6 @@ export default class WebBrowserView extends WebContentsView {
   }
 
   #registerListeners() {
-    this.webContents.session.webRequest.onBeforeSendHeaders(
-      { urls: ["*://accounts.google.com/*"] },
-      (details, callback) => {
-        // Need to change user agent for accounts.google.com (when signing in with Google account).
-        // Otherwise, we will get "Browser not secure" message without ability to proceed.
-        details.requestHeaders["User-Agent"] = "Chrome";
-        callback({ cancel: false, requestHeaders: details.requestHeaders });
-      }
-    );
     this.webContents.on("did-navigate-in-page", async (e, url, isMainFrame) => {
       if (this.#analyzePageAbortController) {
         this.#analyzePageAbortController.abort();
