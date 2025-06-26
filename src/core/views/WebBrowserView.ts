@@ -120,9 +120,12 @@ export default class WebBrowserView extends WebContentsView {
       }
     });
     this.webContents.on("did-create-window", async (win, details) => {
-      win.close();
-      this.#lastLoadedURL = details.url;
-      await this.webContents.loadURL(details.url);
+      console.log('did-create-window', details);
+      if (details.url.startsWith(PATREON_URL)) {
+        win.close();
+        this.#lastLoadedURL = details.url;
+        await this.webContents.loadURL(details.url);
+      }
     });
     this.webContents.on(
       "did-fail-load",
