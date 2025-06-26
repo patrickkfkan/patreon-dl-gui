@@ -31,10 +31,15 @@ export default class WebBrowserView extends WebContentsView {
     this.#registerListeners();
   }
 
-  gotoURL(url: string) {
-    return this.webContents.loadURL(
-      normalizeUrl(url, { defaultProtocol: "https" })
-    );
+  async gotoURL(url: string) {
+    try {
+      await this.webContents.loadURL(
+        normalizeUrl(url, { defaultProtocol: "https" })
+      );
+    }
+    catch (_error) {
+      // Do nothing - let errors be shown within the page
+    }
   }
 
   goBack() {
@@ -120,9 +125,12 @@ export default class WebBrowserView extends WebContentsView {
       }
     });
     this.webContents.on("did-create-window", async (win, details) => {
-      win.close();
-      this.#lastLoadedURL = details.url;
-      await this.webContents.loadURL(details.url);
+      console.log('did-create-window', details);
+      if (details.url.startsWith(PATREON_URL)) {
+        win.close();
+        this.#lastLoadedURL = details.url;
+        await this.webContents.loadURL(details.url);
+      }
     });
     this.webContents.on(
       "did-fail-load",

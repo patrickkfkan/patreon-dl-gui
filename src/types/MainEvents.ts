@@ -1,5 +1,5 @@
 import type { Editor } from "./App";
-import type { FileLoggerConfig } from "patreon-dl";
+import type { FileLoggerConfig, FileLoggerType } from "patreon-dl";
 import type { FileConfig } from "./FileConfig";
 import type { PageInfo } from "./UIConfig";
 import type { DownloaderLogMessage } from "../core/DownloaderConsoleLogger";
@@ -109,7 +109,7 @@ export type DownloaderInitInfo =
       hasError: false;
       error?: undefined;
       downloaderConfig: object;
-      fileLoggerConfig: FileLoggerConfig;
+      fileLoggerConfig: FileLoggerConfig<FileLoggerType.Downloader>;
       prompt: boolean;
     };
 

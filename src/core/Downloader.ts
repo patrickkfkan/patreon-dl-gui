@@ -4,7 +4,8 @@ import DownloaderConsoleLogger from "./DownloaderConsoleLogger";
 import type {
   ConsoleLoggerOptions,
   DownloaderOptions,
-  FileLoggerOptions
+  FileLoggerOptions,
+  FileLoggerType
 } from "patreon-dl";
 import { ChainLogger, ConsoleLogger, DateTime, FileLogger } from "patreon-dl";
 import { getDefaultFileLoggerOptions } from "./util/Config";
@@ -15,7 +16,7 @@ import {
 } from "./Constants";
 import { Shescape } from "shescape";
 
-const shescape = new Shescape({ shell: true });
+const shescape = new Shescape({ shell: process.platform === 'darwin' ? 'zsh' : true });
 
 export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   const targetURL = uiConfig.downloader.target.browserValue?.value;
@@ -130,8 +131,12 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
 
   const consoleLogger = new DownloaderConsoleLogger(consoleLoggerOptions);
 
-  const fileLoggerOptions: FileLoggerOptions = {
+  const fileLoggerOptions: FileLoggerOptions<FileLoggerType.Downloader> = {
     ...getDefaultFileLoggerOptions(),
+    init: {
+      targetURL,
+      outDir: fileConfig.output["out.dir"]
+    },
     enabled: uiConfig["logger.file.1"].enabled,
     logLevel: uiConfig["logger.file.1"]["log.level"],
     logDir: fileConfig["logger.file.1"]["log.dir"],
@@ -148,10 +153,6 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
   };
 
   const fileLogger = new FileLogger(
-    {
-      targetURL,
-      outDir: fileConfig.output["out.dir"]
-    },
     fileLoggerOptions
   );
 

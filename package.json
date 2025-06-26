@@ -1,7 +1,7 @@
 {
   "name": "patreon-dl-gui",
   "productName": "patreon-dl-gui",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "GUI for patreon-dl",
   "main": ".webpack/main",
   "scripts": {
@@ -67,7 +67,7 @@
     "material-icons": "^1.13.13",
     "material-symbols": "^0.28.1",
     "normalize-url": "^8.0.1",
-    "patreon-dl": "^2.4.2",
+    "patreon-dl": "^3.0.0",
     "portfinder": "^1.0.35",
     "proxy-chain": "^2.5.8",
     "react": "^19.0.0",

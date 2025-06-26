@@ -108,11 +108,10 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
     #getDisplayConfig(config: ReturnType<PatreonDownloader<any>["getConfig"]>) {
       const displayConfig = _.cloneDeep(config) as DeepWriteable<
         typeof config
-      > &
-        Record<string, unknown>;
-      delete displayConfig.type;
-      delete displayConfig.postFetch;
-      delete displayConfig.productId;
+      >;
+      delete (displayConfig as Record<string, unknown>).type;
+      delete (displayConfig as Record<string, unknown>).postFetch;
+      delete (displayConfig as Record<string, unknown>).productId;
       if (config.include?.postsPublished?.after) {
         displayConfig.include.postsPublished.after =
           config.include.postsPublished.after.toString();
