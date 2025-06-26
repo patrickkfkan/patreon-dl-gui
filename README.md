@@ -70,6 +70,7 @@ If you intend to create a config file in `patreon-dl-gui` for use with `patreon-
 |--------------------------|---------------------------|
 | v1.0.0 - v2.0.0          | v2.4.1                    |
 | v2.1.0                   | v2.4.2                    |
+| v2.2.0                   | v3.0.0                    |
 
 ## Running / packaging the app from source
 
@@ -91,6 +92,16 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.2.0
+- Update `patreon-dl` library to v3.0.0
+- Bug-fixes:
+  - "Browser not secure" message / disabled sign-in button for Google account sign-ins
+  - Downloading from creators without vanity ([#4](https://github.com/patrickkfkan/patreon-dl-gui/issues/4))
+  - "Shell not supported" error when running on macOS ([#6](https://github.com/patrickkfkan/patreon-dl-gui/issues/6))
+  - "403 - Forbidden" errors when downloading Patreon-hosted videos ([#8](https://github.com/patrickkfkan/patreon-dl-gui/issues/8))
+  - Values inserted through textbox insertion links not persisting ([#9](https://github.com/patrickkfkan/patreon-dl-gui/issues/9))
+- Vimeo helper script: fallback to embed URL if player URL fails to download
 
 v2.1.0
 - Update `patreon-dl` library to v2.4.2 (mainly fixes YouTube download issues)
