@@ -139,8 +139,17 @@ if (!url) {
   process.exit(1);
 }
 
+async function doDownload(_url) {
+  let code = await download(_url, o, videoPassword, ytdlpPath);
+  if (code !== 0 && _url !== embedURL && embedURL) {
+    console.log(`Download failed - retrying with embed URL "${embedURL}"`);
+    return await doDownload(embedURL);
+  }
+  return code;
+}
+
 console.log(`Going to download video from "${url}"`);
 
-download(url, o, videoPassword, ytdlpPath).then((code) => {
+doDownload(url).then((code) => {
   process.exit(code);
 });

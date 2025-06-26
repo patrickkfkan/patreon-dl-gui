@@ -12,6 +12,7 @@ import ConfigParser from "configparser";
 import type {
   FileExistsAction,
   FileLoggerOptions,
+  FileLoggerType,
   LogLevel,
   StopOnCondition
 } from "patreon-dl";
@@ -26,7 +27,7 @@ export interface LoadFileResult {
 
 type BooleanString = "1" | "yes" | "true" | "0" | "no" | "false";
 type LogFileExistsAction = Exclude<
-  FileLoggerOptions["fileExistsAction"],
+  FileLoggerOptions<FileLoggerType.Downloader>["fileExistsAction"],
   undefined
 >;
 
