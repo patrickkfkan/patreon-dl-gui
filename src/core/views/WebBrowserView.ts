@@ -31,10 +31,15 @@ export default class WebBrowserView extends WebContentsView {
     this.#registerListeners();
   }
 
-  gotoURL(url: string) {
-    return this.webContents.loadURL(
-      normalizeUrl(url, { defaultProtocol: "https" })
-    );
+  async gotoURL(url: string) {
+    try {
+      await this.webContents.loadURL(
+        normalizeUrl(url, { defaultProtocol: "https" })
+      );
+    }
+    catch (_error) {
+      // Do nothing - let errors be shown within the page
+    }
   }
 
   goBack() {
