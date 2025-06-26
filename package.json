@@ -1,7 +1,7 @@
 {
   "name": "patreon-dl-gui",
   "productName": "patreon-dl-gui",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "GUI for patreon-dl",
   "main": ".webpack/main",
   "scripts": {
