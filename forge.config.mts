@@ -9,7 +9,7 @@ import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-nati
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
-import { writeFileSync } from 'fs';
+import fs from 'fs';
 import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -80,18 +80,24 @@ const config: ForgeConfig = {
   ],
   hooks: {
     async postPackage(_config, packageResult) {
-      const appPath = packageResult.outputPaths[0];
-
-      // Write a minimal package.json to install externalized modules.
-      // Vite generates CJS code for these modules so they cannot be bundled.
-      writeFileSync(`${appPath}/package.json`, JSON.stringify({
-        dependencies: {
-          "undici": "^6.21.3",
-          "patreon-dl": "^3.0.0"
+      for (const outputPath of packageResult.outputPaths) {
+        // Write a minimal package.json to install externalized modules.
+        // Vite generates CJS code for these modules so they cannot be bundled.
+        // Must place node_modules in ouputPath/resources, otherwise they won't
+        // get included by squirrel.
+        const appDir = path.join(outputPath, 'resources');
+        if (!fs.existsSync(appDir)) {
+          fs.mkdirSync(appDir, { recursive: true });
         }
-      }, null, 2));
-
-      execSync('npm install --omit=dev', { cwd: appPath, stdio: 'inherit' });
+        fs.writeFileSync(`${appDir}/package.json`, JSON.stringify({
+          dependencies: {
+            "undici": "^6.21.3",
+            "patreon-dl": "^3.0.0"
+          }
+        }, null, 2));
+        execSync('npm install --omit=dev', { cwd: appDir, stdio: 'inherit' });
+      }
+      
     }
   }
 };
