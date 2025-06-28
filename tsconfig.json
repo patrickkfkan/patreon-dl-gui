@@ -3,7 +3,7 @@
     "target": "ES2022",
     "jsx": "react-jsx",
     "allowJs": true,
-    "module": "CommonJS",
+    "module": "esnext",
     "esModuleInterop": true,
     "noImplicitAny": true,
     "sourceMap": true,
