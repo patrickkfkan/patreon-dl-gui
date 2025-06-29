@@ -4,7 +4,7 @@ import type {
   UIConfig,
   UIConfigSection
 } from "../../types/UIConfig";
-import type { UnionToTuple } from "../../types/Utility";
+import type { UnionToTuple } from "../../../common/types/Utility";
 import type React from "react";
 import {
   createContext,

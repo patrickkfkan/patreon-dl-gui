@@ -1,5 +1,5 @@
-import type { ObjectKeysByValueType } from "../../types/Utility";
 import type { FileExistsAction, LogLevel, StopOnCondition } from "patreon-dl";
+import { ObjectKeysByValueType } from "../../common/types/Utility";
 
 export interface Tier {
   id: string;
@@ -137,22 +137,12 @@ export interface UIConfig {
 
 export type UIConfigSection = keyof UIConfig;
 
-export type UIConfigSectionWithPropsOf<T> = {
-  [S in UIConfigSection]: ObjectKeysByValueType<UIConfig[S], T> extends (
-    infer R
-  ) ?
-    R extends string | number | symbol ?
-      S
-    : never
-  : never;
-}[UIConfigSection];
+export type UIConfigValuesByType<S extends UIConfigSection, T> = ObjectKeysByValueType<UIConfig[S], T>;
 
-export type UIConfigProp<
-  S extends UIConfigSectionWithPropsOf<T>,
-  T = UIConfig[S][keyof UIConfig[S]]
-> = S extends UIConfigSection ? ObjectKeysByValueType<UIConfig[S], T> : never;
+export type UIConfigByValueType<T> = {
+  [K in keyof UIConfig as UIConfigValuesByType<K, T> extends never ? never : K]: UIConfigValuesByType<K, T>;
+};
 
-export type UIConfigSectionPropTuple<
-  S extends UIConfigSectionWithPropsOf<T>,
-  T = UIConfig[S][keyof UIConfig[S]]
-> = [S, UIConfigProp<S, T>];
+export type UIConfigProp<S extends UIConfigSectionWithPropsOf<T>, T> = UIConfigByValueType<T>[S];
+export type UIConfigSectionWithPropsOf<T> = keyof UIConfigByValueType<T>;
+export type UIConfigSectionPropTuple<S extends UIConfigSection, T> = [S, UIConfigValuesByType<S, T>];

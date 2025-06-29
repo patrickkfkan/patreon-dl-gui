@@ -104,7 +104,7 @@ function toOneOf<V extends string>(
   value: string,
   matches: UnionToTuple<V>
 ): ParseValueResult<V> {
-  if (matches.includes(value as unknown)) {
+  if (matches.includes(value as string)) {
     return {
       result: value as V,
       hasError: false
