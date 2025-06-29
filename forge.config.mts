@@ -60,11 +60,11 @@ const config: ForgeConfig = {
       renderer: [
         {
           name: "editor_view",
-          config: 'vite.renderer-editor.config.ts'
+          config: 'vite.renderer.config.ts'
         },
         {
           name: "modal_view",
-          config: 'vite.renderer-modal.config.ts'
+          config: 'vite.renderer.config.ts'
         }
       ]
     }),
