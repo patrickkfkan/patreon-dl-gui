@@ -1,9 +1,8 @@
 import type {
   UIConfig,
-  UIConfigProp,
   UIConfigSectionWithPropsOf
 } from "../../../types/UIConfig";
-import type { UnionToObjectTuple } from "../../../../common/types/Utility";
+import type { TupleToObjectTuple, UnionToTuple } from "../../../../common/types/Utility";
 import { useConfig } from "../../contexts/ConfigProvider";
 import { Col, Form, Row } from "react-bootstrap";
 import type { AccessibilityProps, HelpProps } from "./Common";
@@ -11,12 +10,12 @@ import { createHelpIcon } from "./Common";
 
 type SelectRowProps<
   S extends UIConfigSectionWithPropsOf<string>,
-  P extends UIConfigProp<S, string>
+  P extends keyof UIConfig[S]
 > = {
   config: [S, P];
   label: string;
-  options: UnionToObjectTuple<
-    UIConfig[S][P] extends string ? UIConfig[S][P] : string,
+  options: TupleToObjectTuple<
+    UnionToTuple<UIConfig[S][P] extends string ? UIConfig[S][P] : never>,
     { label: string }
   >;
 } & HelpProps &
@@ -24,7 +23,7 @@ type SelectRowProps<
 
 function SelectRow<
   S extends UIConfigSectionWithPropsOf<string>,
-  P extends UIConfigProp<S, string>
+  P extends keyof UIConfig[S]
 >(props: SelectRowProps<S, P>) {
   const { config, setConfigValue } = useConfig();
   const { config: pConfig, label, options, ariaLabel } = props;

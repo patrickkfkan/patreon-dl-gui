@@ -1,5 +1,5 @@
 import type { Editor } from "../../types/App";
-import type { YouTubeConnectionStatus } from "../../core/util/YouTubeConfigurator";
+import type { YouTubeConnectionStatus } from "../../util/YouTubeConfigurator";
 import type React from "react";
 import {
   createContext,

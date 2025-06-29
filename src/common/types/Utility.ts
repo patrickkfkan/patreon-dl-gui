@@ -1,33 +1,28 @@
 // https://stackoverflow.com/questions/69676439/create-constant-array-type-from-an-object-type/69676731#69676731
-export type UnionToTuple<U extends string, R extends unknown[] = []> =
+export type UnionToTuple<U extends string | number | symbol, R extends (string | number | symbol)[] = []> =
   {
     [S in U]: Exclude<U, S> extends never ? [...R, S]
     : UnionToTuple<Exclude<U, S>, [...R, S]>;
-  }[U] extends infer S extends unknown[] ?
+  }[U] extends infer S extends string[] ?
     S
   : never;
 
 /**
- * Extended from UnionToTuple
- * U: union (e.g. 'all' | 'custom' | 'none')
- * V: object (e.g. { label: string; }, default: {})
- * VK: value key (default: 'value')
- * Returns: [V & { VK: U1 }, V & { VK: U2 }...] (e.g. [{value: 'all', label: string}, {value: 'custom', label: string}, {value: 'none', label: string}])
- *
- * Note: 'infer' is used to avoid 'Type instantiation is excessively deep' errors. See: https://github.com/microsoft/TypeScript/issues/54910
+ * Converts a tuple of strings to a tuple of objects.
+ * Each object in the tuple has type V & { VK: string; }
+ * E.g.:
+ * const objectTuple: TupleToObjectTuple<['a', 'b'], { label: string; }> =
+ * [
+ *   {value: 'a', label: 'some string' },
+ *   {value: 'b', label: 'some other string' }
+ * ]
  */
-export type UnionToObjectTuple<
-  U extends string | number | symbol,
-  V extends object = object,
-  VK extends string = "value",
-  R extends unknown[] = []
-> =
-  {
-    [S in U]: Exclude<U, S> extends never ? [...R, V & { [key in VK]: S }]
-    : UnionToObjectTuple<Exclude<U, S>, V, VK, [...R, V & { [key in VK]: S }]>;
-  }[U] extends infer S extends (V & { [key in VK]: string })[] ?
-    S
-  : never;
+export type TupleToObjectTuple<T extends (string | number | symbol)[], V extends object = object, VK extends string = "value"> = {
+  [K in keyof T]: T[K] extends string | number | symbol ? V & { [key in VK]: T[K] } : never;
+};
+
+export type UnionToObjectTuple<U extends string | number | symbol, V extends object = object, VK extends string = "value"> =
+  TupleToObjectTuple<UnionToTuple<U>, V, VK>;
 
 export type ObjectKeysByValueType<S extends object, T> = {
   [K in keyof S]: S[K] extends T ? K : never;
