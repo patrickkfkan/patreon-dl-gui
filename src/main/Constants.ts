@@ -4,6 +4,7 @@ import type { MainWindowProps } from "./MainWindow";
 import type { DeepRequired } from "patreon-dl";
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { WebBrowserSettings } from "./config/WebBrowserSettings";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -108,3 +109,7 @@ export const VIMEO_HELPER_SCRIPT_EXEC_ARGS = [
   "--embed-url",
   '"{embed.url}"'
 ];
+
+export const DEFAULT_WEB_BROWSER_SETTINGS: WebBrowserSettings = {
+  clearSessionDataOnExit: false
+};
