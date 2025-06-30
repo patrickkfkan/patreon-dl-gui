@@ -10,6 +10,7 @@ import type {
   YouTubeConnectResult,
   YouTubeConnectVerificationInfo
 } from "../util/YouTubeConfigurator";
+import { WebBrowserSettings } from "../config/WebBrowserSettings";
 
 export type MainProcessRendererEvent =
   | "editorCreated"
@@ -29,7 +30,8 @@ export type MainProcessRendererEvent =
   | "applyProxyResult"
   | "youtubeConfiguratorStart"
   | "youtubeConnectVerificationInfo"
-  | "youtubeConnectResult";
+  | "youtubeConnectResult"
+  | "webBrowserSettings";
 
 export type MainProcessMainEvent =
   | "uiReady"
@@ -43,7 +45,8 @@ export type MainProcessMainEvent =
   | "aboutModalClose"
   | "confirmStartDownload"
   | "downloaderModalClose"
-  | "youtubeConfiguratorModalClose";
+  | "youtubeConfiguratorModalClose"
+  | "webBrowserSettingsModalClose";
 
 export type UICommand =
   | "createEditor"
@@ -183,6 +186,7 @@ export type MainProcessRendererEventListener<
   : E extends "youtubeConnectVerificationInfo" ?
     (info: YouTubeConnectVerificationInfo) => void
   : E extends "youtubeConnectResult" ? (result: YouTubeConnectResult) => void
+  : E extends "webBrowserSettings" ? (settings: WebBrowserSettings) => void
   : never;
 
 export type MainProcessMainEventListener<E extends MainProcessMainEvent> =
@@ -199,4 +203,5 @@ export type MainProcessMainEventListener<E extends MainProcessMainEvent> =
     (result: ConfirmStartDownloadResult) => void
   : E extends "downloaderModalClose" ? () => void
   : E extends "youtubeConfiguratorModalClose" ? () => void
+  : E extends "webBrowserSettingsModalClose" ? () => void
   : never;

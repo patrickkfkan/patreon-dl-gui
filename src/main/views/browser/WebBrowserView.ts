@@ -63,6 +63,14 @@ export default class WebBrowserView extends WebContentsView {
     this.webContents.closeDevTools();
   }
 
+  clearSessionData() {
+    return this.webContents.session.clearStorageData();
+  }
+
+  reload() {
+    return this.webContents.reload();
+  }
+
   #registerListeners() {
     this.webContents.on("did-navigate-in-page", async (e, url, isMainFrame) => {
       if (this.#analyzePageAbortController) {

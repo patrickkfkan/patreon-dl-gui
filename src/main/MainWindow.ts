@@ -267,6 +267,14 @@ export default class MainWindow extends BaseWindow {
     this.contentView.removeChildView(this.modalView);
   }
 
+  async clearSessionData(reload = false) {
+    console.debug("Clearing web browser session data...");
+    await Promise.all(this.#webBrowserViews.map((entry) => entry.view.clearSessionData()));
+    if (reload) {
+      this.#webBrowserViews.forEach((entry) => entry.view.reload());
+    }
+  }
+
   #emitStateChangeEvent() {
     if (this.#emitStateChangeEventDelayTimer) {
       clearTimeout(this.#emitStateChangeEventDelayTimer);

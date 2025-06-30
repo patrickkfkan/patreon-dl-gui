@@ -2,6 +2,7 @@ import type { OpenDialogOptions } from "electron";
 import type { Editor } from "./App";
 import type { UIConfig, UIConfigSection } from "./UIConfig";
 import type { SaveFileConfigResult } from "./MainEvents";
+import { WebBrowserSettings } from "../config/WebBrowserSettings";
 
 export type MainProcessInvocableMethod =
   | "getEditorPanelWidth"
@@ -25,7 +26,10 @@ export type MainProcessInvocableMethod =
   | "configureYouTube"
   | "startYouTubeConnect"
   | "cancelYouTubeConnect"
-  | "disconnectYouTube";
+  | "disconnectYouTube"
+  | "requestWebBrowserSettings"
+  | "saveWebBrowserSettings"
+  | "clearSessionData";
 
 export type MainProcessInvocableMethodHandler<
   M extends MainProcessInvocableMethod
@@ -55,6 +59,9 @@ export type MainProcessInvocableMethodHandler<
   : M extends "startYouTubeConnect" ? () => void
   : M extends "cancelYouTubeConnect" ? () => void
   : M extends "disconnectYouTube" ? () => void
+  : M extends "requestWebBrowserSettings" ? () => void
+  : M extends "saveWebBrowserSettings" ? (settings: WebBrowserSettings) => Promise<void>
+  : M extends "clearSessionData" ? () => void
   : never;
 
 export type CloseEditorResult =

@@ -19,6 +19,7 @@ import { getStartupUIConfig } from "./config/UIConfig";
 import parseArgs from "yargs-parser";
 import { loadLastWindowState, saveWindowState } from "./util/State";
 import { existsSync, mkdirSync } from "fs";
+import { getWebBrowseSettings } from "./config/WebBrowserSettings";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MainProcessConstructor = new (...args: any[]) => MainProcessBase;
@@ -205,6 +206,10 @@ class MainProcessBase extends ProcessBase<"main"> {
     if (confirmed) {
       this.#cleanupCallbacks.forEach((cb) => cb());
       this.#cleanupCallbacks = [];
+      const webBrowserSettings = getWebBrowseSettings();
+      if (webBrowserSettings.clearSessionDataOnExit) {
+        await this.win.clearSessionData();
+      }
       await this.win.destroy();
       return;
     }

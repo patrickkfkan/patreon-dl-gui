@@ -3,6 +3,7 @@ import type { MainProcessConstructor } from "../MainProcess";
 import { getHelpContents } from "../util/Help";
 import { APP_URL } from "../../common/Constants";
 import YouTubeConfigurator from "../util/YouTubeConfigurator";
+import { getWebBrowseSettings, saveWebBrowserSettings } from "../config/WebBrowserSettings";
 
 export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -130,6 +131,54 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
             "youtubeConfiguratorStart",
             YouTubeConfigurator.getConnectionStatus()
           );
+        }),
+
+        this.handle("requestWebBrowserSettings", () => {
+          return new Promise<void>((resolve) => {
+            this.on(
+              "webBrowserSettingsModalClose",
+              () => {
+                this.win.hideModalView();
+                resolve();
+              },
+              { once: true }
+            );
+            this.win.showModalView();
+            this.emitRendererEvent(this.win.modalView, "webBrowserSettings", getWebBrowseSettings());
+          });
+        }),
+
+        this.handle("saveWebBrowserSettings", async (settings) => {
+          try {
+            saveWebBrowserSettings(settings);
+          }
+          catch (error: unknown) {
+            await dialog.showMessageBox(this.win, {
+              title: "Error",
+              message: `An error occurred while saving settings: ${error instanceof Error ? error.message : String(error)}`,
+              buttons: ["OK"]
+            });
+          }
+        }),
+
+        this.handle("clearSessionData", async () => {
+          const dialogOpts = {
+            title: "Confirm",
+            message: `This will clear all cookies and cached data from browser sessions. Confirm?`,
+            buttons: ["Cancel", "Proceed"],
+            cancelId: 0,
+            defaultId: 1
+          };
+          const result = await dialog.showMessageBox(this.win, dialogOpts);
+          if (result.response === dialogOpts.cancelId) {
+            return;
+          }
+          await this.win.clearSessionData(true);
+          await dialog.showMessageBox(this.win, {
+            title: "",
+            message: "Session data have been cleared",
+            buttons: ["OK"]
+          });
         })
       ];
     }
