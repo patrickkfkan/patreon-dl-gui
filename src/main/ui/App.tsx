@@ -6,10 +6,11 @@ import "bootswatch/dist/darkly/bootstrap.min.css";
 import "material-icons/iconfont/material-icons.css";
 import "material-symbols";
 import "./styles/main.css";
+import "../../common/ui/styles/components.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CommandsProvider } from "./contexts/CommandsProvider";
 import WebBrowserToolbar from "./editor/WebBrowserToolbar";
-import CustomScrollbars from "./editor/components/CustomScrollbars";
+import CustomScrollbars from "../../common/ui/components/CustomScrollbars";
 import { ToastContainer } from "react-toastify";
 
 function App() {
@@ -124,9 +125,9 @@ function App() {
             className="d-flex flex-column vh-100"
             style={{ width: `${editorPanelWidth}px` }}
           >
+            <EditorToolbar />
             <CustomScrollbars>
-              <EditorToolbar />
-              <div className="flex-grow-1 px-2 py-3">
+              <div className="flex-fill px-2 py-3">
                 <ConfigProvider>
                   <EditorPanel />
                 </ConfigProvider>

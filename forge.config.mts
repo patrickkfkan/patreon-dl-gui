@@ -56,6 +56,11 @@ const config: ForgeConfig = {
           config: 'vite.preload.config.ts',
           target: "preload"
         },
+        {
+          entry: 'src/server-console/server-console-preload.ts',
+          config: 'vite.preload.config.ts',
+          target: "preload"
+        }
       ],
       renderer: [
         {
@@ -65,6 +70,10 @@ const config: ForgeConfig = {
         {
           name: "modal_view",
           config: 'vite.renderer.config.ts'
+        },
+        {
+          name: "server_console",
+          config: "vite.renderer.config.ts"
         }
       ]
     }),

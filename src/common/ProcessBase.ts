@@ -15,35 +15,48 @@ import type {
   MainProcessInvocableMethod,
   MainProcessInvocableMethodHandler
 } from "../main/types/MainInvocableMethods";
+import { ServerConsoleMainEvent, ServerConsoleMainEventListener, ServerConsoleRendererEvent, ServerConsoleRendererEventListener } from "../server-console/types/ServerConsoleEvents";
+import { ServerConsoleInvocableMethod, ServerConsoleInvocableMethodHandler } from "../server-console/types/ServerConsoleInvocableMethods";
 
-export type ProcessType = "main";
+export type ProcessType = "main" | "serverConsole";
 
 export type ProcessRendererEvent<T extends ProcessType> =
-  T extends "main" ? MainProcessRendererEvent : never;
+  T extends "main" ? MainProcessRendererEvent
+  : T extends "serverConsole" ? ServerConsoleRendererEvent
+  : never;
 
 export type ProcessMainEvent<T extends ProcessType> =
-  T extends "main" ? MainProcessMainEvent : never;
+  T extends "main" ? MainProcessMainEvent
+  : T extends "serverConsole" ? ServerConsoleMainEvent
+  : never;
 
 export type ProcessRendererEventListener<
   T extends ProcessType,
   E extends ProcessRendererEvent<T>
 > =
   E extends MainProcessRendererEvent ? MainProcessRendererEventListener<E>
+  : E extends ServerConsoleRendererEvent ? ServerConsoleRendererEventListener<E>
   : never;
 
 export type ProcessMainEventListener<
   T extends ProcessType,
   E extends ProcessMainEvent<T>
-> = E extends MainProcessMainEvent ? MainProcessMainEventListener<E> : never;
+> =
+  E extends MainProcessMainEvent ? MainProcessMainEventListener<E>
+  : E extends ServerConsoleMainEvent ? ServerConsoleMainEventListener<E>
+  : never;
 
 export type ProcessInvocableMethod<T extends ProcessType> =
-  T extends "main" ? MainProcessInvocableMethod : never;
+  T extends "main" ? MainProcessInvocableMethod
+  : T extends "serverConsole" ? ServerConsoleInvocableMethod
+  : never;
 
 export type ProcessInvocableMethodHandler<
   T extends ProcessType,
   M extends ProcessInvocableMethod<T>
 > =
   M extends MainProcessInvocableMethod ? MainProcessInvocableMethodHandler<M>
+  : M extends ServerConsoleInvocableMethod ? ServerConsoleInvocableMethodHandler<M>
   : never;
 
 export default abstract class ProcessBase<T extends ProcessType> {

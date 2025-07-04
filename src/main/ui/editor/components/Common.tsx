@@ -1,19 +1,6 @@
 import type { UIConfig, UIConfigSection } from "../../../types/UIConfig";
+import type { HelpProps } from "../../../../common/ui";
 import HelpIcon from "./HelpIcon";
-
-export type AccessibilityProps = {
-  ariaLabel?: string | null;
-};
-
-export type HelpProps =
-  | {
-      helpTooltip?: undefined | null;
-      helpHasMoreInfo?: undefined | null;
-    }
-  | {
-      helpTooltip: string;
-      helpHasMoreInfo?: boolean | null;
-    };
 
 export type CreateHelpIconArgs<S extends UIConfigSection> = HelpProps & {
   config: [S, keyof UIConfig[S]];

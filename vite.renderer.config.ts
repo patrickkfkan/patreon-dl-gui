@@ -5,7 +5,8 @@ import { fileURLToPath } from "url";
 
 const SRC_ROOTS = {
   "editor_view": "src/main/views/editor",
-  "modal_view": "src/main/views/modal"
+  "modal_view": "src/main/views/modal",
+  "server_console": "src/server-console"
 };
 
 const __filename = fileURLToPath(import.meta.url);

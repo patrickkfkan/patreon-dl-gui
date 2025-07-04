@@ -4,7 +4,7 @@ import { Button, Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { useCommands } from "../contexts/CommandsProvider";
 import { useEffect, useMemo, useState } from "react";
 import type { RecentDocument } from "../../util/RecentDocuments";
-import ToolbarButton from "./components/ToolbarButton";
+import ToolbarButton from "../../../common/ui/components/ToolbarButton";
 
 const getEditorName = (editor: Editor) => {
   return `${editor.name}${editor.modified ? "*" : ""}`;
@@ -48,7 +48,7 @@ function EditorToolbar() {
 
   return (
     <Navbar bg="primary" sticky="top" style={{ height: "3rem" }}>
-      <Container className="justify-content-start">
+      <Container className="justify-content-start gap-1">
         {activeEditor ?
           <NavDropdown
             title={getEditorName(activeEditor)}

@@ -8,7 +8,7 @@ import type React from "react";
 import { useCallback, useRef } from "react";
 import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import classNames from "classnames";
-import type { AccessibilityProps, HelpProps } from "./Common";
+import type { AccessibilityProps, HelpProps } from "../../../../common/ui";
 import { createHelpIcon } from "./Common";
 
 type InputValueType = "text" | "number" | "dir" | "file";

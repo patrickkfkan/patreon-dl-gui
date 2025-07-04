@@ -11,15 +11,13 @@ import type { PageInfo } from "./types/UIConfig";
 import ModalView from "./views/modal/ModalView";
 import type { ValidateProxyURLResult } from "./util/Config";
 import { validateProxyURL } from "./util/Config";
+import { WindowState } from "../common/util/WindowState";
 
-export interface MainWindowStateInfo {
-  size: { width: number; height: number };
-  position: { x: number; y: number };
-  state: "normal" | "maximized" | "minimized";
+export interface MainWindowState extends WindowState {
   editorPanelWidth: number;
 }
 
-export interface MainWindowProps extends Partial<MainWindowStateInfo> {
+export interface MainWindowProps extends Partial<MainWindowState> {
   devTools?: boolean;
   webBrowserViewInitialURL?: string;
 }
@@ -301,7 +299,7 @@ export default class MainWindow extends BaseWindow {
     this.show();
   }
 
-  getStateInfo(): MainWindowStateInfo {
+  getStateInfo(): MainWindowState {
     const [width, height] = this.getSize();
     const [x, y] = this.getPosition();
     return {
@@ -319,14 +317,14 @@ export default class MainWindow extends BaseWindow {
     return this.#webBrowserViews.find((entry) => entry.active)?.view || null;
   }
 
-  emitMainWindowEvent(event: "stateChange", info: MainWindowStateInfo): boolean;
+  emitMainWindowEvent(event: "stateChange", info: MainWindowState): boolean;
   emitMainWindowEvent(event: string, ...args: unknown[]) {
     return this.emit(event, ...args);
   }
 
   onMainWindowEvent(
     event: "stateChange",
-    listener: (info: MainWindowStateInfo) => void
+    listener: (info: MainWindowState) => void
   ): this;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onMainWindowEvent(event: string, listener: (...args: any[]) => void) {

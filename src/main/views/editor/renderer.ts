@@ -1,3 +1,3 @@
-import { loadMainUI } from "../../ui";
+import { loadMainUI } from "../../../common/ui/Loader";
 
 loadMainUI();

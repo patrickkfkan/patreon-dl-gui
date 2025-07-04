@@ -2,10 +2,11 @@ import { Button, ButtonGroup, Dropdown } from "react-bootstrap";
 
 interface ToolbarButtonProps {
   icon: string;
+  label?: string;
   className?: string;
   iconClassName?: string;
   onClick: () => void;
-  tooltip: string;
+  tooltip?: string;
   split?: {
     label: string;
     onClick: () => void;
@@ -14,13 +15,13 @@ interface ToolbarButtonProps {
 }
 
 function ToolbarButton(props: ToolbarButtonProps) {
-  const { icon, className, iconClassName, onClick, tooltip, split, disabled } =
+  const { icon, label, className, iconClassName, onClick, tooltip, split, disabled } =
     props;
-  const buttonClasses = !split ? `mx-1 ${className || ""}` : className;
+  const baseClasses = "d-flex align-items-center"
   const button = (
     <Button
       size="sm"
-      className={buttonClasses}
+      className={`${baseClasses} ${className || ""}`}
       title={tooltip}
       onClick={onClick}
       aria-label={tooltip}
@@ -32,6 +33,7 @@ function ToolbarButton(props: ToolbarButtonProps) {
       >
         {icon}
       </span>
+      { label ? <span className="ms-2">{label}</span> : null}
     </Button>
   );
   if (!split || split.length === 0) {
