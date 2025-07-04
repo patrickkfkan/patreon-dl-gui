@@ -17,9 +17,9 @@ import ProcessBase from "../common/ProcessBase";
 import { WebBrowserEventSupportMixin } from "./mixins/WebBrowserEvents";
 import { getStartupUIConfig } from "./config/UIConfig";
 import parseArgs from "yargs-parser";
-import { loadLastWindowState, saveWindowState } from "./util/State";
-import { existsSync, mkdirSync } from "fs";
+import { loadLastMainWindowState, saveMainWindowState } from "./util/WindowState";
 import { getWebBrowseSettings } from "./config/WebBrowserSettings";
+import { ensureAppDataPath } from "../common/util/FS";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MainProcessConstructor = new (...args: any[]) => MainProcessBase;
@@ -45,7 +45,7 @@ class MainProcessBase extends ProcessBase<"main"> {
   constructor() {
     super();
     const devTools = Reflect.has(processArgs, "dev-tools");
-    const lastWindowState = loadLastWindowState() || {};
+    const lastWindowState = loadLastMainWindowState();
     this.win = new MainWindow({
       devTools,
       ...lastWindowState
@@ -58,21 +58,6 @@ class MainProcessBase extends ProcessBase<"main"> {
 
   protected setAppMenu(_options?: AppMenuOptions) {
     // To be fulfilled by AppMenuSupportMixin
-  }
-
-  #ensureAppDataPath() {
-    if (!existsSync(APP_DATA_PATH)) {
-      try {
-        mkdirSync(APP_DATA_PATH, {
-          recursive: true
-        });
-      } catch (error: unknown) {
-        console.error(
-          `Failed to create app data path "${APP_DATA_PATH}":`,
-          error instanceof Error ? error.message : String(error)
-        );
-      }
-    }
   }
 
   protected registerMainEventListeners() {
@@ -90,7 +75,7 @@ class MainProcessBase extends ProcessBase<"main"> {
   }
 
   async start() {
-    this.#ensureAppDataPath();
+    ensureAppDataPath();
     this.setAppMenu();
     this.win.on("close", (e) => {
       this.end(e);
@@ -104,7 +89,7 @@ class MainProcessBase extends ProcessBase<"main"> {
     );
 
     this.win.onMainWindowEvent("stateChange", (info) => {
-      saveWindowState(info);
+      saveMainWindowState(info);
     });
 
     this.win.onWebBrowserViewEvent("pageInfo", (info) => {

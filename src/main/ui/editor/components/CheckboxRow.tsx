@@ -5,7 +5,7 @@ import type {
 } from "../../../types/UIConfig";
 import { useConfig } from "../../contexts/ConfigProvider";
 import { Col, Form, Row } from "react-bootstrap";
-import type { AccessibilityProps, HelpProps } from "./Common";
+import type { AccessibilityProps, HelpProps } from "../../../../common/ui";
 import { createHelpIcon } from "./Common";
 import type { JSX } from "react";
 

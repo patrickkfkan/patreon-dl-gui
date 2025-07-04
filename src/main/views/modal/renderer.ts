@@ -1,3 +1,3 @@
-import { loadModalWrapper } from "../../ui";
+import { loadModalWrapper } from "../../../common/ui/Loader";
 
 loadModalWrapper();

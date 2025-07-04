@@ -2,21 +2,6 @@
   cursor: ew-resize;
 }
 
-.scrollbars .track-vertical {
-  top: 3rem;
-  bottom: 2px;
-  right: 0px;
-  background: var(--bs-secondary);
-  opacity: 0.2;
-  border-radius: 3px;
-}
-
-.scrollbars .thumb-vertical {
-  border-radius: 3px;
-  background: var(--bs-light);
-  opacity: 0.2;
-}
-
 .nav-link.active {
   --bs-nav-underline-link-active-color: var(--bs-nav-link-color) !important;
 }

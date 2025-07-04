@@ -134,7 +134,6 @@ export default class WebBrowserView extends WebContentsView {
       }
     });
     this.webContents.on("did-create-window", async (win, details) => {
-      console.log('did-create-window', details);
       if (details.url.startsWith(PATREON_URL)) {
         win.close();
         this.#lastLoadedURL = details.url;

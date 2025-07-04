@@ -3,6 +3,7 @@ import type { Editor } from "./App";
 import type { UIConfig, UIConfigSection } from "./UIConfig";
 import type { SaveFileConfigResult } from "./MainEvents";
 import { WebBrowserSettings } from "../config/WebBrowserSettings";
+import type { FSChooserResult } from "../../common/util/FS";
 
 export type MainProcessInvocableMethod =
   | "getEditorPanelWidth"
@@ -91,13 +92,4 @@ export type OpenFileResult =
       hasError?: undefined;
       editor: Editor;
       isNewEditor: boolean;
-    };
-
-export type FSChooserResult =
-  | {
-      canceled: true;
-    }
-  | {
-      canceled: false;
-      filePath: string;
     };

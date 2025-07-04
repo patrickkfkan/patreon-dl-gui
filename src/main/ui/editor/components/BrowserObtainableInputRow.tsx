@@ -18,7 +18,7 @@ import {
   Row
 } from "react-bootstrap";
 import { useCallback, useEffect, useState } from "react";
-import type { AccessibilityProps, HelpProps } from "./Common";
+import type { AccessibilityProps, HelpProps } from "../../../../common/ui";
 import { createHelpIcon } from "./Common";
 
 type PropWithSupportData<

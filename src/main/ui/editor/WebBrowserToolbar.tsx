@@ -1,8 +1,8 @@
-import { Button, Container, Form, InputGroup, Navbar } from "react-bootstrap";
+import { Button, Container, Form, InputGroup, Navbar, Stack } from "react-bootstrap";
 import { useCommands } from "../contexts/CommandsProvider";
 import type { KeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
-import ToolbarButton from "./components/ToolbarButton";
+import ToolbarButton from "../../../common/ui/components/ToolbarButton";
 import type { WebBrowserPageNavigatedInfo } from "../../types/MainEvents";
 
 function WebBrowserToolbar() {
@@ -42,7 +42,7 @@ function WebBrowserToolbar() {
 
   return (
     <Navbar id="web-browser-toolbar" sticky="top" style={{ height: "3rem" }}>
-      <Container className="pe-0">
+      <Stack direction="horizontal" className="w-100 ps-2" gap={1}>
         <ToolbarButton
           disabled={!pageInfo?.canGoBack}
           icon="chevron_left"
@@ -64,7 +64,7 @@ function WebBrowserToolbar() {
           tooltip="Go to Patreon homepage"
           onClick={gotoHome}
         />
-        <InputGroup>
+        <InputGroup className="flex-fill">
           <Form.Control
             ref={urlInputRef}
             type="text"
@@ -93,7 +93,7 @@ function WebBrowserToolbar() {
           tooltip="Settings"
           onClick={editSettings}
         />
-      </Container>
+      </Stack>
     </Navbar>
   );
 }

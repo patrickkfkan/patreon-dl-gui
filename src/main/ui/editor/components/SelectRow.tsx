@@ -5,7 +5,7 @@ import type {
 import type { TupleToObjectTuple, UnionToTuple } from "../../../../common/types/Utility";
 import { useConfig } from "../../contexts/ConfigProvider";
 import { Col, Form, Row } from "react-bootstrap";
-import type { AccessibilityProps, HelpProps } from "./Common";
+import type { AccessibilityProps, HelpProps } from "../../../../common/ui";
 import { createHelpIcon } from "./Common";
 
 type SelectRowProps<

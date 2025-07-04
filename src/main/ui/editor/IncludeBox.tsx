@@ -15,7 +15,7 @@ import {
 import _ from "lodash";
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
-import type { AccessibilityProps, HelpProps } from "./components/Common";
+import type { AccessibilityProps, HelpProps } from "../../../common/ui";
 import { createHelpIcon } from "./components/Common";
 import TextInputRow from "./components/TextInputRow";
 import HelpIcon from "./components/HelpIcon";

@@ -12,6 +12,7 @@ import type { FileConfig } from "../types/FileConfig";
 import type { SaveFileConfigResult } from "../types/MainEvents";
 import RecentDocuments from "../util/RecentDocuments";
 import type { OpenFileResult } from "../types/MainInvocableMethods";
+import { openFSChooser } from "../../common/util/FS";
 
 export function FileEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -23,17 +24,7 @@ export function FileEventSupportMixin<TBase extends MainProcessConstructor>(
         ...callbacks,
 
         this.handle("openFSChooser", async (options) => {
-          const result = await dialog.showOpenDialog(this.win, options);
-          if (result.canceled) {
-            return {
-              canceled: true
-            };
-          } else {
-            return {
-              canceled: false,
-              filePath: result.filePaths[0]
-            };
-          }
+          return await openFSChooser(this.win, options);
         }),
 
         this.handle("openFile", async (currentEditors, _filePath?: string) => {
