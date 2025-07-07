@@ -1,7 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import type { ForgeConfig } from '@electron-forge/shared-types';
-import { MakerSquirrel } from '@electron-forge/maker-squirrel';
+import { MakerWix } from '@electron-forge/maker-wix';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerRpm, MakerRpmConfig } from '@electron-forge/maker-rpm';
@@ -11,6 +11,7 @@ import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import fs from 'fs';
 import { execSync } from 'child_process';
+import packageJSON from './package.json' assert { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,11 +19,27 @@ const __dirname = path.dirname(__filename);
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    extraResource: ['./resources_out/bin'],
+    extraResource: [
+      path.join(__dirname, 'resources_out/bin'),
+      path.join(
+        __dirname,
+        'src/resources/packaging/patreon-dl-gui-server-console.desktop'
+      )
+    ],
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerWix({
+      icon: path.join(__dirname, 'assets/electron.ico'),
+      shortcutFolderName: packageJSON.productName,
+      beforeCreate: async (msiCreator) => {
+        // Load custom Wix XML template which:
+        // 1. Removes "(Machine - MSI)" from the product name
+        // 2. Removes "(Machine)" from the visible product name
+        // 3. Adds a shortcut for the server console
+        msiCreator.wixTemplate = fs.readFileSync(path.join(__dirname, 'misc/custom-wix.xml'), 'utf8');
+      }
+    }),
     new MakerZIP({}, ['darwin']),
     new MakerRpm({
       options: {
@@ -33,9 +50,20 @@ const config: ForgeConfig = {
          * throw "Pkg: Error reading from file" when executed.
          */
         specTemplate: path.join(__dirname, '/misc/rpm-spec.ejs'),
-      } as MakerRpmConfig['options'],
+        scripts: {
+          post: path.join(__dirname, 'src/resources/packaging/rpm/postinstall.sh'),
+          postun: path.join(__dirname, 'src/resources/packaging/rpm/postuninstall.sh')
+        }
+      } as MakerRpmConfig['options']
     }),
-    new MakerDeb({}),
+    new MakerDeb({
+      options: {
+        scripts: {
+          postinst: path.join(__dirname, 'src/resources/packaging/deb/postinst'),
+          postrm: path.join(__dirname, 'src/resources/packaging/deb/postrm')
+        }
+      }
+    })
   ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
@@ -106,7 +134,31 @@ const config: ForgeConfig = {
         }, null, 2));
         execSync('npm install --omit=dev', { cwd: appDir, stdio: 'inherit' });
       }
-      
+    },
+    async postMake(config, makeResults) {
+      const hasWixMaker = config.makers.some(
+        (maker) => maker instanceof MakerWix
+      );
+      if (!hasWixMaker) {
+        return;
+      }
+      // Find the Wix output artifact and add version / arch to its filename
+      for (const result of makeResults) {
+        const artifacts = result.artifacts.filter(
+          artifact => path.extname(artifact) === '.msi'
+        );
+        for (const artifact of artifacts) {
+          const { dir, name, ext } = path.parse(artifact);
+          const newName = path.join(
+            dir,
+            `${name}-${packageJSON.version}_${result.arch} Setup${ext}`
+          );
+          fs.renameSync(artifact, newName);
+          console.info(
+            `Renamed artifact: ${path.basename(artifact)} -> ${path.basename(newName)}`
+          );
+        }
+      }
     }
   }
 };

@@ -1,0 +1,3 @@
+#!/bin/sh
+rm -f /usr/share/applications/patreon-dl-gui-server-console.desktop
+update-desktop-database /usr/share/applications || true
