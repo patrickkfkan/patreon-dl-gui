@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=patreon-dl-gui (Server Console)
+Comment=Browse content downloaded by patreon-dl
+Exec=/usr/bin/patreon-dl-gui --server-console
+Icon=patreon-dl-gui
+Type=Application
+Categories=Utility;

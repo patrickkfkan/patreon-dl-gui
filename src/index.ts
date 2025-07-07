@@ -4,10 +4,6 @@ import parseArgs from "yargs-parser";
 import { USER_AGENT } from "./common/Constants";
 import ServerConsoleProcess from "./server-console/ServerConsoleProcess";
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (electronStartup) {
-  app.quit();
-}
 
 app.on("ready", async () => {
   const processArgs = parseArgs(process.argv);

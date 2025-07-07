@@ -1,0 +1,3 @@
+#!/bin/sh
+install -Dm644 /usr/lib/patreon-dl-gui/resources/patreon-dl-gui-server-console.desktop /usr/share/applications/patreon-dl-gui-server-console.desktop
+update-desktop-database /usr/share/applications || true
