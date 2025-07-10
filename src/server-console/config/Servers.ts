@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { APP_DATA_PATH } from "../../common/Constants";
-import { Server } from "../types/Server";
+import type { Server } from "../types/Server";
 
 const SERVERS_FILE_PATH = path.join(APP_DATA_PATH, "/Servers.json");
 

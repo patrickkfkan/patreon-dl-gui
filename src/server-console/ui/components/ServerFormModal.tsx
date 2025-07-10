@@ -4,7 +4,7 @@ import _ from "lodash";
 import type { Server } from "../../types/Server";
 import TextInputRow from "./TextInputRow";
 import SelectRow from "./SelectRow";
-import { SaveServerFormResult } from "../../types/ServerConsoleInvocableMethods";
+import type { SaveServerFormResult } from "../../types/ServerConsoleInvocableMethods";
 
 const NEW_SERVER: Server = {
   name: "",

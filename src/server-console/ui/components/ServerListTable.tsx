@@ -1,10 +1,14 @@
 import "react-data-grid/lib/styles.css";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ServerList, ServerListEntry } from "../../types/Server";
-import { Button, ButtonProps, Stack } from "react-bootstrap";
-import { DataGrid, SortColumn, type Column } from "react-data-grid";
-import { ServerConsoleInvocableMethod } from "../../types/ServerConsoleInvocableMethods";
-import ServerErrorModal, { ServerErrorModalProps } from "./ServerErrorModal";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ServerList, ServerListEntry } from "../../types/Server";
+import type { ButtonProps} from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
+import type { SortColumn} from "react-data-grid";
+import { DataGrid, type Column } from "react-data-grid";
+import type { ServerConsoleInvocableMethod } from "../../types/ServerConsoleInvocableMethods";
+import type { ServerErrorModalProps } from "./ServerErrorModal";
+import ServerErrorModal from "./ServerErrorModal";
 
 interface ServerActionButtonProps {
   entry: ServerListEntry;

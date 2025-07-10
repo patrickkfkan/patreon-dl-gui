@@ -1,5 +1,6 @@
 import type { MainWindowState as MainWindowState } from "../MainWindow";
-import { loadLastWindowState, saveWindowState, WindowState } from "../../common/util/WindowState";
+import type { WindowState } from "../../common/util/WindowState";
+import { loadLastWindowState, saveWindowState } from "../../common/util/WindowState";
 
 
 export function loadLastMainWindowState() {

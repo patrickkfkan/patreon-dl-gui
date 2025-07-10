@@ -1,5 +1,5 @@
-import { DeepRequired } from "patreon-dl";
-import { ServerConsoleWindowProps } from "./ServerConsoleWindow";
+import type { DeepRequired } from "patreon-dl";
+import type { ServerConsoleWindowProps } from "./ServerConsoleWindow";
 
 export const DEFAULT_SERVER_CONSOLE_WINDOW_PROPS: ServerConsoleWindowProps &
   DeepRequired<Omit<ServerConsoleWindowProps, "position">> = {
