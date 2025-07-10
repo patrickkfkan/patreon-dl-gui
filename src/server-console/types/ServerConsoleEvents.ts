@@ -1,4 +1,4 @@
-import { Server, ServerList } from "./Server";
+import type { Server, ServerList } from "./Server";
 
 export type ServerConsoleRendererEvent =
   | "serverListUpdate"

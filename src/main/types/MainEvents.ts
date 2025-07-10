@@ -10,7 +10,7 @@ import type {
   YouTubeConnectResult,
   YouTubeConnectVerificationInfo
 } from "../util/YouTubeConfigurator";
-import { WebBrowserSettings } from "../config/WebBrowserSettings";
+import type { WebBrowserSettings } from "../config/WebBrowserSettings";
 
 export type MainProcessRendererEvent =
   | "editorCreated"

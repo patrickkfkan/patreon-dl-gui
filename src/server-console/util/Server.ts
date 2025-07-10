@@ -1,4 +1,4 @@
-import { ServerList } from "../types/Server";
+import type { ServerList } from "../types/Server";
 
 export function getStartableServerListEntryIds(list: ServerList) {
   return list.entries

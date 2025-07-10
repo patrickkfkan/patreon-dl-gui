@@ -1,5 +1,5 @@
 import type { FileExistsAction, LogLevel, StopOnCondition } from "patreon-dl";
-import { ObjectKeysByValueType } from "../../common/types/Utility";
+import type { ObjectKeysByValueType } from "../../common/types/Utility";
 
 export interface Tier {
   id: string;

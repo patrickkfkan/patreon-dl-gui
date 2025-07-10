@@ -1,4 +1,4 @@
-import { WebServer } from "patreon-dl";
+import type { WebServer } from "patreon-dl";
 
 export interface Server {
   name: string;

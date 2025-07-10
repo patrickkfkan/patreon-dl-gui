@@ -1,5 +1,5 @@
 import { Modal } from "react-bootstrap";
-import { ServerListEntry } from "../../types/Server";
+import type { ServerListEntry } from "../../types/Server";
 
 export interface ServerErrorModalProps {
   serverListEntry: ServerListEntry & { status: "error" };

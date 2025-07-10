@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
 import { DEFAULT_SERVER_CONSOLE_WINDOW_PROPS } from "./Constants";
-import { ConstrainedWindowState, WindowState } from "../common/util/WindowState";
+import type { ConstrainedWindowState, WindowState } from "../common/util/WindowState";
 import { fileURLToPath } from "url";
 
 declare const SERVER_CONSOLE_VITE_DEV_SERVER_URL: string;

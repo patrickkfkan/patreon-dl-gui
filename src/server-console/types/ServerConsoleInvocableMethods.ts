@@ -1,5 +1,5 @@
 import type { OpenDialogOptions } from "electron";
-import { Server } from "./Server";
+import type { Server } from "./Server";
 import type { FSChooserResult } from "../../common/util/FS";
 
 export type ServerConsoleInvocableMethod =

@@ -2,7 +2,7 @@ import type { OpenDialogOptions } from "electron";
 import type { Editor } from "./App";
 import type { UIConfig, UIConfigSection } from "./UIConfig";
 import type { SaveFileConfigResult } from "./MainEvents";
-import { WebBrowserSettings } from "../config/WebBrowserSettings";
+import type { WebBrowserSettings } from "../config/WebBrowserSettings";
 import type { FSChooserResult } from "../../common/util/FS";
 
 export type MainProcessInvocableMethod =

@@ -1,7 +1,7 @@
 import { Navbar } from "react-bootstrap";
 import { useCallback, useEffect, useState } from "react";
 import ToolbarButton from "../../common/ui/components/ToolbarButton";
-import { ServerList } from "../types/Server";
+import type { ServerList } from "../types/Server";
 import { getStartableServerListEntryIds, getStoppableServerListEntryIds } from "../util/Server";
 
 function ServerConsoleToolbar() {

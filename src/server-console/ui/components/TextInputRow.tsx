@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { Button, Col, Form, InputGroup, Row, Stack } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import classNames from "classnames";
 import type { AccessibilityProps, HelpProps } from "../../../common/ui";
 import HelpIcon from "./HelpIcon";

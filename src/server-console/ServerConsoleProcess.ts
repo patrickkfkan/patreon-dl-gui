@@ -3,12 +3,12 @@ import os from "os";
 import { APP_DATA_PATH } from "../common/Constants";
 import ProcessBase from "../common/ProcessBase";
 import parseArgs from "yargs-parser";
-import { Server, ServerList, ServerListEntry } from "./types/Server";
+import type { Server, ServerList, ServerListEntry } from "./types/Server";
 import ServerConsoleWindow from "./ServerConsoleWindow";
 import { getServers, saveServers } from "./config/Servers";
 import { WebServer } from "patreon-dl";
-import { BaseWindow, dialog, Menu, shell } from "electron";
-import { SaveServerFormResult } from "./types/ServerConsoleInvocableMethods";
+import { dialog, Menu, shell } from "electron";
+import type { SaveServerFormResult } from "./types/ServerConsoleInvocableMethods";
 import path from "path";
 import { loadLastWindowState, saveWindowState } from "../common/util/WindowState";
 import { ensureAppDataPath, openFSChooser } from "../common/util/FS";
@@ -167,7 +167,6 @@ export default class ServerConsoleProcess extends ProcessBase<"serverConsole"> {
         break;
     }
     return await new Promise<void>((resolve) => {
-      let resolved = false;
       cleanupCallbacks.push(
         this.handle("saveServerFormData", (server) => {
           server.name = server.name.trim();
@@ -192,14 +191,12 @@ export default class ServerConsoleProcess extends ProcessBase<"serverConsole"> {
           const saveResult = onSave(server);
           if (saveResult.success) {
             resolve();
-            resolved = true;
           }
           return saveResult;
         }),
 
         this.handle("cancelServerForm", () => {
           resolve();
-          resolved = true;
         })
       );
     }).finally(() => {

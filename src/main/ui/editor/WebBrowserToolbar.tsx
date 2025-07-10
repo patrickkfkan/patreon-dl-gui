@@ -1,4 +1,4 @@
-import { Button, Container, Form, InputGroup, Navbar, Stack } from "react-bootstrap";
+import { Button, Form, InputGroup, Navbar, Stack } from "react-bootstrap";
 import { useCommands } from "../contexts/CommandsProvider";
 import type { KeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";

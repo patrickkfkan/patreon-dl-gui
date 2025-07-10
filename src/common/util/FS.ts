@@ -1,4 +1,6 @@
-import electron, { BaseWindow, dialog } from "electron";
+import type { BaseWindow} from "electron";
+import type electron from "electron";
+import { dialog } from "electron";
 import fs from "fs";
 import { APP_DATA_PATH } from "../Constants";
 

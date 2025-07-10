@@ -15,8 +15,8 @@ import type {
   MainProcessInvocableMethod,
   MainProcessInvocableMethodHandler
 } from "../main/types/MainInvocableMethods";
-import { ServerConsoleMainEvent, ServerConsoleMainEventListener, ServerConsoleRendererEvent, ServerConsoleRendererEventListener } from "../server-console/types/ServerConsoleEvents";
-import { ServerConsoleInvocableMethod, ServerConsoleInvocableMethodHandler } from "../server-console/types/ServerConsoleInvocableMethods";
+import type { ServerConsoleMainEvent, ServerConsoleMainEventListener, ServerConsoleRendererEvent, ServerConsoleRendererEventListener } from "../server-console/types/ServerConsoleEvents";
+import type { ServerConsoleInvocableMethod, ServerConsoleInvocableMethodHandler } from "../server-console/types/ServerConsoleInvocableMethods";
 
 export type ProcessType = "main" | "serverConsole";
 
