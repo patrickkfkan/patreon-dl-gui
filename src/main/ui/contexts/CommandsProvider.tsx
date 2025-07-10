@@ -26,6 +26,7 @@ export type CommandsContextValue = {
     gotoHome: () => void;
     goBack: () => void;
     goForward: () => void;
+    reload: () => void;
     editSettings: () => void;
   };
 };
@@ -170,6 +171,11 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
       goForward: () => {
         window.mainAPI.invoke("webBrowserForward");
       },
+
+      reload: () => {
+        window.mainAPI.invoke("webBrowserReload");
+      },
+
       editSettings: () => {
         window.mainAPI.invoke("requestWebBrowserSettings");
       }
