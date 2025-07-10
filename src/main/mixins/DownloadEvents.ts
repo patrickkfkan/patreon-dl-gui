@@ -35,7 +35,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                   consoleLogger,
                   fileLogger,
                   prompt
-                } = convertUIConfigToPatreonDLOptions(editor.config);
+                } = convertUIConfigToPatreonDLOptions(editor.config, { userAgent: this.resolvedUserAgent });
                 this.downloader = {
                   instance: await PatreonDownloader.getInstance(
                     targetURL,

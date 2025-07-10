@@ -18,13 +18,13 @@ import { Shescape } from "shescape";
 
 const shescape = new Shescape({ shell: process.platform === 'darwin' ? 'zsh' : true });
 
-export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
+export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig, extra: { userAgent: string }) {
   const targetURL = uiConfig.downloader.target.browserValue?.value;
   if (!targetURL) {
     throw Error("No target URL");
   }
 
-  const fileConfig = convertUIConfigToFileContents(uiConfig);
+  const fileConfig = convertUIConfigToFileContents(uiConfig, extra);
 
   const downloaderOptions: DownloaderOptions = {
     cookie: fileConfig.downloader["cookie"],
@@ -86,7 +86,8 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig) {
             rejectUnauthorizedTLS:
               uiConfig.request["proxy.reject.unauthorized.tls"]
           }
-        : null
+        : null,
+      userAgent: extra.userAgent
     }
   };
 

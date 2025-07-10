@@ -86,7 +86,7 @@ export function FileEventSupportMixin<TBase extends MainProcessConstructor>(
                 editorId: editor.id,
                 name: editor.name,
                 filePath: editor.filePath,
-                contents: convertUIConfigToFileContentsString(editor.config)
+                contents: convertUIConfigToFileContentsString(editor.config, { userAgent: this.resolvedUserAgent})
               };
               if (editor.promptOnSave) {
                 this.on(
@@ -136,7 +136,7 @@ export function FileEventSupportMixin<TBase extends MainProcessConstructor>(
               editorId: editor.id,
               name: editor.name,
               filePath: editor.filePath,
-              contents: convertUIConfigToFileContentsString(editor.config)
+              contents: convertUIConfigToFileContentsString(editor.config, { userAgent: this.resolvedUserAgent })
             };
 
             this.on(
@@ -173,7 +173,7 @@ export function FileEventSupportMixin<TBase extends MainProcessConstructor>(
         editorId: editor.id,
         name: path.parse(result.filePath).base,
         filePath: result.filePath,
-        contents: convertUIConfigToFileContentsString(editor.config)
+        contents: convertUIConfigToFileContentsString(editor.config, { userAgent: this.resolvedUserAgent })
       });
     }
 

@@ -150,7 +150,14 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
 
         this.handle("saveWebBrowserSettings", async (settings) => {
           try {
+            settings.userAgent = settings.userAgent.trim();
+            const newUserAgent = settings.userAgent || this.defaultUserAgent;
+            const userAgentChanged = newUserAgent !== this.resolvedUserAgent;
             saveWebBrowserSettings(settings);
+            if (userAgentChanged) {
+              this.resolvedUserAgent = newUserAgent;
+              this.win.setUserAgent(newUserAgent);
+            }
           }
           catch (error: unknown) {
             await dialog.showMessageBox(this.win, {

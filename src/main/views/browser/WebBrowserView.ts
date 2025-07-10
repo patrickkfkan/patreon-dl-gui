@@ -7,7 +7,6 @@ import type { WebBrowserPageNavigatedInfo } from "../../types/MainEvents";
 import normalizeUrl from "normalize-url";
 import { anonymizeProxy, closeAnonymizedProxy } from "proxy-chain";
 import portfinder from "portfinder";
-import { USER_AGENT } from "../../../common/Constants";
 
 export default class WebBrowserView extends WebContentsView {
   #lastLoadedURL: string | null;
@@ -28,14 +27,17 @@ export default class WebBrowserView extends WebContentsView {
     this.#lastLoadedURL = null;
     this.#analyzePageAbortController = null;
     this.#proxy = null;
-    this.webContents.setUserAgent(USER_AGENT);
     this.#registerListeners();
+  }
+
+  async #loadURL(url: string) {
+    await this.webContents.loadURL(url);
   }
 
   async gotoURL(url: string) {
     try {
-      await this.webContents.loadURL(
-        normalizeUrl(url, { defaultProtocol: "https" })
+      await this.#loadURL(
+        normalizeUrl(url, { defaultProtocol: "https" }),
       );
     }
     catch (_error) {
@@ -85,6 +87,15 @@ export default class WebBrowserView extends WebContentsView {
         }
         return;
       }
+      if (this.#isCloudflareChallengePage(url)) {
+        console.debug(
+          `WebBrowserView: detected Cloudflare challenge page, skipping analysis`
+        );
+        this.#lastLoadedURL = null;
+        this.#emitPageNavigatedEvent(url);
+        await this.#emitEmptyPageInfoEvent();
+        return;
+      }
       console.debug(`WebBrowserView: target changed: ${url}`);
       if (this.#lastLoadedURL !== null && this.#lastLoadedURL !== url) {
         e.preventDefault();
@@ -92,7 +103,7 @@ export default class WebBrowserView extends WebContentsView {
         console.debug(
           `WebBrowserView: reloading page to get updated bootstrap data...`
         );
-        await this.webContents.loadURL(url);
+        await this.#loadURL(url);
         return;
       }
       this.#emitPageNavigatedEvent(url);
@@ -137,7 +148,7 @@ export default class WebBrowserView extends WebContentsView {
       if (details.url.startsWith(PATREON_URL)) {
         win.close();
         this.#lastLoadedURL = details.url;
-        await this.webContents.loadURL(details.url);
+        await this.#loadURL(details.url);
       }
     });
     this.webContents.on(
@@ -210,6 +221,16 @@ export default class WebBrowserView extends WebContentsView {
       await closeAnonymizedProxy(this.#proxy.anonymizedURL, true);
       this.#proxy = null;
     }
+  }
+
+  #isCloudflareChallengePage(url: string) {
+    const qs = new URLSearchParams(new URL(url).search);
+    for (const param of qs.keys()) {
+      if (param.startsWith("__cf_chl_") || param.startsWith("cf_clearance")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   #emitPageNavigatedEvent(url: string) {
