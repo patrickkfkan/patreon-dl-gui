@@ -1,0 +1,29 @@
+.scrollbars .track-vertical {
+  top: 0;
+  bottom: 2px;
+  right: 0;
+  background: var(--bs-secondary);
+  opacity: 0.2;
+  border-radius: 3px;
+}
+
+.scrollbars .thumb-vertical {
+  border-radius: 3px;
+  background: var(--bs-light);
+  opacity: 0.2;
+}
+
+.scrollbars .track-horizontal {
+  left: 0;
+  bottom: 2px;
+  right: 0;
+  background: var(--bs-secondary);
+  opacity: 0.2;
+  border-radius: 3px;
+}
+
+.scrollbars .thumb-horizontal {
+  border-radius: 3px;
+  background: var(--bs-light);
+  opacity: 0.2;
+}
