@@ -2,7 +2,10 @@ import type {
   UIConfig,
   UIConfigSectionWithPropsOf
 } from "../../../types/UIConfig";
-import type { TupleToObjectTuple, UnionToTuple } from "../../../../common/types/Utility";
+import type {
+  TupleToObjectTuple,
+  UnionToTuple
+} from "../../../../common/types/Utility";
 import { useConfig } from "../../contexts/ConfigProvider";
 import { Col, Form, Row } from "react-bootstrap";
 import type { AccessibilityProps, HelpProps } from "../../../../common/ui";

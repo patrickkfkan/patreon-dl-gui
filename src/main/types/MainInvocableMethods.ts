@@ -63,7 +63,8 @@ export type MainProcessInvocableMethodHandler<
   : M extends "cancelYouTubeConnect" ? () => void
   : M extends "disconnectYouTube" ? () => void
   : M extends "requestWebBrowserSettings" ? () => void
-  : M extends "saveWebBrowserSettings" ? (settings: WebBrowserSettings) => Promise<void>
+  : M extends "saveWebBrowserSettings" ?
+    (settings: WebBrowserSettings) => Promise<void>
   : M extends "clearSessionData" ? () => void
   : never;
 

@@ -16,12 +16,14 @@ export type ServerConsoleInvocableMethod =
   | "stopAllServers"
   | "openExternalBrowser";
 
-export type SaveServerFormResult = {
-  success: true;
-} | {
-  success: false;
-  errors: Partial<Record<keyof Server, string>>;
-}
+export type SaveServerFormResult =
+  | {
+      success: true;
+    }
+  | {
+      success: false;
+      errors: Partial<Record<keyof Server, string>>;
+    };
 
 export type ServerConsoleInvocableMethodHandler<
   M extends ServerConsoleInvocableMethod

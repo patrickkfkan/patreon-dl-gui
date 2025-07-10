@@ -12,7 +12,10 @@ import type { SaveFileConfigResult } from "../types/MainEvents";
 const TRUE_STRING = "1";
 const FALSE_STRING = "0";
 
-export function convertUIConfigToFileContents(config: UIConfig, extra: { userAgent: string }) {
+export function convertUIConfigToFileContents(
+  config: UIConfig,
+  extra: { userAgent: string }
+) {
   const postsPublished = config.include["posts.published"];
   let postsPublishedAfter = "",
     postsPublishedBefore = "";
@@ -156,7 +159,10 @@ export function convertUIConfigToFileContents(config: UIConfig, extra: { userAge
   return contents;
 }
 
-export function convertUIConfigToFileContentsString(config: UIConfig, extra: { userAgent: string }) {
+export function convertUIConfigToFileContentsString(
+  config: UIConfig,
+  extra: { userAgent: string }
+) {
   const contents = convertUIConfigToFileContents(config, extra);
   const lines: string[] = [];
   for (const [section, sectionContent] of Object.entries(contents)) {

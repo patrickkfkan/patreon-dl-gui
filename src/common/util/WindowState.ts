@@ -25,8 +25,7 @@ class CachedWindowStates {
     if (fs.existsSync(WINDOW_STATE_FILE_PATH)) {
       try {
         cached = fs.readJSONSync(WINDOW_STATE_FILE_PATH) || {};
-      }
-      catch (error: unknown) {
+      } catch (error: unknown) {
         console.error(
           `Failed to load last window states from "${WINDOW_STATE_FILE_PATH}":`,
           error instanceof Error ? error.message : String(error)
@@ -38,9 +37,7 @@ class CachedWindowStates {
   }
 }
 
-export function loadLastWindowState(
-  windowName: string
-): WindowState | null;
+export function loadLastWindowState(windowName: string): WindowState | null;
 export function loadLastWindowState<T extends WindowState>(
   windowName: string,
   validateFn: (data: WindowState) => data is T
@@ -63,7 +60,10 @@ export function loadLastWindowState<T extends WindowState = WindowState>(
   return data;
 }
 
-export function saveWindowState<T extends WindowState>(windowName: string, data: T) {
+export function saveWindowState<T extends WindowState>(
+  windowName: string,
+  data: T
+) {
   const current = CachedWindowStates.get();
   current[windowName] = data;
   try {

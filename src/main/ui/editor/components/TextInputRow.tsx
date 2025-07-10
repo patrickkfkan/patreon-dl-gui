@@ -130,7 +130,7 @@ function TextInputRow<
     textbox.setRangeText(value);
     textbox.selectionEnd = textbox.selectionStart = currentStart + value.length;
     textbox.focus();
-    const event = new Event('change', { bubbles: true });
+    const event = new Event("change", { bubbles: true });
     textbox.dispatchEvent(event);
   }, []);
 

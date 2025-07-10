@@ -3,7 +3,10 @@ import type { MainProcessConstructor } from "../MainProcess";
 import { getHelpContents } from "../util/Help";
 import { APP_URL } from "../../common/Constants";
 import YouTubeConfigurator from "../util/YouTubeConfigurator";
-import { getWebBrowseSettings, saveWebBrowserSettings } from "../config/WebBrowserSettings";
+import {
+  getWebBrowseSettings,
+  saveWebBrowserSettings
+} from "../config/WebBrowserSettings";
 
 export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -144,7 +147,11 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
               { once: true }
             );
             this.win.showModalView();
-            this.emitRendererEvent(this.win.modalView, "webBrowserSettings", getWebBrowseSettings());
+            this.emitRendererEvent(
+              this.win.modalView,
+              "webBrowserSettings",
+              getWebBrowseSettings()
+            );
           });
         }),
 
@@ -158,8 +165,7 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
               this.resolvedUserAgent = newUserAgent;
               this.win.setUserAgent(newUserAgent);
             }
-          }
-          catch (error: unknown) {
+          } catch (error: unknown) {
             await dialog.showMessageBox(this.win, {
               title: "Error",
               message: `An error occurred while saving settings: ${error instanceof Error ? error.message : String(error)}`,

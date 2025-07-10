@@ -10,20 +10,29 @@ import { WebServer } from "patreon-dl";
 import { dialog, Menu, shell } from "electron";
 import type { SaveServerFormResult } from "./types/ServerConsoleInvocableMethods";
 import path from "path";
-import { loadLastWindowState, saveWindowState } from "../common/util/WindowState";
+import {
+  loadLastWindowState,
+  saveWindowState
+} from "../common/util/WindowState";
 import { ensureAppDataPath, openFSChooser } from "../common/util/FS";
-import { getStartableServerListEntryIds, getStoppableServerListEntryIds } from "./util/Server";
+import {
+  getStartableServerListEntryIds,
+  getStoppableServerListEntryIds
+} from "./util/Server";
 
 const processArgs = parseArgs(process.argv);
 
 type LaunchServerFormParams = {
   onSave: (server: Server) => SaveServerFormResult;
-} & ({
-  mode: "add";
-} | {
-  mode: "edit";
-  server: Server;
-});
+} & (
+  | {
+      mode: "add";
+    }
+  | {
+      mode: "edit";
+      server: Server;
+    }
+);
 
 export default class ServerConsoleProcess extends ProcessBase<"serverConsole"> {
   protected win: ServerConsoleWindow;
@@ -172,15 +181,21 @@ export default class ServerConsoleProcess extends ProcessBase<"serverConsole"> {
           server.name = server.name.trim();
           server.dataDir = server.dataDir.trim();
           // Validate input
-          const errors:(SaveServerFormResult & { success: false; })['errors'] = {};
+          const errors: (SaveServerFormResult & { success: false })["errors"] =
+            {};
           if (!server.name) {
             errors.name = "Server name is required";
           }
           if (!server.dataDir) {
             errors.dataDir = "Data directory must be specified";
           }
-          if (isNaN(server.portNumber) || server.portNumber < 1024 || server.portNumber > 65535) {
-            errors.portNumber = "Port number must be between 1024 and 65535 (inclusive)";
+          if (
+            isNaN(server.portNumber) ||
+            server.portNumber < 1024 ||
+            server.portNumber > 65535
+          ) {
+            errors.portNumber =
+              "Port number must be between 1024 and 65535 (inclusive)";
           }
           if (Object.keys(errors).length > 0) {
             return {
@@ -286,10 +301,10 @@ export default class ServerConsoleProcess extends ProcessBase<"serverConsole"> {
     }
     if (this.#promptDelete) {
       const result = await dialog.showMessageBox(this.win, {
-        type: 'warning',
-        title: 'Delete server',
+        type: "warning",
+        title: "Delete server",
         message: `Are you sure you want to delete the server "${entry.server.name}"?`,
-        buttons: ['Cancel', 'Delete'],
+        buttons: ["Cancel", "Delete"],
         cancelId: 0,
         defaultId: 1,
         checkboxLabel: "Don't ask me again",
@@ -317,11 +332,19 @@ export default class ServerConsoleProcess extends ProcessBase<"serverConsole"> {
   }
 
   async startAllServers() {
-    await Promise.all(getStartableServerListEntryIds(this.serverList).map((id) => this.startServer(id)));
+    await Promise.all(
+      getStartableServerListEntryIds(this.serverList).map((id) =>
+        this.startServer(id)
+      )
+    );
   }
 
   async stopAllServers() {
-    await Promise.all((getStoppableServerListEntryIds(this.serverList)).map((id) => this.stopServer(id)));
+    await Promise.all(
+      getStoppableServerListEntryIds(this.serverList).map((id) =>
+        this.stopServer(id)
+      )
+    );
   }
 
   #getServerList(): ServerList {

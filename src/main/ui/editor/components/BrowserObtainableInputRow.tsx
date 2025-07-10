@@ -30,7 +30,7 @@ type PropWithSupportData<
   >;
 
 type BrowserObtainableInputRowProps<
-  S extends UIConfigSectionWithPropsOf<BrowserObtainableInput>,
+  S extends UIConfigSectionWithPropsOf<BrowserObtainableInput>
 > = {
   config: [S, PropWithSupportData<S>];
   label: string;

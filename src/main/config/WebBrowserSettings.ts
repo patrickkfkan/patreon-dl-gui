@@ -1,9 +1,12 @@
-import path from 'path';
-import fs from 'fs-extra';
-import { APP_DATA_PATH } from '../../common/Constants';
-import { DEFAULT_WEB_BROWSER_SETTINGS } from '../Constants';
+import path from "path";
+import fs from "fs-extra";
+import { APP_DATA_PATH } from "../../common/Constants";
+import { DEFAULT_WEB_BROWSER_SETTINGS } from "../Constants";
 
-const WEB_BROWSER_SETTINGS_PATH = path.join(APP_DATA_PATH, "/WebBrowserSettings.json");
+const WEB_BROWSER_SETTINGS_PATH = path.join(
+  APP_DATA_PATH,
+  "/WebBrowserSettings.json"
+);
 
 export interface WebBrowserSettings {
   userAgent: string;
@@ -20,9 +23,8 @@ export function getWebBrowseSettings(): WebBrowserSettings {
     return {
       ...DEFAULT_WEB_BROWSER_SETTINGS,
       ...loaded
-    }
-  }
-  catch (error: unknown) {
+    };
+  } catch (error: unknown) {
     console.error(
       `Failed to read web browser settings from "${WEB_BROWSER_SETTINGS_PATH}"`,
       error instanceof Error ? error.message : String(error)
@@ -34,10 +36,9 @@ export function getWebBrowseSettings(): WebBrowserSettings {
 export function saveWebBrowserSettings(settings: WebBrowserSettings) {
   try {
     return fs.writeJSONSync(WEB_BROWSER_SETTINGS_PATH, settings);
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const err = error instanceof Error ? error.message : String(error);
-    const message = `Failed to save web browser settings to "${WEB_BROWSER_SETTINGS_PATH}": ${err}`
+    const message = `Failed to save web browser settings to "${WEB_BROWSER_SETTINGS_PATH}": ${err}`;
     console.error(message);
     throw error;
   }
