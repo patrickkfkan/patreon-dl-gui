@@ -11,7 +11,7 @@ function WebBrowserToolbar() {
     null
   );
   const [editedURL, setEditedURL] = useState("");
-  const { gotoURL, gotoHome, goBack, goForward, editSettings } = useCommands().webBrowser;
+  const { gotoURL, gotoHome, goBack, goForward, reload, editSettings } = useCommands().webBrowser;
 
   useEffect(() => {
     const removeListenerCallbacks = [
@@ -42,17 +42,19 @@ function WebBrowserToolbar() {
 
   return (
     <Navbar id="web-browser-toolbar" sticky="top" style={{ height: "3rem" }}>
-      <Stack direction="horizontal" className="w-100 ps-2" gap={1}>
+      <Stack direction="horizontal" className="w-100 ps-2" gap={2}>
         <ToolbarButton
           disabled={!pageInfo?.canGoBack}
-          icon="chevron_left"
-          className="nav"
+          icon="arrow_back_ios"
+          iconClassName="fs-6"
+          className="nav ms-2"
           tooltip="Go back one page"
           onClick={goBack}
         />
         <ToolbarButton
           disabled={!pageInfo?.canGoForward}
-          icon="chevron_right"
+          icon="arrow_forward_ios"
+          iconClassName="fs-6"
           className="nav"
           tooltip="Go foward one page"
           onClick={goForward}
@@ -95,8 +97,8 @@ function WebBrowserToolbar() {
         </InputGroup>
         <ToolbarButton
           icon="settings"
-          className="nav ms-2"
           iconClassName="fs-5"
+          className="nav ms-1"
           tooltip="Settings"
           onClick={editSettings}
         />
