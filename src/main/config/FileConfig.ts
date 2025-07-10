@@ -12,7 +12,7 @@ import type { SaveFileConfigResult } from "../types/MainEvents";
 const TRUE_STRING = "1";
 const FALSE_STRING = "0";
 
-export function convertUIConfigToFileContents(config: UIConfig) {
+export function convertUIConfigToFileContents(config: UIConfig, extra: { userAgent: string }) {
   const postsPublished = config.include["posts.published"];
   let postsPublishedAfter = "",
     postsPublishedBefore = "";
@@ -90,7 +90,8 @@ export function convertUIConfigToFileContents(config: UIConfig) {
       "proxy.url": config.request["proxy.url"].trim(),
       "proxy.reject.unauthorized.tls": booleanToString(
         config.request["proxy.reject.unauthorized.tls"]
-      )
+      ),
+      "user.agent": extra.userAgent
     },
     "embed.downloader.youtube": {
       exec:
@@ -155,8 +156,8 @@ export function convertUIConfigToFileContents(config: UIConfig) {
   return contents;
 }
 
-export function convertUIConfigToFileContentsString(config: UIConfig) {
-  const contents = convertUIConfigToFileContents(config);
+export function convertUIConfigToFileContentsString(config: UIConfig, extra: { userAgent: string }) {
+  const contents = convertUIConfigToFileContents(config, extra);
   const lines: string[] = [];
   for (const [section, sectionContent] of Object.entries(contents)) {
     lines.push(`[${section}]`);

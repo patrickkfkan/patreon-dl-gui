@@ -88,7 +88,7 @@ function WebBrowserToolbar() {
         </InputGroup>
         <ToolbarButton
           icon="settings"
-          className="nav ms-3"
+          className="nav ms-2"
           iconClassName="fs-5"
           tooltip="Settings"
           onClick={editSettings}

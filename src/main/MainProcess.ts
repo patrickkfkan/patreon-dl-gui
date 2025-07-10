@@ -20,6 +20,7 @@ import parseArgs from "yargs-parser";
 import { loadLastMainWindowState, saveMainWindowState } from "./util/WindowState";
 import { getWebBrowseSettings } from "./config/WebBrowserSettings";
 import { ensureAppDataPath } from "../common/util/FS";
+import { DEFAULT_MAIN_WINDOW_PROPS } from "./Constants";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MainProcessConstructor = new (...args: any[]) => MainProcessBase;
@@ -32,6 +33,10 @@ export interface DownloaderBundle {
   status: "init" | "running" | "end";
 }
 
+export interface MainProcessBaseArgs {
+  defaultUserAgent: string;
+}
+
 const processArgs = parseArgs(process.argv);
 
 class MainProcessBase extends ProcessBase<"main"> {
@@ -39,20 +44,26 @@ class MainProcessBase extends ProcessBase<"main"> {
   protected activeEditor: Editor | null;
   protected modifiedEditors: Editor[];
   protected downloader: DownloaderBundle | null;
+  protected defaultUserAgent: string;
+  protected resolvedUserAgent: string;
   #cleanupCallbacks: (() => void)[];
   #lastCreatedEditorId = 0;
 
-  constructor() {
+  constructor(args: MainProcessBaseArgs) {
     super();
     const devTools = Reflect.has(processArgs, "dev-tools");
     const lastWindowState = loadLastMainWindowState();
+    this.resolvedUserAgent = getWebBrowseSettings().userAgent.trim() || args.defaultUserAgent;
     this.win = new MainWindow({
       devTools,
-      ...lastWindowState
+      ...lastWindowState,
+      webBrowserViewInitialURL: DEFAULT_MAIN_WINDOW_PROPS.webBrowserViewInitialURL,
+      webBrowserViewUserAgent: this.resolvedUserAgent
     });
     this.activeEditor = null;
     this.modifiedEditors = [];
     this.downloader = null;
+    this.defaultUserAgent = args.defaultUserAgent;
     this.#cleanupCallbacks = [];
   }
 
@@ -107,6 +118,7 @@ class MainProcessBase extends ProcessBase<"main"> {
     await this.win.launch();
 
     console.debug(`Main process started. App data path is "${APP_DATA_PATH}".`);
+    console.debug(`Default user agent is "${this.defaultUserAgent}".`);
   }
 
   protected async createEditor(

@@ -1,4 +1,4 @@
-import { BaseWindow } from "electron";
+import { BaseWindow, session } from "electron";
 import { DEFAULT_MAIN_WINDOW_PROPS } from "./Constants";
 import WebBrowserView from "./views/browser/WebBrowserView";
 import EditorView from "./views/editor/EditorView";
@@ -11,15 +11,16 @@ import type { PageInfo } from "./types/UIConfig";
 import ModalView from "./views/modal/ModalView";
 import type { ValidateProxyURLResult } from "./util/Config";
 import { validateProxyURL } from "./util/Config";
-import { WindowState } from "../common/util/WindowState";
+import type { WindowState } from "../common/util/WindowState";
 
 export interface MainWindowState extends WindowState {
   editorPanelWidth: number;
 }
 
 export interface MainWindowProps extends Partial<MainWindowState> {
-  devTools?: boolean;
-  webBrowserViewInitialURL?: string;
+  devTools: boolean;
+  webBrowserViewInitialURL: string;
+  webBrowserViewUserAgent: string;
 }
 
 interface WebBrowserViewEntry {
@@ -50,14 +51,12 @@ export default class MainWindow extends BaseWindow {
   #editorPanelWidth: number;
   #emitStateChangeEventDelayTimer: NodeJS.Timeout | null;
 
-  constructor(props?: MainWindowProps) {
+  constructor(props: MainWindowProps) {
     super();
-    const devTools = props?.devTools ?? DEFAULT_MAIN_WINDOW_PROPS.devTools;
+    const devTools = props.devTools;
     this.#initialWebBrowserProps = {
-      url:
-        props?.webBrowserViewInitialURL ??
-        DEFAULT_MAIN_WINDOW_PROPS.webBrowserViewInitialURL,
-      devTools
+      url: props.webBrowserViewInitialURL,
+      devTools,
     };
 
     this.editorView = new EditorView();
@@ -102,6 +101,8 @@ export default class MainWindow extends BaseWindow {
     this.on("minimize", () => {
       this.#emitStateChangeEvent();
     });
+
+    this.setUserAgent(props.webBrowserViewUserAgent);
   }
 
   async createWebBrowserViewForEditor(
@@ -263,6 +264,14 @@ export default class MainWindow extends BaseWindow {
 
   hideModalView() {
     this.contentView.removeChildView(this.modalView);
+  } 
+    
+  setUserAgent(userAgent: string) {
+    session.defaultSession.webRequest.onBeforeSendHeaders(null);
+    session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+      details.requestHeaders["User-Agent"] = userAgent;
+      callback({ requestHeaders: details.requestHeaders });
+    });
   }
 
   async clearSessionData(reload = false) {

@@ -6,6 +6,7 @@ import { DEFAULT_WEB_BROWSER_SETTINGS } from '../Constants';
 const WEB_BROWSER_SETTINGS_PATH = path.join(APP_DATA_PATH, "/WebBrowserSettings.json");
 
 export interface WebBrowserSettings {
+  userAgent: string;
   // Clear session data (cookies, cache...) on closing the editor
   clearSessionDataOnExit: boolean;
 }
