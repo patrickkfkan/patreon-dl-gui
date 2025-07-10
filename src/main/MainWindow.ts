@@ -56,7 +56,7 @@ export default class MainWindow extends BaseWindow {
     const devTools = props.devTools;
     this.#initialWebBrowserProps = {
       url: props.webBrowserViewInitialURL,
-      devTools,
+      devTools
     };
 
     this.editorView = new EditorView();
@@ -264,19 +264,23 @@ export default class MainWindow extends BaseWindow {
 
   hideModalView() {
     this.contentView.removeChildView(this.modalView);
-  } 
-    
+  }
+
   setUserAgent(userAgent: string) {
     session.defaultSession.webRequest.onBeforeSendHeaders(null);
-    session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-      details.requestHeaders["User-Agent"] = userAgent;
-      callback({ requestHeaders: details.requestHeaders });
-    });
+    session.defaultSession.webRequest.onBeforeSendHeaders(
+      (details, callback) => {
+        details.requestHeaders["User-Agent"] = userAgent;
+        callback({ requestHeaders: details.requestHeaders });
+      }
+    );
   }
 
   async clearSessionData(reload = false) {
     console.debug("Clearing web browser session data...");
-    await Promise.all(this.#webBrowserViews.map((entry) => entry.view.clearSessionData()));
+    await Promise.all(
+      this.#webBrowserViews.map((entry) => entry.view.clearSessionData())
+    );
     if (reload) {
       this.#webBrowserViews.forEach((entry) => entry.view.reload());
     }

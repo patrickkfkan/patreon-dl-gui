@@ -6,8 +6,7 @@ export type ServerConsoleRendererEvent =
   | "showEditServerForm"
   | "closeServerForm";
 
-export type ServerConsoleMainEvent =
-  | "uiReady";
+export type ServerConsoleMainEvent = "uiReady";
 
 export type ServerConsoleRendererEventListener<
   E extends ServerConsoleRendererEvent
@@ -19,5 +18,4 @@ export type ServerConsoleRendererEventListener<
   : never;
 
 export type ServerConsoleMainEventListener<E extends ServerConsoleMainEvent> =
-  E extends "uiReady" ? () => void
-  : never;
+  E extends "uiReady" ? () => void : never;

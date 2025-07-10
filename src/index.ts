@@ -15,19 +15,18 @@ function getDefaultUserAgent() {
   // Just strip the app name and version from the default user agent string.
   // It's important to leave everything else intact to avoid Cloudflare (if triggered)
   // going into a loop.
-  return session.defaultSession.getUserAgent().replace(
-    ` ${app.name}/${app.getVersion()}`, ''
-  );
+  return session.defaultSession
+    .getUserAgent()
+    .replace(` ${app.name}/${app.getVersion()}`, "");
 }
 
 app.on("ready", async () => {
   const processArgs = parseArgs(process.argv);
-  const serverConsole = Reflect.has(processArgs, 'server-console');
+  const serverConsole = Reflect.has(processArgs, "server-console");
   if (serverConsole) {
     const serverConsoleProcess = new ServerConsoleProcess();
     await serverConsoleProcess.start();
-  }
-  else {
+  } else {
     const defaultUserAgent = getDefaultUserAgent();
     session.defaultSession.setUserAgent(defaultUserAgent);
     const main = new MainProcess({ defaultUserAgent });

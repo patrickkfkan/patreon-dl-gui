@@ -1,7 +1,10 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
 import { DEFAULT_SERVER_CONSOLE_WINDOW_PROPS } from "./Constants";
-import type { ConstrainedWindowState, WindowState } from "../common/util/WindowState";
+import type {
+  ConstrainedWindowState,
+  WindowState
+} from "../common/util/WindowState";
 import { fileURLToPath } from "url";
 
 declare const SERVER_CONSOLE_VITE_DEV_SERVER_URL: string;
@@ -11,19 +14,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export type ServerConsoleWindowState = WindowState;
 
-export interface ServerConsoleWindowProps extends Partial<ServerConsoleWindowState & ConstrainedWindowState> {
+export interface ServerConsoleWindowProps
+  extends Partial<ServerConsoleWindowState & ConstrainedWindowState> {
   devTools?: boolean;
 }
 
 export default class ServerConsoleWindow extends BrowserWindow {
   #emitStateChangeEventDelayTimer: NodeJS.Timeout | null;
- 
+
   constructor(props?: ServerConsoleWindowProps) {
-    const devTools = props?.devTools ?? DEFAULT_SERVER_CONSOLE_WINDOW_PROPS.devTools;
+    const devTools =
+      props?.devTools ?? DEFAULT_SERVER_CONSOLE_WINDOW_PROPS.devTools;
     super({
       webPreferences: {
         sandbox: false,
-        preload: path.join(__dirname, 'server-console-preload.mjs'),
+        preload: path.join(__dirname, "server-console-preload.mjs"),
         devTools
       },
       title: `Server Console - ${app.getName()}`
@@ -32,7 +37,8 @@ export default class ServerConsoleWindow extends BrowserWindow {
     const windowSize = props?.size ?? DEFAULT_SERVER_CONSOLE_WINDOW_PROPS.size;
     const windowPosition =
       props?.position ?? DEFAULT_SERVER_CONSOLE_WINDOW_PROPS.position;
-    const windowState = props?.state ?? DEFAULT_SERVER_CONSOLE_WINDOW_PROPS.state;
+    const windowState =
+      props?.state ?? DEFAULT_SERVER_CONSOLE_WINDOW_PROPS.state;
 
     this.setMinimumSize(
       DEFAULT_SERVER_CONSOLE_WINDOW_PROPS.minSize.width,
@@ -64,7 +70,7 @@ export default class ServerConsoleWindow extends BrowserWindow {
 
     this.on("minimize", () => {
       this.#emitStateChangeEvent();
-    });   
+    });
   }
 
   #emitStateChangeEvent() {
@@ -87,7 +93,12 @@ export default class ServerConsoleWindow extends BrowserWindow {
       await this.webContents.loadURL(SERVER_CONSOLE_VITE_DEV_SERVER_URL);
     } else {
       // Production: load the built HTML file
-      await this.webContents.loadFile(path.resolve(__dirname, `../renderer/${SERVER_CONSOLE_VITE_NAME}/index.html`));
+      await this.webContents.loadFile(
+        path.resolve(
+          __dirname,
+          `../renderer/${SERVER_CONSOLE_VITE_NAME}/index.html`
+        )
+      );
     }
     this.show();
   }
@@ -105,7 +116,10 @@ export default class ServerConsoleWindow extends BrowserWindow {
     };
   }
 
-  emitServerConsoleWindowEvent(event: "stateChange", info: ServerConsoleWindowState): boolean;
+  emitServerConsoleWindowEvent(
+    event: "stateChange",
+    info: ServerConsoleWindowState
+  ): boolean;
   emitServerConsoleWindowEvent(event: string, ...args: unknown[]) {
     return this.emit(event, ...args);
   }
@@ -115,7 +129,10 @@ export default class ServerConsoleWindow extends BrowserWindow {
     listener: (info: ServerConsoleWindowState) => void
   ): this;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onServerConsoleWindowEvent(event: string, listener: (...args: any[]) => void) {
+  onServerConsoleWindowEvent(
+    event: string,
+    listener: (...args: any[]) => void
+  ) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.on(event as any, listener);
   }

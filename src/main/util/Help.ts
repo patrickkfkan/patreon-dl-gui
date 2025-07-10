@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "fs";
 import type { UIConfig, UIConfigSection } from "../types/UIConfig";
 import path from "path";
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

@@ -15,9 +15,17 @@ interface ToolbarButtonProps {
 }
 
 function ToolbarButton(props: ToolbarButtonProps) {
-  const { icon, label, className, iconClassName, onClick, tooltip, split, disabled } =
-    props;
-  const baseClasses = "d-flex align-items-center"
+  const {
+    icon,
+    label,
+    className,
+    iconClassName,
+    onClick,
+    tooltip,
+    split,
+    disabled
+  } = props;
+  const baseClasses = "d-flex align-items-center";
   const button = (
     <Button
       size="sm"
@@ -33,7 +41,9 @@ function ToolbarButton(props: ToolbarButtonProps) {
       >
         {icon}
       </span>
-      { label ? <span className="ms-2">{label}</span> : null}
+      {label ?
+        <span className="ms-2">{label}</span>
+      : null}
     </Button>
   );
   if (!split || split.length === 0) {

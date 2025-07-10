@@ -1,6 +1,6 @@
 import { WebContentsView } from "electron";
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { fileURLToPath } from "url";
+import path from "path";
 
 declare const EDITOR_VIEW_VITE_DEV_SERVER_URL: string;
 declare const EDITOR_VIEW_VITE_NAME: string;
@@ -13,7 +13,7 @@ export default class EditorView extends WebContentsView {
     super({
       webPreferences: {
         sandbox: false,
-        preload: path.join(__dirname, 'editor-view-preload.mjs')
+        preload: path.join(__dirname, "editor-view-preload.mjs")
       }
     });
   }
@@ -32,7 +32,12 @@ export default class EditorView extends WebContentsView {
       return this.webContents.loadURL(EDITOR_VIEW_VITE_DEV_SERVER_URL);
     } else {
       // Production: load the built HTML file
-      return this.webContents.loadFile(path.resolve(__dirname, `../renderer/${EDITOR_VIEW_VITE_NAME}/index.html`));
+      return this.webContents.loadFile(
+        path.resolve(
+          __dirname,
+          `../renderer/${EDITOR_VIEW_VITE_NAME}/index.html`
+        )
+      );
     }
   }
 

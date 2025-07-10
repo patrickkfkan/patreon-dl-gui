@@ -1,6 +1,6 @@
 import { WebContentsView } from "electron";
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { fileURLToPath } from "url";
+import path from "path";
 
 declare const MODAL_VIEW_VITE_DEV_SERVER_URL: string;
 declare const MODAL_VIEW_VITE_NAME: string;
@@ -13,7 +13,7 @@ export default class ModalView extends WebContentsView {
     super({
       webPreferences: {
         sandbox: false,
-        preload: path.join(__dirname, 'modal-view-preload.mjs')
+        preload: path.join(__dirname, "modal-view-preload.mjs")
       }
     });
     this.setBackgroundColor("#00000000");
@@ -33,7 +33,12 @@ export default class ModalView extends WebContentsView {
       return this.webContents.loadURL(MODAL_VIEW_VITE_DEV_SERVER_URL);
     } else {
       // Production: load the built HTML file
-      return this.webContents.loadFile(path.resolve(__dirname, `../renderer/${MODAL_VIEW_VITE_NAME}/index.html`));
+      return this.webContents.loadFile(
+        path.resolve(
+          __dirname,
+          `../renderer/${MODAL_VIEW_VITE_NAME}/index.html`
+        )
+      );
     }
   }
 

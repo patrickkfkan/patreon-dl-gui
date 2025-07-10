@@ -1,5 +1,8 @@
 // https://stackoverflow.com/questions/69676439/create-constant-array-type-from-an-object-type/69676731#69676731
-export type UnionToTuple<U extends string | number | symbol, R extends (string | number | symbol)[] = []> =
+export type UnionToTuple<
+  U extends string | number | symbol,
+  R extends (string | number | symbol)[] = []
+> =
   {
     [S in U]: Exclude<U, S> extends never ? [...R, S]
     : UnionToTuple<Exclude<U, S>, [...R, S]>;
@@ -17,12 +20,21 @@ export type UnionToTuple<U extends string | number | symbol, R extends (string |
  *   {value: 'b', label: 'some other string' }
  * ]
  */
-export type TupleToObjectTuple<T extends (string | number | symbol)[], V extends object = object, VK extends string = "value"> = {
-  [K in keyof T]: T[K] extends string | number | symbol ? V & { [key in VK]: T[K] } : never;
+export type TupleToObjectTuple<
+  T extends (string | number | symbol)[],
+  V extends object = object,
+  VK extends string = "value"
+> = {
+  [K in keyof T]: T[K] extends string | number | symbol ?
+    V & { [key in VK]: T[K] }
+  : never;
 };
 
-export type UnionToObjectTuple<U extends string | number | symbol, V extends object = object, VK extends string = "value"> =
-  TupleToObjectTuple<UnionToTuple<U>, V, VK>;
+export type UnionToObjectTuple<
+  U extends string | number | symbol,
+  V extends object = object,
+  VK extends string = "value"
+> = TupleToObjectTuple<UnionToTuple<U>, V, VK>;
 
 export type ObjectKeysByValueType<S extends object, T> = {
   [K in keyof S]: S[K] extends T ? K : never;

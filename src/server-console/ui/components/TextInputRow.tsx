@@ -6,11 +6,9 @@ import HelpIcon from "./HelpIcon";
 
 type InputValueType = "text" | "number" | "dir" | "file";
 
-type TextInputRowProps<
-  T extends InputValueType
-> = {
+type TextInputRowProps<T extends InputValueType> = {
   type?: T;
-  value: T extends 'number' ? number : string;
+  value: T extends "number" ? number : string;
   label: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
@@ -19,12 +17,10 @@ type TextInputRowProps<
 
 const nativeSetter = Object.getOwnPropertyDescriptor(
   window.HTMLInputElement.prototype,
-  'value'
+  "value"
 )?.set;
 
-function TextInputRow<
-  T extends InputValueType
->(props: TextInputRowProps<T>) {
+function TextInputRow<T extends InputValueType>(props: TextInputRowProps<T>) {
   const {
     type = "text",
     value,
@@ -50,22 +46,19 @@ function TextInputRow<
     />
   );
 
-  const openFSChooser = useCallback(
-    async (type: "dir" | "file") => {
-      const result = await window.serverConsoleAPI.invoke("openFSChooser", {
-        properties: type === "dir" ? ["openDirectory"] : ["openFile"],
-        title: type === "dir" ? "Choose directory" : "Choose file"
-      });
-      if (result.canceled) {
-        return;
-      }
-      if (textboxRef.current) {
-        nativeSetter?.call(textboxRef.current, result.filePath);
-        textboxRef.current.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    },
-    []
-  );
+  const openFSChooser = useCallback(async (type: "dir" | "file") => {
+    const result = await window.serverConsoleAPI.invoke("openFSChooser", {
+      properties: type === "dir" ? ["openDirectory"] : ["openFile"],
+      title: type === "dir" ? "Choose directory" : "Choose file"
+    });
+    if (result.canceled) {
+      return;
+    }
+    if (textboxRef.current) {
+      nativeSetter?.call(textboxRef.current, result.filePath);
+      textboxRef.current.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }, []);
 
   let textboxContainer;
   switch (type) {
@@ -96,33 +89,31 @@ function TextInputRow<
       break;
   }
 
-  const classes = classNames(
-    "m-0",
-    "py-1",
-    "align-items-center"
-  );
+  const classes = classNames("m-0", "py-1", "align-items-center");
 
   return (
     <div>
       <Row className={classes}>
-        <Col className="p-0" xs={4}>{label}:</Col>
+        <Col className="p-0" xs={4}>
+          {label}:
+        </Col>
         <Col className="p-0" xs={8}>
           <div className="d-flex align-items-center">
             {textboxContainer}
-            {helpTooltip ? (
+            {helpTooltip ?
               <HelpIcon tooltip={helpTooltip} className="ms-2" />
-            ) : null}
+            : null}
           </div>
         </Col>
       </Row>
-      { error ? (
+      {error ?
         <Row className="m-0">
-        <Col className="p-0" xs={4}></Col>
-        <Col className="p-0" xs={8}>
-          <span className="text-danger">{error}</span>
-        </Col>
-      </Row>
-      ): null}
+          <Col className="p-0" xs={4}></Col>
+          <Col className="p-0" xs={8}>
+            <span className="text-danger">{error}</span>
+          </Col>
+        </Row>
+      : null}
     </div>
   );
 }

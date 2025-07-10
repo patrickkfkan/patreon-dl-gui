@@ -33,7 +33,7 @@ function WebBRowserSettingsModal() {
         return;
       }
       settings.userAgent = e.target.value;
-      setSettings({...settings});
+      setSettings({ ...settings });
     },
     [settings]
   );
@@ -43,7 +43,7 @@ function WebBRowserSettingsModal() {
       return;
     }
     settings.clearSessionDataOnExit = !settings.clearSessionDataOnExit;
-    setSettings({...settings});
+    setSettings({ ...settings });
   }, [settings]);
 
   const clearSessionData = useCallback(async () => {
@@ -70,9 +70,18 @@ function WebBRowserSettingsModal() {
           <div className="w-100 mb-3">
             <div className="mb-2">
               User Agent
-              <span className="fst-italic"> (leave blank unless you know what you&apos;re doing)</span>:
+              <span className="fst-italic">
+                {" "}
+                (leave blank unless you know what you&apos;re doing)
+              </span>
+              :
             </div>
-            <Form.Control type="text" value={settings.userAgent} placeholder="(Default)" onChange={handleUserAgentChange} />
+            <Form.Control
+              type="text"
+              value={settings.userAgent}
+              placeholder="(Default)"
+              onChange={handleUserAgentChange}
+            />
           </div>
           <Stack direction="horizontal" className="w-100" gap={3}>
             <Form.Check
@@ -81,10 +90,7 @@ function WebBRowserSettingsModal() {
               label="Clear session data on exit"
               onChange={toggleClearSessionData}
             />
-            <Button
-              href="#"
-              onClick={clearSessionData}
-            >
+            <Button href="#" onClick={clearSessionData}>
               Clear now
             </Button>
           </Stack>

@@ -19,8 +19,8 @@ import type {
 import { DateTime } from "patreon-dl";
 import path from "path";
 import { existsSync } from "fs";
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

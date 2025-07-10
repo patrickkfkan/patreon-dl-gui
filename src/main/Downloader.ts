@@ -16,9 +16,14 @@ import {
 } from "./Constants";
 import { Shescape } from "shescape";
 
-const shescape = new Shescape({ shell: process.platform === 'darwin' ? 'zsh' : true });
+const shescape = new Shescape({
+  shell: process.platform === "darwin" ? "zsh" : true
+});
 
-export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig, extra: { userAgent: string }) {
+export function convertUIConfigToPatreonDLOptions(
+  uiConfig: UIConfig,
+  extra: { userAgent: string }
+) {
   const targetURL = uiConfig.downloader.target.browserValue?.value;
   if (!targetURL) {
     throw Error("No target URL");
@@ -153,9 +158,7 @@ export function convertUIConfigToPatreonDLOptions(uiConfig: UIConfig, extra: { u
     color: uiConfig["logger.file.1"].color
   };
 
-  const fileLogger = new FileLogger(
-    fileLoggerOptions
-  );
+  const fileLogger = new FileLogger(fileLoggerOptions);
 
   downloaderOptions.logger = new ChainLogger([consoleLogger, fileLogger]);
 

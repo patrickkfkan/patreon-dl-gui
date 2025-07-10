@@ -13,7 +13,6 @@ export function loadModalWrapper() {
   root.render(<ModalWrapper />);
 }
 
-
 export function loadServerConsoleUI() {
   const root = createRoot(document.body);
   root.render(<ServerConsoleApp />);

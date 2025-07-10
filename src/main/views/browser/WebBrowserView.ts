@@ -36,11 +36,8 @@ export default class WebBrowserView extends WebContentsView {
 
   async gotoURL(url: string) {
     try {
-      await this.#loadURL(
-        normalizeUrl(url, { defaultProtocol: "https" }),
-      );
-    }
-    catch (_error) {
+      await this.#loadURL(normalizeUrl(url, { defaultProtocol: "https" }));
+    } catch (_error) {
       // Do nothing - let errors be shown within the page
     }
   }

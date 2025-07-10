@@ -8,9 +8,7 @@ interface HelpIconProps {
   className?: string;
 }
 
-function HelpIcon(
-  props: HelpIconProps
-) {
+function HelpIcon(props: HelpIconProps) {
   const [id] = useState(_.uniqueId("tooltip-trigger-"));
   const { tooltip, className } = props;
 
@@ -24,14 +22,8 @@ function HelpIcon(
       >
         help
       </a>
-      <Tooltip
-        style={{ zIndex: 9999 }}
-        place="top"
-        anchorSelect={`#${id}`}
-      >
-        <div style={{ maxWidth: "16rem" }}>
-          {tooltip}
-        </div>
+      <Tooltip style={{ zIndex: 9999 }} place="top" anchorSelect={`#${id}`}>
+        <div style={{ maxWidth: "16rem" }}>{tooltip}</div>
       </Tooltip>
     </>
   );

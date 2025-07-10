@@ -1,4 +1,4 @@
-import type { BaseWindow} from "electron";
+import type { BaseWindow } from "electron";
 import type electron from "electron";
 import { dialog } from "electron";
 import fs from "fs";
@@ -13,7 +13,10 @@ export type FSChooserResult =
       filePath: string;
     };
 
-export async function openFSChooser(win: BaseWindow, options: electron.OpenDialogOptions): Promise<FSChooserResult> {
+export async function openFSChooser(
+  win: BaseWindow,
+  options: electron.OpenDialogOptions
+): Promise<FSChooserResult> {
   const result = await dialog.showOpenDialog(win, options);
   if (result.canceled) {
     return {

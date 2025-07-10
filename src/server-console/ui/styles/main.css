@@ -1,3 +1,3 @@
-.server-list-table .rdg-cell[aria-selected='true'] {
+.server-list-table .rdg-cell[aria-selected="true"] {
   outline: none;
 }

@@ -11,7 +11,8 @@ function WebBrowserToolbar() {
     null
   );
   const [editedURL, setEditedURL] = useState("");
-  const { gotoURL, gotoHome, goBack, goForward, reload, editSettings } = useCommands().webBrowser;
+  const { gotoURL, gotoHome, goBack, goForward, reload, editSettings } =
+    useCommands().webBrowser;
 
   useEffect(() => {
     const removeListenerCallbacks = [

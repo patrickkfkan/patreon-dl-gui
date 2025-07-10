@@ -17,7 +17,10 @@ import ProcessBase from "../common/ProcessBase";
 import { WebBrowserEventSupportMixin } from "./mixins/WebBrowserEvents";
 import { getStartupUIConfig } from "./config/UIConfig";
 import parseArgs from "yargs-parser";
-import { loadLastMainWindowState, saveMainWindowState } from "./util/WindowState";
+import {
+  loadLastMainWindowState,
+  saveMainWindowState
+} from "./util/WindowState";
 import { getWebBrowseSettings } from "./config/WebBrowserSettings";
 import { ensureAppDataPath } from "../common/util/FS";
 import { DEFAULT_MAIN_WINDOW_PROPS } from "./Constants";
@@ -53,11 +56,13 @@ class MainProcessBase extends ProcessBase<"main"> {
     super();
     const devTools = Reflect.has(processArgs, "dev-tools");
     const lastWindowState = loadLastMainWindowState();
-    this.resolvedUserAgent = getWebBrowseSettings().userAgent.trim() || args.defaultUserAgent;
+    this.resolvedUserAgent =
+      getWebBrowseSettings().userAgent.trim() || args.defaultUserAgent;
     this.win = new MainWindow({
       devTools,
       ...lastWindowState,
-      webBrowserViewInitialURL: DEFAULT_MAIN_WINDOW_PROPS.webBrowserViewInitialURL,
+      webBrowserViewInitialURL:
+        DEFAULT_MAIN_WINDOW_PROPS.webBrowserViewInitialURL,
       webBrowserViewUserAgent: this.resolvedUserAgent
     });
     this.activeEditor = null;

@@ -35,7 +35,9 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                   consoleLogger,
                   fileLogger,
                   prompt
-                } = convertUIConfigToPatreonDLOptions(editor.config, { userAgent: this.resolvedUserAgent });
+                } = convertUIConfigToPatreonDLOptions(editor.config, {
+                  userAgent: this.resolvedUserAgent
+                });
                 this.downloader = {
                   instance: await PatreonDownloader.getInstance(
                     targetURL,
@@ -106,9 +108,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     #getDisplayConfig(config: ReturnType<PatreonDownloader<any>["getConfig"]>) {
-      const displayConfig = _.cloneDeep(config) as DeepWriteable<
-        typeof config
-      >;
+      const displayConfig = _.cloneDeep(config) as DeepWriteable<typeof config>;
       delete (displayConfig as Record<string, unknown>).type;
       delete (displayConfig as Record<string, unknown>).postFetch;
       delete (displayConfig as Record<string, unknown>).productId;

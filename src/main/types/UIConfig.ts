@@ -137,12 +137,22 @@ export interface UIConfig {
 
 export type UIConfigSection = keyof UIConfig;
 
-export type UIConfigValuesByType<S extends UIConfigSection, T> = ObjectKeysByValueType<UIConfig[S], T>;
+export type UIConfigValuesByType<
+  S extends UIConfigSection,
+  T
+> = ObjectKeysByValueType<UIConfig[S], T>;
 
 export type UIConfigByValueType<T> = {
-  [K in keyof UIConfig as UIConfigValuesByType<K, T> extends never ? never : K]: UIConfigValuesByType<K, T>;
+  [K in keyof UIConfig as UIConfigValuesByType<K, T> extends never ? never
+  : K]: UIConfigValuesByType<K, T>;
 };
 
-export type UIConfigProp<S extends UIConfigSectionWithPropsOf<T>, T> = UIConfigByValueType<T>[S];
+export type UIConfigProp<
+  S extends UIConfigSectionWithPropsOf<T>,
+  T
+> = UIConfigByValueType<T>[S];
 export type UIConfigSectionWithPropsOf<T> = keyof UIConfigByValueType<T>;
-export type UIConfigSectionPropTuple<S extends UIConfigSection, T> = [S, UIConfigValuesByType<S, T>];
+export type UIConfigSectionPropTuple<S extends UIConfigSection, T> = [
+  S,
+  UIConfigValuesByType<S, T>
+];
