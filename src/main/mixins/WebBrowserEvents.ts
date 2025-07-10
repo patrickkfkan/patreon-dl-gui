@@ -26,6 +26,10 @@ export function WebBrowserEventSupportMixin<
           this.win.webBrowserView?.goForward();
         }),
 
+        this.handle("webBrowserReload", () => {
+          this.win.webBrowserView?.reload();
+        }),
+
         this.on("viewBoundsChange", (bounds) => {
           this.win.updateViewBounds(bounds);
         })

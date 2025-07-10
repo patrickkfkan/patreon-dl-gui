@@ -58,9 +58,16 @@ function WebBrowserToolbar() {
           onClick={goForward}
         />
         <ToolbarButton
-          icon="home"
-          className="nav"
+          icon="refresh"
           iconClassName="fs-5"
+          className="nav"
+          tooltip="Reload page"
+          onClick={reload}
+        />
+        <ToolbarButton
+          icon="home"
+          iconClassName="fs-5"
+          className="nav"
           tooltip="Go to Patreon homepage"
           onClick={gotoHome}
         />

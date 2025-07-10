@@ -22,6 +22,7 @@ export type MainProcessInvocableMethod =
   | "setWebBrowserURLToHome"
   | "webBrowserBack"
   | "webBrowserForward"
+  | "webBrowserReload"
   | "startDownload"
   | "abortDownload"
   | "configureYouTube"
@@ -54,6 +55,7 @@ export type MainProcessInvocableMethodHandler<
   : M extends "setWebBrowserURLToHome" ? () => void
   : M extends "webBrowserBack" ? () => void
   : M extends "webBrowserForward" ? () => void
+  : M extends "webBrowserReload" ? () => void
   : M extends "startDownload" ? (editor: Editor) => void
   : M extends "abortDownload" ? () => void
   : M extends "configureYouTube" ? () => void
