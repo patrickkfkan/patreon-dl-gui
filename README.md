@@ -19,6 +19,7 @@ An Electron app that provides a GUI for [patreon-dl](https://github.com/patrickk
   - Download only certain types of media
   - Filter posts by tier, date published, type of media contained
   - Download through proxy server
+- Access downloaded content through a web browser
 
 ## Installation
 
@@ -48,9 +49,29 @@ Furthermore, if you intend to download embedded Vimeo videos, you are recommende
 3. Select "Use helper script" for "Download method".
 4. Click the folder icon for "Path to yt-dlp" and select the downloaded binary.
 
+## Browsing downloaded content
+
+Content downloaded by `patreon-dl-gui` v2.2.0 onwards can be accessed through a web browser. To do this, you need to configure and start a web server that serves content from the download destination directory.
+
+In `patreon-dl-gui`, say you've downloaded content to destination directory "C:\My Patreon Downloads". You would then do the following:
+
+- Open the `patreon-dl-gui (Server Console)` app, found in the `patreon-dl-gui` Start Menu folder on Windows or `Utilities` application menu folder on Linux (subject to your Linux distro / desktop environment).
+- Click the "Add" button in the toolbar and set the server's properties as follows:
+  | Property | Value |
+  |------|---------|
+  | Name | Anything will do |
+  | Data directory | Point to "C:\My Patreon Downloads" |
+  | Port | Leave as "Auto" |
+- Click the "Add" button. The server is now added and you should see a new entry in the table.
+- In the Action column of the added entry, click the "Start" button (play icon).
+- If server starts successfully, you should see the message "Running: `URL`" in the Status column. Click the URL to open it in a web browser and begin browsing the downloaded content.
+- If you have multiple destination directories, you can add a server for each of them.
+
 ## Interoperability with `patreon-dl` CLI
 
 `patreon-dl-gui` is a standalone app that utilizes the `patreon-dl` library to download Patreon content. On the other hand, `patreon-dl` comes with a CLI tool that has the option to read downloader options from a config file.
+
+### Config files
 
 Generally speaking, config files saved in `patreon-dl-gui` can be passed to the `patreon-dl` CLI tool without issue, subject to the following exceptions:
 
@@ -64,13 +85,26 @@ What about the other way round? You should note that the config schema accepted 
 
 When you open a config file, the app will notify you of any omitted or unsupported options.
 
-If you intend to create a config file in `patreon-dl-gui` for use with `patreon-dl` CLI, you should also ensure that the version of `patreon-dl` used by the app matches that of the CLI:
+If you intend to create a config file in `patreon-dl-gui` for use with `patreon-dl` CLI, you should also ensure that the version of `patreon-dl` used by the app matches that of the CLI. See [Version matching](#version-matching).
+
+### Browseability of downloaded content
+
+Through its bundled `patreon-dl-server` executable, `patreon-dl` v3.0.0 onwards can serve content downloaded by `patreon-dl-gui` v2.2.0 and higher.
+
+Through its server console app, `patreon-dl-gui` v2.3.0 onwards can serve content downloaded by `patreon-dl` v3.0.0 and higher.
+
+As is the case with config files, to ensure there will be no compatibility issues, you should match the `patreon-dl-gui` version with the `patreon-dl` version used by it.
+
+### Version matching
+
+The following table lists the version of `patreon-dl` used by each version of `patreon-dl-gui`:
 
 | `patreon-dl-gui` version | `patreon-dl` version used |
 |--------------------------|---------------------------|
 | v1.0.0 - v2.0.0          | v2.4.1                    |
 | v2.1.0                   | v2.4.2                    |
 | v2.2.0                   | v3.0.0                    |
+| v2.3.0                   | v3.1.0                    |
 
 ## Running / packaging the app from source
 
@@ -83,6 +117,9 @@ $ git clone https://github.com/patrickkfkan/patreon-dl-gui.git
 $ cd patreon-dl-gui
 $ npm i
 $ npm run start
+
+// To start the server console
+$ npm run start -- -- --server-console
 ```
 
 To package the app for your OS:
@@ -92,6 +129,16 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.3.0
+- Update `patreon-dl` library to v3.1.0
+- If you got hit by Cloudflare verification loop, this should now be fixed.
+- Add web browser settings with:
+  - option to clear session data
+  - option to set a custom user agent (mainly for debugging purpose - do not use unless you know what you're doing)
+- Add reload button to web browser
+- On Windows, Start Menu folder should now have the correct name "patreon-dl-gui".
+- Add server console for managing servers providing access to downloaded content
 
 v2.2.0
 - Update `patreon-dl` library to v3.0.0
