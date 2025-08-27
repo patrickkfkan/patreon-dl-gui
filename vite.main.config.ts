@@ -34,11 +34,18 @@ export default defineConfig((env) => {
       target: "esnext",
       rollupOptions: {
         // Vite generates CJS code for these modules so they need to be externalized.
-        external: [
+                external: [
           "bufferutil",
           "utf-8-validate",
           "undici", // ^6.21.3
           "patreon-dl", // ^3.0.0
+          "shescape",
+          "dateformat",
+          "configparser",
+          "proxy-chain",
+          "portfinder",
+          "html-entities",
+          "electron-dl",
 
           ...builtinModules,
           ...builtinModules.map(m => `node:${m}`)
