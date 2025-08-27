@@ -2,7 +2,7 @@ import MainWindow from "./MainWindow";
 import type { Editor } from "./types/App";
 import type { UICommand, ExecUICommandParams } from "./types/MainEvents";
 import type DownloaderConsoleLogger from "./DownloaderConsoleLogger";
-import { dialog, app } from "electron";
+import { dialog, app, BrowserWindow } from "electron";
 import type PatreonDownloader from "patreon-dl";
 import _ from "lodash";
 import type { AppMenuOptions } from "./mixins/AppMenu";
@@ -88,15 +88,12 @@ class MainProcessBase extends ProcessBase<"main"> {
           entries: RecentDocuments.list()
         });
       }),
-      import { BrowserWindow } from "electron";
-// ... (rest of the file)
       this.handle("downloadExternal", async ({ url, creatorName }: { url: string; creatorName: string; }) => {
         const win = this.win;
         const downloadPath = path.join(APP_DATA_PATH, "downloads", creatorName);
         await download(win as unknown as BrowserWindow, url, {
           directory: downloadPath,
           onStarted: (item: any) => {
-// ... (rest of the file)
             this.win.editorView.webContents.send("download-progress", {
               percent: item.getReceivedBytes() / item.getTotalBytes(),
               totalBytes: item.getTotalBytes(),
