@@ -2,7 +2,7 @@ import MainWindow from "./MainWindow";
 import type { Editor } from "./types/App";
 import type { UICommand, ExecUICommandParams } from "./types/MainEvents";
 import type DownloaderConsoleLogger from "./DownloaderConsoleLogger";
-import { dialog } from "electron";
+import { dialog, app } from "electron";
 import type PatreonDownloader from "patreon-dl";
 import _ from "lodash";
 import type { AppMenuOptions } from "./mixins/AppMenu";
@@ -24,6 +24,8 @@ import {
 import { getWebBrowseSettings } from "./config/WebBrowserSettings";
 import { ensureAppDataPath } from "../common/util/FS";
 import { DEFAULT_MAIN_WINDOW_PROPS } from "./Constants";
+import path from "path";
+const { download } = require("electron-dl");
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MainProcessConstructor = new (...args: any[]) => MainProcessBase;
@@ -84,6 +86,30 @@ class MainProcessBase extends ProcessBase<"main"> {
         });
         this.emitRendererEvent(this.win.editorView, "recentDocumentsInfo", {
           entries: RecentDocuments.list()
+        });
+      }),
+      this.handle("downloadExternal", async ({ url, creatorName }: { url: string; creatorName: string; }) => {
+        const win = this.win;
+        const downloadPath = path.join(APP_DATA_PATH, "downloads", creatorName);
+        await download(win, url, {
+          directory: downloadPath,
+          onStarted: (item: any) => {
+            this.win.editorView.webContents.send("download-progress", {
+              percent: item.getReceivedBytes() / item.getTotalBytes(),
+              totalBytes: item.getTotalBytes(),
+              receivedBytes: item.getReceivedBytes()
+            });
+          },
+          onProgress: (progress: any) => {
+            this.win.editorView.webContents.send("download-progress", {
+              percent: progress.percent,
+              totalBytes: progress.totalBytes,
+              receivedBytes: progress.transferredBytes
+            });
+          },
+          onCompleted: (file: any) => {
+            this.win.editorView.webContents.send("download-complete", file);
+          }
         });
       })
       // More to be added by mixins

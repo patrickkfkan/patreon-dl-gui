@@ -10,7 +10,11 @@ const getEditorName = (editor: Editor) => {
   return `${editor.name}${editor.modified ? "*" : ""}`;
 };
 
-function EditorToolbar() {
+interface EditorToolbarProps {
+  onExternalDownloadClick: () => void;
+}
+
+function EditorToolbar({ onExternalDownloadClick }: EditorToolbarProps) {
   const { editors, activeEditor, setActiveEditor } = useEditor();
   const [recentDocuments, setRecentDocuments] = useState<
     readonly RecentDocument[]
@@ -90,6 +94,11 @@ function EditorToolbar() {
           disabled={!activeEditor}
           onClick={startDownload}
           tooltip="Start download"
+        />
+        <ToolbarButton
+          icon="link"
+          onClick={onExternalDownloadClick}
+          tooltip="Download from URL"
         />
       </Container>
       {activeEditor ?
