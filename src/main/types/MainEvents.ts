@@ -46,7 +46,8 @@ export type MainProcessMainEvent =
   | "confirmStartDownload"
   | "downloaderModalClose"
   | "youtubeConfiguratorModalClose"
-  | "webBrowserSettingsModalClose";
+  | "webBrowserSettingsModalClose"
+  | "downloadExternal";
 
 export type UICommand =
   | "createEditor"
@@ -204,4 +205,5 @@ export type MainProcessMainEventListener<E extends MainProcessMainEvent> =
   : E extends "downloaderModalClose" ? () => void
   : E extends "youtubeConfiguratorModalClose" ? () => void
   : E extends "webBrowserSettingsModalClose" ? () => void
+  : E extends "downloadExternal" ? (args: { url: string; creatorName: string }) => void
   : never;

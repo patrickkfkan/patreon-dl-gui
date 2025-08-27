@@ -12,10 +12,13 @@ import { CommandsProvider } from "./contexts/CommandsProvider";
 import WebBrowserToolbar from "./editor/WebBrowserToolbar";
 import CustomScrollbars from "../../common/ui/components/CustomScrollbars";
 import { ToastContainer } from "react-toastify";
+import ExternalDownloadModal from "./modals/ExternalDownloadModal";
 
 function App() {
   const [uiReady, setUIReady] = useState(false);
   const [editorPanelWidth, setEditorPanelWidth] = useState<number | null>(null);
+  const [showExternalDownloadModal, setShowExternalDownloadModal] =
+    useState(false);
   const editorPanelRef = useRef<HTMLDivElement>(null);
   const webBrowserViewRef = useRef<HTMLDivElement>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
@@ -125,7 +128,11 @@ function App() {
             className="d-flex flex-column vh-100"
             style={{ width: `${editorPanelWidth}px` }}
           >
-            <EditorToolbar />
+            <EditorToolbar
+              onExternalDownloadClick={() =>
+                setShowExternalDownloadModal(true)
+              }
+            />
             <CustomScrollbars>
               <div className="flex-fill px-2 py-3">
                 <ConfigProvider>
@@ -158,6 +165,10 @@ function App() {
             }}
           />
         </div>
+        <ExternalDownloadModal
+          show={showExternalDownloadModal}
+          onHide={() => setShowExternalDownloadModal(false)}
+        />
       </CommandsProvider>
     </EditorContextProvider>
   );

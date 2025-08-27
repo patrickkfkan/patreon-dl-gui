@@ -31,7 +31,8 @@ export type MainProcessInvocableMethod =
   | "disconnectYouTube"
   | "requestWebBrowserSettings"
   | "saveWebBrowserSettings"
-  | "clearSessionData";
+  | "clearSessionData"
+  | "downloadExternal";
 
 export type MainProcessInvocableMethodHandler<
   M extends MainProcessInvocableMethod
@@ -66,6 +67,7 @@ export type MainProcessInvocableMethodHandler<
   : M extends "saveWebBrowserSettings" ?
     (settings: WebBrowserSettings) => Promise<void>
   : M extends "clearSessionData" ? () => void
+  : M extends "downloadExternal" ? (args: { url: string; creatorName: string }) => Promise<void>
   : never;
 
 export type CloseEditorResult =
