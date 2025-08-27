@@ -25,7 +25,7 @@ import { getWebBrowseSettings } from "./config/WebBrowserSettings";
 import { ensureAppDataPath } from "../common/util/FS";
 import { DEFAULT_MAIN_WINDOW_PROPS } from "./Constants";
 import path from "path";
-const { download } = require("electron-dl");
+import { download } from "electron-dl";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MainProcessConstructor = new (...args: any[]) => MainProcessBase;
@@ -88,12 +88,15 @@ class MainProcessBase extends ProcessBase<"main"> {
           entries: RecentDocuments.list()
         });
       }),
+      import { BrowserWindow } from "electron";
+// ... (rest of the file)
       this.handle("downloadExternal", async ({ url, creatorName }: { url: string; creatorName: string; }) => {
         const win = this.win;
         const downloadPath = path.join(APP_DATA_PATH, "downloads", creatorName);
-        await download(win, url, {
+        await download(win as unknown as BrowserWindow, url, {
           directory: downloadPath,
           onStarted: (item: any) => {
+// ... (rest of the file)
             this.win.editorView.webContents.send("download-progress", {
               percent: item.getReceivedBytes() / item.getTotalBytes(),
               totalBytes: item.getTotalBytes(),
