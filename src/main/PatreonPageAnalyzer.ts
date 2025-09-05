@@ -201,6 +201,13 @@ export default class PatreonPageAnalyzer {
     } = json.query && typeof json.query === "object" ? json.query : {};
 
     const __parseSlugId = (s: string) => {
+      // Check if ID only - no slug
+      if (!isNaN(Number(s))) {
+        return {
+          slug: null,
+          id: s
+        }
+      }
       const match = /(.+)-(\d+)$/.exec(s);
       if (match?.length === 3) {
         return {
@@ -248,11 +255,11 @@ export default class PatreonPageAnalyzer {
       typeof postId === "string"
     ) {
       const { slug, id } = __parseSlugId(postId);
-      if (slug && id) {
+      if (id) {
         const an: URLAnalysis = {
           type: "post",
           postId: id,
-          slug
+          slug: slug ?? undefined
         };
         return {
           normalizedURL: `${PATREON_URL}/posts/${postId}`,
