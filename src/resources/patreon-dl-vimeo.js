@@ -2,7 +2,7 @@
 
 /**
  * Taken from patreon-dl:
- * https://github.com/patrickkfkan/patreon-dl/blob/23868152f3e37711e0964a7b909d2a41eb464759/bin/patreon-dl-vimeo.js
+ * https://github.com/patrickkfkan/patreon-dl/blob/master/bin/patreon-dl-vimeo.js
  *
  * Converted to CommonJS so it can be packaged as single executable application
  * in `npm run prepare`.
@@ -58,15 +58,23 @@ function getCommandString(cmd, args) {
   return [cmd, ...quotedArgs].join(" ");
 }
 
-async function download(url, o, videoPassword, ytdlpPath) {
+async function download(url, o, videoPassword, ytdlpPath, ytdlpArgs) {
   let proc;
   const ytdlp = ytdlpPath || "yt-dlp";
+  const parsedYtdlpArgs = parseArgs(ytdlpArgs);
   try {
     return await new Promise((resolve, reject) => {
       let settled = false;
-      const args = ["-o", o, "--referer", "https://patreon.com/"];
+      const args = [];
+      if (!parsedYtdlpArgs["o"] && !parsedYtdlpArgs["output"]) {
+        args.push("-o", o);
+      }
+      if (!parsedYtdlpArgs["referrer"]) {
+        args.push("--referer", "https://patreon.com/");
+      }
+      args.push(...ytdlpArgs);
       const printArgs = [...args];
-      if (videoPassword) {
+      if (videoPassword && !parsedYtdlpArgs["video-password"]) {
         args.push("--video-password", videoPassword);
         printArgs.push("--video-password", "******");
       }
@@ -121,6 +129,7 @@ const o = _o?.trim() ? path.resolve(_o.trim()) : null;
 const embedHTML = _embedHTML?.trim();
 const embedURL = _embedURL?.trim();
 const ytdlpPath = _ytdlpPath?.trim() ? path.resolve(_ytdlpPath.trim()) : null;
+const ytdlpArgs = args["_"];
 
 if (!o) {
   console.error("No output file specified");
@@ -140,7 +149,7 @@ if (!url) {
 }
 
 async function doDownload(_url) {
-  let code = await download(_url, o, videoPassword, ytdlpPath);
+  let code = await download(_url, o, videoPassword, ytdlpPath, ytdlpArgs);
   if (code !== 0 && _url !== embedURL && embedURL) {
     console.log(`Download failed - retrying with embed URL "${embedURL}"`);
     return await doDownload(embedURL);

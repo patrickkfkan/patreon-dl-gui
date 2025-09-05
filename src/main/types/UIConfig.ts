@@ -95,6 +95,7 @@ export interface UIConfig {
     // Helper params
     "helper.ytdlp.path": string;
     "helper.password": string;
+    "helper.ytdlp.args": string;
   };
   "logger.console": {
     enabled: boolean;

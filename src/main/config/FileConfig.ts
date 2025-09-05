@@ -152,7 +152,9 @@ export function convertUIConfigToFileContents(
       "vimeo.helper.ytdlp.path":
         config["embed.downloader.vimeo"]["helper.ytdlp.path"].trim() || "",
       "vimeo.helper.password":
-        config["embed.downloader.vimeo"]["helper.password"].trim() || ""
+        config["embed.downloader.vimeo"]["helper.password"].trim() || "",
+      "vimeo.helper.ytdlp.args":
+        config["embed.downloader.vimeo"]["helper.ytdlp.args"].trim() || ""
     }
   };
 

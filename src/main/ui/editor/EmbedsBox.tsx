@@ -176,6 +176,11 @@ function EmbedsBox() {
                   label="Private video password"
                   helpTooltip="Password for protected Vimeo videos"
                 />
+                <TextInputRow
+                  config={["embed.downloader.vimeo", "helper.ytdlp.args"]}
+                  label="yt-dlp args"
+                  helpTooltip="Command-line options to pass directly to yt-dlp"
+                />
               </>
             : null}
             {embedDownloaderVimeo.type === "custom" ?

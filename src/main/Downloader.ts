@@ -207,5 +207,11 @@ function getVimeoHelperExec(config: UIConfig["embed.downloader.vimeo"]) {
       shescape.quote(config["helper.password"].trim())
     );
   }
+  if (config["helper.ytdlp.args"].trim()) {
+    args.push(
+      "--",
+      config["helper.ytdlp.args"].trim()
+    );
+  }
   return [shescape.quote(VIMEO_HELPER_SCRIPT_PATH), ...args].join(" ");
 }
