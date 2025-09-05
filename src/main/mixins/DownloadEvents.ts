@@ -108,10 +108,10 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     #getDisplayConfig(config: ReturnType<PatreonDownloader<any>["getConfig"]>) {
-      const displayConfig = _.cloneDeep(config) as DeepWriteable<typeof config>;
-      delete (displayConfig as Record<string, unknown>).type;
-      delete (displayConfig as Record<string, unknown>).postFetch;
-      delete (displayConfig as Record<string, unknown>).productId;
+      const displayConfig = _.cloneDeep(config) as any;
+      delete displayConfig.type;
+      delete displayConfig.postFetch;
+      delete displayConfig.productId;
       if (config.include?.postsPublished?.after) {
         displayConfig.include.postsPublished.after =
           config.include.postsPublished.after.toString();
@@ -119,6 +119,30 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
       if (config.include?.postsPublished?.before) {
         displayConfig.include.postsPublished.before =
           config.include.postsPublished.before.toString();
+      }
+      if (config.include?.mediaByFilename) {
+        for (const [k, v] of Object.entries(config.include.mediaByFilename)) {
+          if (v) {
+            if (v.startsWith('!')) {
+              const stripped = v.substring(1);
+              if (!stripped) {
+                delete displayConfig.include.mediaByFilename[k];
+              }
+              else {
+                displayConfig.include.mediaByFilename[k] = {
+                  pattern: v.substring(1),
+                  'case-sensitive': false
+                };
+              }
+            }
+            else {
+              displayConfig.include.mediaByFilename[k] = {
+                pattern: v,
+                'case-sensitive': true
+              };
+            }
+          }
+        }
       }
       return displayConfig;
     }
