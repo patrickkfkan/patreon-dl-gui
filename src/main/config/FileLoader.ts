@@ -743,6 +743,12 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         "vimeo.helper.password",
         defaultConfig["embed.downloader.vimeo"]["helper.password"],
         toString
+      ),
+      "helper.ytdlp.args": __fromFileConfigValue(
+        "patreon.dl.gui",
+        "vimeo.helper.ytdlp.args",
+        defaultConfig["embed.downloader.vimeo"]["helper.ytdlp.args"],
+        toString
       )
     },
     "logger.console": {

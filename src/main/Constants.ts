@@ -92,7 +92,8 @@ export const FILE_CONFIG_SECTION_PROPS = {
     "connect.youtube",
     "vimeo.downloader.type",
     "vimeo.helper.ytdlp.path",
-    "vimeo.helper.password"
+    "vimeo.helper.password",
+    "vimeo.helper.ytdlp.args"
   ]
 } as const;
 

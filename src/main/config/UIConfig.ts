@@ -130,7 +130,8 @@ function convertPatreonDLOptionsToUIConfig(
       type: "custom",
       exec: "",
       "helper.ytdlp.path": "",
-      "helper.password": ""
+      "helper.password": "",
+      "helper.ytdlp.args": ""
     },
     "logger.console": {
       enabled: consoleLoggerOptions.enabled,
