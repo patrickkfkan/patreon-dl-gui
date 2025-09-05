@@ -2,6 +2,7 @@ import type { Tier } from "./types/UIConfig";
 import { PATREON_URL } from "./Constants";
 import type { URLAnalysis } from "patreon-dl";
 import { load as cheerioLoad } from "cheerio";
+import PatreonDownloader from "patreon-dl";
 
 const PAGE_PATHNAME_FORMATS = {
   postsByUser: [
@@ -16,6 +17,17 @@ const PAGE_PATHNAME_FORMATS = {
   postsByCollection: ["/collection/[collectionId]"],
   product: ["/[vanity]/shop/[productId]"]
 };
+
+const URL_RULES = {
+  postsByUser: [
+    "/cw/\\u003cstring:vanity\\u003e/posts"
+  ]
+}
+
+type PageAnalysis = Pick<
+    PatreonPageAnalysis & { status: "complete" },
+    "normalizedURL" | "target"
+  >;
 
 interface JSONWithPageBootstrap {
   props: {
@@ -51,11 +63,24 @@ export default class PatreonPageAnalyzer {
     html: string,
     signal: AbortSignal
   ): Promise<PatreonPageAnalysis> {
+    let an: PageAnalysis | null = null;
+    let tiers: Tier[] | null = null;
+    let bootstrapNotFound = false;
     const json = await this.#getJSONWithPageBootstrap(html);
-    if (!json) {
-      return {
-        status: "bootstrapNotFound"
-      };
+    if (json) {
+      an = this.#analyzePage(json);
+      tiers = this.#getTiers(json);
+    }
+    else {
+      const isNextJSStreamingResponse = html.includes('self.__next_f.push');
+      if (isNextJSStreamingResponse) {
+        an = this.#analyzeNextJSStreamingResponse(html);
+        tiers = await this.#getTiersFromStreamingResponse(html);
+        bootstrapNotFound = !an && !tiers;
+      }
+      else {
+        bootstrapNotFound = true;
+      }
     }
     if (signal.aborted) {
       console.debug("PatreonPageAnalyzer: aborted");
@@ -63,8 +88,11 @@ export default class PatreonPageAnalyzer {
       abortError.name = "AbortError";
       throw abortError;
     }
-    const an = this.#analyzePage(json);
-    const tiers = this.#getTiers(json);
+    if (bootstrapNotFound) {
+      return {
+        status: 'bootstrapNotFound'
+      };
+    }
     return {
       status: "complete",
       normalizedURL: an?.normalizedURL || null,
@@ -97,10 +125,7 @@ export default class PatreonPageAnalyzer {
 
   static #analyzePage(
     json: JSONWithPageBootstrap
-  ): Pick<
-    PatreonPageAnalysis & { status: "complete" },
-    "normalizedURL" | "target"
-  > | null {
+  ): PageAnalysis | null {
     /**
      * Perform our own analysis based on pageBootStrap,
      * This gives more accurate result than patreon-dl's URLHelper.analyzeURL().
@@ -224,6 +249,51 @@ export default class PatreonPageAnalyzer {
         };
       }
       return null;
+    }
+    return null;
+  }
+
+  static #analyzeNextJSStreamingResponse(html: string): PageAnalysis | null {
+    const urlRuleRegex = /\\(?:\\?)"url_rule\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
+    const urlRuleMatch = urlRuleRegex.exec(html);
+    const urlRule = urlRuleMatch && urlRuleMatch[1].replaceAll('\\\\', '\\');
+    if (!urlRule) {
+      return null;
+    }
+    const vanityRegex = /\\(?:\\?)"vanity\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
+    const vanityMatch = vanityRegex.exec(html);
+    const vanity = vanityMatch && vanityMatch[1];
+    if (URL_RULES.postsByUser.includes(urlRule) && vanity) {
+      const an: URLAnalysis = {
+        type: "postsByUser",
+        vanity
+      };
+      return {
+        normalizedURL: `${PATREON_URL}/${vanity}/posts`,
+        target: {
+          ...an,
+          description: this.#getTargetDesc(an)
+        }
+      };
+    }
+    return null;
+  }
+
+  static async #getTiersFromStreamingResponse(html: string): Promise<Tier[] | null> {
+    const campaignIdRegex = /campaign_id\\(?:\\?)",\\(?:\\?)"unit_id\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
+    const campaignIdMatch = campaignIdRegex.exec(html);
+    const campaignId = campaignIdMatch && campaignIdMatch[1];
+    if (!campaignId) {
+      return null;
+    }
+    const campaign = await PatreonDownloader.getCampaign({ campaignId });
+    if (campaign) {
+      const __parseTierTitle = (id: string, value: string | null) =>
+        value || (id === "-1" ? "Public" : `Tier #${id}`);
+      return campaign?.rewards.map<Tier>((reward) => ({
+        id: reward.id,
+        title: __parseTierTitle(reward.id, reward.title)
+      }));
     }
     return null;
   }
