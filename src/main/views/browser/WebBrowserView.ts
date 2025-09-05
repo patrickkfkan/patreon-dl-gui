@@ -78,11 +78,29 @@ export default class WebBrowserView extends WebContentsView {
       }
       if (!url.startsWith(PATREON_URL)) {
         if (isMainFrame) {
-          this.#lastLoadedURL = null;
-          this.#emitPageNavigatedEvent(url);
-          await this.#emitEmptyPageInfoEvent();
+          this.#analyzePageAbortController = new AbortController();
+          // Sometimes creators have their own domain names, so we also need to check
+          // if it is a Patreon-page.
+          try {
+            if (!await this.#isPatreonPage(this.#analyzePageAbortController.signal)) {
+              this.#lastLoadedURL = null;
+              this.#emitPageNavigatedEvent(url);
+              await this.#emitEmptyPageInfoEvent();
+              return;
+            }
+            console.debug(`WebBrowserView: custom domain Patreon page detected: ${url}`)
+          } catch (error: unknown) {
+            if (error instanceof Error && error.name === "AbortError") {
+              return;
+            }
+            console.error(`Failed to check if "${url}" is a Patreon page:`, error);
+          } finally {
+            this.#analyzePageAbortController = null;
+          }
         }
-        return;
+        else {
+          return;
+        }
       }
       if (this.#isCloudflareChallengePage(url)) {
         console.debug(
@@ -228,6 +246,43 @@ export default class WebBrowserView extends WebContentsView {
       }
     }
     return false;
+  }
+
+  #isPatreonPage(signal: AbortSignal) {
+    return new Promise<boolean>(
+      (resolve, reject) => {
+        let lastObtainedHTML = "";
+        const __setTimer = (rt = 1) =>
+          setTimeout(async () => {
+            const html = await this.webContents.executeJavaScript(
+              "document.body.innerHTML"
+            );
+            if (signal.aborted) {
+              const err = Error("Aborted");
+              err.name = "AbortError";
+              reject(err);
+              return;
+            }
+            if (lastObtainedHTML !== html) {
+              const isPatreonPage = await PatreonPageAnalyzer.isPatreonPage(html);
+              if (isPatreonPage) {
+                resolve(true);
+                return;
+              }
+              lastObtainedHTML = html;
+              __setTimer();
+            }
+            else if (rt < 5) {
+              __setTimer(rt + 1);
+            }
+            else { // Page has not changed in approx 1.5s
+              resolve(false);
+            }
+          }, 300);
+
+        __setTimer();
+      }
+    );
   }
 
   #emitPageNavigatedEvent(url: string) {
