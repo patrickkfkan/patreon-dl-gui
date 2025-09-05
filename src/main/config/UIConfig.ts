@@ -7,6 +7,11 @@ import {
   type DownloaderOptions
 } from "patreon-dl";
 import { getDefaultFileLoggerOptions } from "../util/Config";
+import os from "os";
+import path from "path";
+
+// Override patreon-dl default output path to user's home directory
+const defaultOutputPath = path.join(os.homedir(), 'patreon-dl');
 
 export function getStartupUIConfig(): UIConfig {
   return convertPatreonDLOptionsToUIConfig(getDefaultDownloaderOptions());
@@ -48,7 +53,7 @@ function convertPatreonDLOptionsToUIConfig(
       "dry.run": p.dryRun
     },
     output: {
-      "out.dir": p.outDir,
+      "out.dir": defaultOutputPath,
       "campaign.dir.name.format": p.dirNameFormat.campaign,
       "content.dir.name.format": p.dirNameFormat.content,
       "media.filename.format": p.filenameFormat.media,
