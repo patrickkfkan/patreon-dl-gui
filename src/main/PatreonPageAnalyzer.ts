@@ -4,6 +4,10 @@ import type { URLAnalysis } from "patreon-dl";
 import { load as cheerioLoad } from "cheerio";
 import PatreonDownloader from "patreon-dl";
 
+// "Custom domain" paths and rules not fully tested.
+// Included possible combinations just in case any of 
+// them turns up.
+
 const PAGE_PATHNAME_FORMATS = {
   postsByUser: [
     "/cw/[vanity]/[[...tab]]",
@@ -11,16 +15,37 @@ const PAGE_PATHNAME_FORMATS = {
     "/c/[vanity]/[[...tab]]",
     "/cw/[vanity]/posts",
     "/[vanity]/posts",
-    "/c/[vanity]/posts"
+    "/c/[vanity]/posts",
+    // Custom domain
+    "/cw/_customdomain/[[...tab]]",
+    "/_customdomain/[[...tab]]",
+    "/c/_customdomain/[[...tab]]",
+    "/cw/_customdomain/posts",
+    "/_customdomain/posts",
+    "/c/_customdomain/posts"
   ],
-  post: ["/posts/[postId]"],
-  postsByCollection: ["/collection/[collectionId]"],
-  product: ["/[vanity]/shop/[productId]"]
+  post: [
+    "/posts/[postId]",
+    // Custom domain
+    "/_customdomain/posts/[postId]"
+  ],
+  postsByCollection: [
+    "/collection/[collectionId]",
+    // Custom domain
+    "/_customdomain/collection/[collectionId]"
+  ],
+  product: [
+    "/[vanity]/shop/[productId]",
+    // Custom domain
+    "/_customdomain/shop/[productId]"
+  ]
 };
 
 const URL_RULES = {
   postsByUser: [
-    "/cw/\\u003cstring:vanity\\u003e/posts"
+    "/cw/\\u003cstring:vanity\\u003e/posts",
+    // Custom domain
+    "/_customdomain/posts"
   ]
 }
 
@@ -59,6 +84,31 @@ export type PatreonPageAnalysis =
     };
 
 export default class PatreonPageAnalyzer {
+  static async isPatreonPage(html: string) {
+    const $ = cheerioLoad(html);
+    const scripts = $('script[type="application/ld+json"]').toArray();
+    for (const script of scripts) {
+      const scriptContent = $(script).html();
+      if (scriptContent) {
+        try {
+          const json = JSON.parse(scriptContent);
+          if (
+            json["@context"] === "http://schema.org/" &&
+            json["@type"] === "Organization" &&
+            json["name"] === "Patreon" &&
+            json["url"] === 'http://www.patreon.com'
+          ) {
+            return true;
+          }
+        }
+        catch (_) {
+          // Do nothing
+        }
+      }
+    }
+    return false;
+  }
+  
   static async analyze(
     html: string,
     signal: AbortSignal
@@ -136,6 +186,8 @@ export default class PatreonPageAnalyzer {
      * or otherwise a Google captcha challenge triggered by bot detection.
      */
     const page = json.page;
+    console.debug('PatreonPageAnalyzer: "page" value in bootstrap:', page);
+    console.debug('PatreonPageAnalyzer: "query" value in bootstrap:', json.query);
     if (!page || typeof page !== "string") {
       return null;
     }
@@ -257,12 +309,14 @@ export default class PatreonPageAnalyzer {
     const urlRuleRegex = /\\(?:\\?)"url_rule\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
     const urlRuleMatch = urlRuleRegex.exec(html);
     const urlRule = urlRuleMatch && urlRuleMatch[1].replaceAll('\\\\', '\\');
+    console.debug('PatreonPageAnalyzer: "url_rule" value in Next.js streaming response:', urlRule);
     if (!urlRule) {
       return null;
     }
     const vanityRegex = /\\(?:\\?)"vanity\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
     const vanityMatch = vanityRegex.exec(html);
     const vanity = vanityMatch && vanityMatch[1];
+    console.debug('PatreonPageAnalyzer: "vanity" value in Next.js streaming response:', vanity);
     if (URL_RULES.postsByUser.includes(urlRule) && vanity) {
       const an: URLAnalysis = {
         type: "postsByUser",
