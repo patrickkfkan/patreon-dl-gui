@@ -78,13 +78,13 @@ export default class WebBrowserView extends WebContentsView {
       }
       if (!url.startsWith(PATREON_URL)) {
         if (isMainFrame) {
+          this.#emitPageNavigatedEvent(url);
           this.#analyzePageAbortController = new AbortController();
           // Sometimes creators have their own domain names, so we also need to check
           // if it is a Patreon-page.
           try {
             if (!await this.#isPatreonPage(this.#analyzePageAbortController.signal)) {
               this.#lastLoadedURL = null;
-              this.#emitPageNavigatedEvent(url);
               await this.#emitEmptyPageInfoEvent();
               return;
             }
