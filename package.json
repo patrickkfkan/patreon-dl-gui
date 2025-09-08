@@ -68,7 +68,7 @@
     "material-icons": "^1.13.13",
     "material-symbols": "^0.28.1",
     "normalize-url": "^8.0.1",
-    "patreon-dl": "^3.1.0",
+    "patreon-dl": "^3.2.0",
     "portfinder": "^1.0.35",
     "proxy-chain": "^2.5.8",
     "react": "^19.0.0",
