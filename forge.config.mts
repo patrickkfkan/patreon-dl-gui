@@ -16,6 +16,9 @@ import packageJSON from './package.json' assert { type: 'json' };
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const isMakePhase = process.env.FORGE_PHASE === 'make';
+const isPackagePhase = process.env.FORGE_PHASE === 'package';
+
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
@@ -66,7 +69,18 @@ const config: ForgeConfig = {
     })
   ],
   plugins: [
-    new AutoUnpackNativesPlugin({}),
+    ...(isMakePhase || isPackagePhase ? [
+      new AutoUnpackNativesPlugin({}),
+      new FusesPlugin({
+        version: FuseVersion.V1,
+        [FuseV1Options.RunAsNode]: false,
+        [FuseV1Options.EnableCookieEncryption]: true,
+        [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
+        [FuseV1Options.EnableNodeCliInspectArguments]: false,
+        [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
+        [FuseV1Options.OnlyLoadAppFromAsar]: true,
+      })
+    ] : []),
     new VitePlugin({
       build: [
         {
@@ -104,16 +118,7 @@ const config: ForgeConfig = {
           config: "vite.renderer.config.ts"
         }
       ]
-    }),
-    new FusesPlugin({
-      version: FuseVersion.V1,
-      [FuseV1Options.RunAsNode]: false,
-      [FuseV1Options.EnableCookieEncryption]: true,
-      [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
-      [FuseV1Options.EnableNodeCliInspectArguments]: false,
-      [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
-      [FuseV1Options.OnlyLoadAppFromAsar]: true,
-    }),
+    })
   ],
   hooks: {
     async postPackage(_config, packageResult) {
@@ -129,7 +134,7 @@ const config: ForgeConfig = {
         fs.writeFileSync(`${appDir}/package.json`, JSON.stringify({
           dependencies: {
             "undici": "^6.21.3",
-            "patreon-dl": "^3.0.0"
+            "patreon-dl": "^3.2.0"
           }
         }, null, 2));
         execSync('npm install --omit=dev', { cwd: appDir, stdio: 'inherit' });
