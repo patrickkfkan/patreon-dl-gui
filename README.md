@@ -105,6 +105,7 @@ The following table lists the version of `patreon-dl` used by each version of `p
 | v2.1.0                   | v2.4.2                    |
 | v2.2.0                   | v3.0.0                    |
 | v2.3.0                   | v3.1.0                    |
+| v2.4.0                   | v3.2.0                    |
 
 ## Running / packaging the app from source
 
@@ -129,6 +130,12 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.4.0
+- Update `patreon-dl` library to v3.2.0
+- Fix target identification issues with "cw" ([#22](https://github.com/patrickkfkan/patreon-dl-gui/issues/22)) and custom-domain pages
+- Change default output directory to `<HOME_DIR>/patreon-dl` ([@Anthonyy232](https://github.com/Anthonyy232) - [#19](https://github.com/patrickkfkan/patreon-dl-gui/issues/19))
+- Add "yt-dlp args" input to Vimeo helper script options
 
 v2.3.0
 - Update `patreon-dl` library to v3.1.0
