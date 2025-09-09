@@ -8,8 +8,8 @@
   "scripts": {
     "prepare": "tsc --noEmit && rimraf ./resources_out && npx pkg --targets node20 --out-path ./resources_out/bin ./src/resources/patreon-dl-vimeo.js",
     "start": "npm run prepare && electron-forge start",
-    "package": "FORGE_PHASE=package npm run prepare && electron-forge package",
-    "make": "FORGE_PHASE=make npm run prepare && electron-forge make",
+    "package": "cross-env-shell FORGE_PHASE=package \"npm run prepare && electron-forge package\"",
+    "make": "cross-env-shell FORGE_PHASE=make \"npm run prepare && electron-forge make\"",
     "publish": "npm run prepare && electron-forge publish",
     "lint": "npx eslint ./src",
     "lint:fix": "npx eslint ./src --fix",
@@ -40,6 +40,7 @@
     "@types/yargs-parser": "^21.0.3",
     "@vitejs/plugin-react": "^4.6.0",
     "@yao-pkg/pkg": "^6.3.2",
+    "cross-env": "^10.0.0",
     "css-loader": "^6.11.0",
     "electron": "^38.0.0",
     "eslint": "^9.20.1",
