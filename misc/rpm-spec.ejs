@@ -61,3 +61,13 @@ if (postun) print('\n\n\n') }
 %><% if (postun) {
   %>%postun
 <% print(postun) } %>
+
+<% print('\n\n\n') %>
+
+%posttrans
+if [ "$1" = "2" ]; then
+  if [ ! -f /usr/share/applications/patreon-dl-gui-server-console.desktop ]; then
+    install -Dm644 /usr/lib/patreon-dl-gui/resources/patreon-dl-gui-server-console.desktop /usr/share/applications/patreon-dl-gui-server-console.desktop
+    update-desktop-database /usr/share/applications || true
+  fi
+fi
