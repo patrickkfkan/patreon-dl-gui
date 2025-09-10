@@ -109,7 +109,7 @@ The following table lists the version of `patreon-dl` used by each version of `p
 
 ## Running / packaging the app from source
 
-You need [Node JS](https://nodejs.org) v20.18.1 or higher.
+You need [Node JS](https://nodejs.org) v22.12.0 or higher.
 
 To run in dev mode:
 
@@ -136,6 +136,7 @@ v2.4.0
 - Fix target identification issues with "cw" ([#22](https://github.com/patrickkfkan/patreon-dl-gui/issues/22)) and custom-domain pages
 - Change default output directory to `<HOME_DIR>/patreon-dl` ([@Anthonyy232](https://github.com/Anthonyy232) - [#19](https://github.com/patrickkfkan/patreon-dl-gui/issues/19))
 - Add "yt-dlp args" input to Vimeo helper script options
+- Fix cookies not being fetched completely
 
 v2.3.0
 - Update `patreon-dl` library to v3.1.0
