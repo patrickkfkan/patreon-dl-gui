@@ -339,9 +339,8 @@ export default class WebBrowserView extends WebContentsView {
   }
 
   async #getCookie() {
-    const cookies = await this.webContents.session.cookies.get({
-      domain: ".patreon.com"
-    });
+    const cookies = (await this.webContents.session.cookies.get({}))
+      .filter((c) => c.domain && (c.domain === 'patreon.com' || c.domain.endsWith('.patreon.com')));
     return cookies
       .reduce<string[]>((result, c) => {
         result.push(`${c.name}=${c.value}`);
