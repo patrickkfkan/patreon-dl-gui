@@ -38,7 +38,7 @@ export default defineConfig((env) => {
           "bufferutil",
           "utf-8-validate",
           "undici", // ^6.21.3
-          "patreon-dl", // ^3.0.0
+          "patreon-dl", // ^3.2.1
 
           ...builtinModules,
           ...builtinModules.map(m => `node:${m}`)
