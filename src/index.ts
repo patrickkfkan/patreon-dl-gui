@@ -20,8 +20,12 @@ function getDefaultUserAgent() {
     .replace(` ${app.name}/${app.getVersion()}`, "");
 }
 
+const processArgs = parseArgs(process.argv);
+if (Reflect.has(processArgs, "ignore-certificate-errors")) {
+  app.commandLine.appendSwitch("ignore-certificate-errors");
+}
+
 app.on("ready", async () => {
-  const processArgs = parseArgs(process.argv);
   const serverConsole = Reflect.has(processArgs, "server-console");
   if (serverConsole) {
     const serverConsoleProcess = new ServerConsoleProcess();
