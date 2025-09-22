@@ -106,6 +106,7 @@ The following table lists the version of `patreon-dl` used by each version of `p
 | v2.2.0                   | v3.0.0                    |
 | v2.3.0                   | v3.1.0                    |
 | v2.4.0                   | v3.2.0                    |
+| v2.4.1                   | v3.2.1
 
 ## Running / packaging the app from source
 
@@ -130,6 +131,12 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.4.1
+- Update `patreon-dl` library to v3.2.1
+  - Fix log file path sanitization returning invalid path in some cases on Windows, causing download process to fail right at the beginning.
+- Fix target identification error when proxy is used ([#24](https://github.com/patrickkfkan/patreon-dl-gui/issues/24))
+
 
 v2.4.0
 - Update `patreon-dl` library to v3.2.0
