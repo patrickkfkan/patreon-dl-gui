@@ -1,4 +1,4 @@
-import { WebContentsView } from "electron";
+import { session, WebContentsView } from "electron";
 import { PATREON_URL } from "../../Constants";
 import type { PatreonPageAnalysis } from "../../PatreonPageAnalyzer";
 import PatreonPageAnalyzer from "../../PatreonPageAnalyzer";
@@ -9,6 +9,9 @@ import { anonymizeProxy, closeAnonymizedProxy } from "proxy-chain";
 import portfinder from "portfinder";
 
 export default class WebBrowserView extends WebContentsView {
+
+  static #userAgent: string = "";
+
   #lastLoadedURL: string | null;
   #analyzePageAbortController: AbortController | null;
   #proxy: {
@@ -28,6 +31,17 @@ export default class WebBrowserView extends WebContentsView {
     this.#analyzePageAbortController = null;
     this.#proxy = null;
     this.#registerListeners();
+  }
+
+  static setUserAgent(userAgent: string) {
+    this.#userAgent = userAgent;
+    session.defaultSession.webRequest.onBeforeSendHeaders(null);
+    session.defaultSession.webRequest.onBeforeSendHeaders(
+      (details, callback) => {
+        details.requestHeaders["User-Agent"] = userAgent;
+        callback({ requestHeaders: details.requestHeaders });
+      }
+    );
   }
 
   async #loadURL(url: string) {
@@ -124,11 +138,12 @@ export default class WebBrowserView extends WebContentsView {
       this.#emitPageNavigatedEvent(url);
       this.#analyzePageAbortController = new AbortController();
       try {
+        const cookie = await this.#getCookie();
         console.debug(`WebBrowserView: run PatreonPageAnalyzer on "${url}"`);
         const analysis = await this.#analyzePage(
-          this.#analyzePageAbortController.signal
+          this.#analyzePageAbortController.signal,
+          cookie
         );
-        const cookie = await this.#getCookie();
         console.debug(
           `WebBrowserView: got the following from page:`,
           JSON.stringify(
@@ -307,7 +322,7 @@ export default class WebBrowserView extends WebContentsView {
     });
   }
 
-  #analyzePage(signal: AbortSignal) {
+  #analyzePage(signal: AbortSignal, cookie: string) {
     return new Promise<PatreonPageAnalysis & { status: "complete" }>(
       (resolve, reject) => {
         let lastObtainedHTML = "";
@@ -323,7 +338,15 @@ export default class WebBrowserView extends WebContentsView {
               return;
             }
             if (lastObtainedHTML !== html) {
-              const an = await PatreonPageAnalyzer.analyze(html, signal);
+              const an = await PatreonPageAnalyzer.analyze(
+                html,
+                signal,
+                {
+                  proxy: this.#proxy,
+                  userAgent: WebBrowserView.#userAgent,
+                  cookie
+                }
+              );
               if (an.status === "complete") {
                 resolve(an);
                 return;
