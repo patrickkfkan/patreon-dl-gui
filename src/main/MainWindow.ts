@@ -1,4 +1,4 @@
-import { BaseWindow, session } from "electron";
+import { BaseWindow } from "electron";
 import { DEFAULT_MAIN_WINDOW_PROPS } from "./Constants";
 import WebBrowserView from "./views/browser/WebBrowserView";
 import EditorView from "./views/editor/EditorView";
@@ -267,13 +267,7 @@ export default class MainWindow extends BaseWindow {
   }
 
   setUserAgent(userAgent: string) {
-    session.defaultSession.webRequest.onBeforeSendHeaders(null);
-    session.defaultSession.webRequest.onBeforeSendHeaders(
-      (details, callback) => {
-        details.requestHeaders["User-Agent"] = userAgent;
-        callback({ requestHeaders: details.requestHeaders });
-      }
-    );
+    WebBrowserView.setUserAgent(userAgent);
   }
 
   async clearSessionData(reload = false) {

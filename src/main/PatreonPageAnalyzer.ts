@@ -4,6 +4,15 @@ import type { URLAnalysis } from "patreon-dl";
 import { load as cheerioLoad } from "cheerio";
 import PatreonDownloader from "patreon-dl";
 
+export interface AnalyzerRequestOptions {
+  proxy?: {
+    url: string;
+    rejectUnauthorizedTLS: boolean;
+  } | null;
+  userAgent: string;
+  cookie: string;
+}
+
 // "Custom domain" paths and rules not fully tested.
 // Included possible combinations just in case any of 
 // them turns up.
@@ -111,7 +120,8 @@ export default class PatreonPageAnalyzer {
   
   static async analyze(
     html: string,
-    signal: AbortSignal
+    signal: AbortSignal,
+    requestOptions: AnalyzerRequestOptions
   ): Promise<PatreonPageAnalysis> {
     let an: PageAnalysis | null = null;
     let tiers: Tier[] | null = null;
@@ -125,7 +135,14 @@ export default class PatreonPageAnalyzer {
       const isNextJSStreamingResponse = html.includes('self.__next_f.push');
       if (isNextJSStreamingResponse) {
         an = this.#analyzeNextJSStreamingResponse(html);
-        tiers = await this.#getTiersFromStreamingResponse(html);
+        try {
+          tiers = await this.#getTiersFromStreamingResponse(html, signal, requestOptions);
+        }
+        catch (error) {
+          if (!signal.aborted) {
+            throw error;
+          }
+        }
         bootstrapNotFound = !an && !tiers;
       }
       else {
@@ -340,14 +357,22 @@ export default class PatreonPageAnalyzer {
     return null;
   }
 
-  static async #getTiersFromStreamingResponse(html: string): Promise<Tier[] | null> {
+  static async #getTiersFromStreamingResponse(html: string, signal: AbortSignal, requestOptions: AnalyzerRequestOptions): Promise<Tier[] | null> {
     const campaignIdRegex = /campaign_id\\(?:\\?)",\\(?:\\?)"unit_id\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
     const campaignIdMatch = campaignIdRegex.exec(html);
     const campaignId = campaignIdMatch && campaignIdMatch[1];
     if (!campaignId) {
+      console.warn('PatreonPageAnalyzer: "campaign_id" not found in Next.js streaming response');
       return null;
     }
-    const campaign = await PatreonDownloader.getCampaign({ campaignId });
+    console.debug('PatreonPageAnalyzer: "campaign_id" value in Next.js streaming response:', campaignId);
+    const campaign = await PatreonDownloader.getCampaign({ campaignId }, signal, {
+      cookie: requestOptions.cookie,
+      request: {
+        proxy: requestOptions.proxy,
+        userAgent: requestOptions.userAgent
+      }
+    });
     if (campaign) {
       const __parseTierTitle = (id: string, value: string | null) =>
         value || (id === "-1" ? "Public" : `Tier #${id}`);
