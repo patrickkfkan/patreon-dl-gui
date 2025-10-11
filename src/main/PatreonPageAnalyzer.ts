@@ -101,11 +101,18 @@ export default class PatreonPageAnalyzer {
       if (scriptContent) {
         try {
           const json = JSON.parse(scriptContent);
+          const matchContext = [
+            "http://schema.org/",
+            "https://schema.org/"
+          ].includes(String(json["@context"]));
+          const matchUrl = matchContext && [
+            "http://www.patreon.com",
+            "https://www.patreon.com"
+          ].includes(String(json["url"]));
           if (
-            json["@context"] === "http://schema.org/" &&
             json["@type"] === "Organization" &&
             json["name"] === "Patreon" &&
-            json["url"] === 'http://www.patreon.com'
+            matchUrl
           ) {
             return true;
           }
