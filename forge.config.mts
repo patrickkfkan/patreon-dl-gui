@@ -125,8 +125,7 @@ const config: ForgeConfig = {
       for (const outputPath of packageResult.outputPaths) {
         // Write a minimal package.json to install externalized modules.
         // Vite generates CJS code for these modules so they cannot be bundled.
-        // Must place node_modules in ouputPath/resources, otherwise they won't
-        // get included by squirrel.
+        // Place node_modules in ouputPath/resources.
         const appDir = path.join(outputPath, 'resources');
         if (!fs.existsSync(appDir)) {
           fs.mkdirSync(appDir, { recursive: true });
@@ -134,10 +133,12 @@ const config: ForgeConfig = {
         fs.writeFileSync(`${appDir}/package.json`, JSON.stringify({
           dependencies: {
             "undici": "^6.21.3",
-            "patreon-dl": "^3.2.1"
+            "patreon-dl": "^3.3.1"
           }
         }, null, 2));
         execSync('npm install --omit=dev', { cwd: appDir, stdio: 'inherit' });
+        // Rebuild better-sqlite3 to prevent NODE_MODULE_VERSION mismatch
+        execSync('npx electron-rebuild', { cwd: appDir, stdio: 'inherit' });
       }
     },
     async postMake(config, makeResults) {
