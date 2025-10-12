@@ -106,7 +106,8 @@ The following table lists the version of `patreon-dl` used by each version of `p
 | v2.2.0                   | v3.0.0                    |
 | v2.3.0                   | v3.1.0                    |
 | v2.4.0                   | v3.2.0                    |
-| v2.4.1                   | v3.2.1
+| v2.4.1                   | v3.2.1                    |
+| v2.4.2                   | v3.3.1                    |
 
 ## Running / packaging the app from source
 
@@ -131,6 +132,14 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.4.2
+- Update `patreon-dl` library to v3.3.1
+  - Fix YouTube download error ([#28](https://github.com/patrickkfkan/patreon-dl-gui/issues/28))
+  - Browse: add next / previous links to post page
+  - Some DB optimizations
+  - [Full changelog](https://github.com/patrickkfkan/patreon-dl#changelog)
+- Fix target identification sometimes fail for custom-domain pages
 
 v2.4.1
 - Update `patreon-dl` library to v3.2.1
