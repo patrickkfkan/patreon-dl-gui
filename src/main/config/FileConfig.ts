@@ -36,6 +36,15 @@ export function convertUIConfigToFileContents(
     (tier) => tier.id
   );
 
+  const uiconfigMaxVideoResolution = config.downloader["max.video.resolution"];
+  let maxVideoResolution: string;
+  if (uiconfigMaxVideoResolution === "none") {
+    maxVideoResolution = "";
+  }
+  else {
+    maxVideoResolution = uiconfigMaxVideoResolution.substring(0, uiconfigMaxVideoResolution.length - 1);
+  }
+
   const contents: FileConfigContents = {
     downloader: {
       "target.url": getBrowserObtainableInputValue(config.downloader.target),
@@ -46,7 +55,9 @@ export function convertUIConfigToFileContents(
       "stop.on": config.downloader["stop.on"].trim(),
       "no.prompt": booleanToString(config.downloader["no.prompt"]),
       "dry.run": booleanToString(config.downloader["dry.run"]),
-      "path.to.ffmpeg": config.downloader["path.to.ffmpeg"].trim()
+      "path.to.ffmpeg": config.downloader["path.to.ffmpeg"].trim(),
+      "path.to.deno": config.downloader["path.to.deno"].trim(),
+      "max.video.resolution": maxVideoResolution
     },
     output: {
       "out.dir": config.output["out.dir"].trim(),

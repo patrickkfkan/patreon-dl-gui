@@ -1,6 +1,7 @@
 import type {
   BrowserObtainableInput,
   CustomSelectionValue,
+  MaxVideoResolution,
   UIConfig
 } from "../types/UIConfig";
 import type { UnionToTuple } from "../../common/types/Utility";
@@ -21,6 +22,7 @@ import path from "path";
 import { existsSync } from "fs";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import { normalizeMaxVideoResolution } from "../util/Config";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -233,6 +235,27 @@ function toDateTimePickerValue(value: string): ParseValueResult<string> {
   }
 }
 
+function toMaxVideoResolution(value: string): ParseValueResult<MaxVideoResolution> {
+  try {
+    const result = normalizeMaxVideoResolution(value);
+    return {
+      hasError: false,
+      result
+    };
+  }
+  catch (error) {
+    return {
+      hasError: true,
+      messages: [
+        {
+          type: 'warn',
+          text: error instanceof Error ? error.message : String(error)
+        }
+      ]
+    };
+  }
+}
+
 function toTargetValue(
   value: string
 ): ParseValueResult<BrowserObtainableInput> {
@@ -432,6 +455,18 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         "path.to.ffmpeg",
         defaultConfig.downloader["path.to.ffmpeg"],
         toString
+      ),
+      "path.to.deno": __fromFileConfigValue(
+        "downloader",
+        "path.to.deno",
+        defaultConfig.downloader["path.to.deno"],
+        toString
+      ),
+      "max.video.resolution": __fromFileConfigValue(
+        "downloader",
+        "max.video.resolution",
+        defaultConfig.downloader["max.video.resolution"],
+        toMaxVideoResolution
       ),
       "use.status.cache": __fromFileConfigValue(
         "downloader",

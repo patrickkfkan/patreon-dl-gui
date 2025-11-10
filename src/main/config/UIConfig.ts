@@ -1,4 +1,4 @@
-import type { UIConfig } from "../types/UIConfig";
+import type { MaxVideoResolution, UIConfig } from "../types/UIConfig";
 import type { DateTime } from "patreon-dl";
 import {
   ConsoleLogger,
@@ -6,7 +6,7 @@ import {
   type DeepRequired,
   type DownloaderOptions
 } from "patreon-dl";
-import { getDefaultFileLoggerOptions } from "../util/Config";
+import { getDefaultFileLoggerOptions, normalizeMaxVideoResolution } from "../util/Config";
 import os from "os";
 import path from "path";
 
@@ -34,6 +34,13 @@ function convertPatreonDLOptionsToUIConfig(
   const postsPublishedBefore = __convertPublishDate(
     p.include.postsPublished.before
   );
+  let maxVideoResolution: MaxVideoResolution;
+  try {
+    maxVideoResolution = normalizeMaxVideoResolution(p.maxVideoResolution);
+  }
+  catch (_) {
+    maxVideoResolution = "none";
+  }
   const conf: UIConfig = {
     downloader: {
       target: {
@@ -47,6 +54,8 @@ function convertPatreonDLOptionsToUIConfig(
         manualValue: ""
       },
       "path.to.ffmpeg": p.pathToFFmpeg || "",
+      "path.to.deno": p.pathToDeno || "",
+      "max.video.resolution": maxVideoResolution,
       "use.status.cache": p.useStatusCache,
       "stop.on": p.stopOn,
       "no.prompt": false,
