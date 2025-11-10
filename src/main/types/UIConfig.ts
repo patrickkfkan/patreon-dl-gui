@@ -35,13 +35,13 @@ export type CustomSelectionValue<
 };
 
 export type MaxVideoResolution =
-  "none" |
-  "360p" |
-  "480p" |
-  "720p" |
-  "1080p" |
-  "1440p" |
-  "2160p";
+  | "none"
+  | "360p"
+  | "480p"
+  | "720p"
+  | "1080p"
+  | "1440p"
+  | "2160p";
 
 export interface UIConfig {
   downloader: {

@@ -235,20 +235,21 @@ function toDateTimePickerValue(value: string): ParseValueResult<string> {
   }
 }
 
-function toMaxVideoResolution(value: string): ParseValueResult<MaxVideoResolution> {
+function toMaxVideoResolution(
+  value: string
+): ParseValueResult<MaxVideoResolution> {
   try {
     const result = normalizeMaxVideoResolution(value);
     return {
       hasError: false,
       result
     };
-  }
-  catch (error) {
+  } catch (error) {
     return {
       hasError: true,
       messages: [
         {
-          type: 'warn',
+          type: "warn",
           text: error instanceof Error ? error.message : String(error)
         }
       ]

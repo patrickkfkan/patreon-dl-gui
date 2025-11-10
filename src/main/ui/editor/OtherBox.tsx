@@ -6,7 +6,6 @@ import { useMemo } from "react";
 import _ from "lodash";
 import CheckboxRow from "./components/CheckboxRow";
 import SelectRow from "./components/SelectRow";
-import { MAX_VIDEO_RESOLUTIONS } from "../../Constants";
 import type { UnionToObjectTuple } from "../../../common/types/Utility";
 
 interface OtherBoxState {
@@ -19,7 +18,10 @@ interface OtherBoxState {
 
 let oldState: OtherBoxState | null = null;
 
-const MAX_VIDEO_RESOLUTION_OPTIONS: UnionToObjectTuple<MaxVideoResolution, { label: string }> = [
+const MAX_VIDEO_RESOLUTION_OPTIONS: UnionToObjectTuple<
+  MaxVideoResolution,
+  { label: string }
+> = [
   { value: "none", label: "None - download best quality" },
   { value: "360p", label: "360p" },
   { value: "480p", label: "480p" },
@@ -27,7 +29,7 @@ const MAX_VIDEO_RESOLUTION_OPTIONS: UnionToObjectTuple<MaxVideoResolution, { lab
   { value: "1080p", label: "1080p" },
   { value: "1440p", label: "1440p" },
   { value: "2160p", label: "2160p" }
-]
+];
 
 function getOtherBoxState(config: UIConfig): OtherBoxState {
   const state: OtherBoxState = {
@@ -67,12 +69,12 @@ function OtherBox() {
           helpHasMoreInfo
         />
         <SelectRow
-          config={['downloader', 'max.video.resolution']}
+          config={["downloader", "max.video.resolution"]}
           label="Max video resolution"
           options={MAX_VIDEO_RESOLUTION_OPTIONS}
           helpTooltip="Maximum video resolution."
           helpHasMoreInfo
-        />    
+        />
         <CheckboxRow
           config={["downloader", "no.prompt"]}
           label="No prompt"
