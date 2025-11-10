@@ -1,8 +1,7 @@
-import PatreonDownloader from "patreon-dl";
+import PatreonDownloader, { isDenoInstalled } from "patreon-dl";
 import { convertUIConfigToPatreonDLOptions } from "../Downloader";
 import type { DownloaderBundle, MainProcessConstructor } from "../MainProcess";
 import type { Editor } from "../types/App";
-import type { DeepWriteable } from "../../common/types/Utility";
 import ObjectHelper from "../util/ObjectHelper";
 import { dialog } from "electron";
 import _ from "lodash";
@@ -11,6 +10,8 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
 ) {
   return class DownloadEventSupportedProcess extends Base {
+    #showDenoMissingWarning = true;
+
     protected registerMainEventListeners() {
       const callbacks = super.registerMainEventListeners();
       return [
@@ -62,6 +63,8 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                   fileLoggerConfig: fileLogger.getConfig(),
                   prompt
                 });
+
+                await this.#showDenoMissingWarningDialog(dlConfig);
 
                 this.on(
                   "confirmStartDownload",
@@ -145,6 +148,27 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
         }
       }
       return displayConfig;
+    }
+
+    async #showDenoMissingWarningDialog(config: ReturnType<PatreonDownloader<any>["getConfig"]>) {
+      if (!this.#showDenoMissingWarning) {
+        return;
+      }
+      const ytExternalDownloader = config.embedDownloaders && config.embedDownloaders.find((downloader) => downloader.provider === 'YouTube' && downloader.exec);
+      if(!ytExternalDownloader && !isDenoInstalled(config.pathToDeno || undefined).installed) {
+        const result = await dialog.showMessageBox(this.win, {
+          type: 'warning',
+          buttons: ['Got it'],
+          checkboxLabel: 'Do not show me again for the rest of this session',
+          defaultId: 0,
+          title: 'Warning',
+          message: `Deno not found`,
+          detail: 'Deno (https://deno.com) is not found on this system. For embedded YouTube videos, the downloader needs to run code obtained from YouTube / Google servers. Without Deno, such code will be executed without sandboxing. Running un-sandboxed code exposes your system to potential security vulnerabilities, including unauthorized access, data corruption, or malicious operations. If you do have Deno installed, you may specify its path manually in the "Other" tab. Otherwise, procceed at your own discretion.',
+        });
+        if (result.checkboxChecked) {
+          this.#showDenoMissingWarning = false;
+        }
+      }
     }
 
     async #startDownloader() {

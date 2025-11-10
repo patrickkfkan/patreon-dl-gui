@@ -34,11 +34,22 @@ export type CustomSelectionValue<
   custom: V[];
 };
 
+export type MaxVideoResolution =
+  "none" |
+  "360p" |
+  "480p" |
+  "720p" |
+  "1080p" |
+  "1440p" |
+  "2160p";
+
 export interface UIConfig {
   downloader: {
     target: BrowserObtainableInput;
     cookie: BrowserObtainableInput;
     "path.to.ffmpeg": string;
+    "path.to.deno": string;
+    "max.video.resolution": MaxVideoResolution;
     "use.status.cache": boolean;
     "stop.on": StopOnCondition;
     "no.prompt": boolean;

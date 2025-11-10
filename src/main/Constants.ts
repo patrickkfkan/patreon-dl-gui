@@ -5,6 +5,7 @@ import type { DeepRequired } from "patreon-dl";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import type { WebBrowserSettings } from "./config/WebBrowserSettings";
+import { MaxVideoResolution } from "./types/UIConfig";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -28,7 +29,9 @@ export const FILE_CONFIG_SECTION_PROPS = {
     "stop.on",
     "no.prompt",
     "dry.run",
-    "path.to.ffmpeg"
+    "path.to.ffmpeg",
+    "path.to.deno",
+    "max.video.resolution"
   ],
   output: [
     "out.dir",
@@ -117,3 +120,13 @@ export const DEFAULT_WEB_BROWSER_SETTINGS: WebBrowserSettings = {
   userAgent: "",
   clearSessionDataOnExit: false
 };
+
+export const MAX_VIDEO_RESOLUTIONS: MaxVideoResolution[] = [
+  "none",
+  "360p",
+  "480p",
+  "720p",
+  "1080p",
+  "1440p",
+  "2160p"
+];
