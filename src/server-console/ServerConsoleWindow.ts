@@ -128,9 +128,10 @@ export default class ServerConsoleWindow extends BrowserWindow {
     event: "stateChange",
     listener: (info: ServerConsoleWindowState) => void
   ): this;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   onServerConsoleWindowEvent(
     event: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     listener: (...args: any[]) => void
   ) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

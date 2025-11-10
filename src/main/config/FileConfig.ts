@@ -40,9 +40,11 @@ export function convertUIConfigToFileContents(
   let maxVideoResolution: string;
   if (uiconfigMaxVideoResolution === "none") {
     maxVideoResolution = "";
-  }
-  else {
-    maxVideoResolution = uiconfigMaxVideoResolution.substring(0, uiconfigMaxVideoResolution.length - 1);
+  } else {
+    maxVideoResolution = uiconfigMaxVideoResolution.substring(
+      0,
+      uiconfigMaxVideoResolution.length - 1
+    );
   }
 
   const contents: FileConfigContents = {

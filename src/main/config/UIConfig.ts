@@ -6,12 +6,15 @@ import {
   type DeepRequired,
   type DownloaderOptions
 } from "patreon-dl";
-import { getDefaultFileLoggerOptions, normalizeMaxVideoResolution } from "../util/Config";
+import {
+  getDefaultFileLoggerOptions,
+  normalizeMaxVideoResolution
+} from "../util/Config";
 import os from "os";
 import path from "path";
 
 // Override patreon-dl default output path to user's home directory
-const defaultOutputPath = path.join(os.homedir(), 'patreon-dl');
+const defaultOutputPath = path.join(os.homedir(), "patreon-dl");
 
 export function getStartupUIConfig(): UIConfig {
   return convertPatreonDLOptionsToUIConfig(getDefaultDownloaderOptions());
@@ -37,8 +40,7 @@ function convertPatreonDLOptionsToUIConfig(
   let maxVideoResolution: MaxVideoResolution;
   try {
     maxVideoResolution = normalizeMaxVideoResolution(p.maxVideoResolution);
-  }
-  catch (_) {
+  } catch (_) {
     maxVideoResolution = "none";
   }
   const conf: UIConfig = {

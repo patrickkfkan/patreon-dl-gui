@@ -5,7 +5,7 @@ import type { DeepRequired } from "patreon-dl";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import type { WebBrowserSettings } from "./config/WebBrowserSettings";
-import { MaxVideoResolution } from "./types/UIConfig";
+import type { MaxVideoResolution } from "./types/UIConfig";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

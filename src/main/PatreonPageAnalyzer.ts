@@ -14,7 +14,7 @@ export interface AnalyzerRequestOptions {
 }
 
 // "Custom domain" paths and rules not fully tested.
-// Included possible combinations just in case any of 
+// Included possible combinations just in case any of
 // them turns up.
 
 const PAGE_PATHNAME_FORMATS = {
@@ -56,12 +56,12 @@ const URL_RULES = {
     // Custom domain
     "/_customdomain/posts"
   ]
-}
+};
 
 type PageAnalysis = Pick<
-    PatreonPageAnalysis & { status: "complete" },
-    "normalizedURL" | "target"
-  >;
+  PatreonPageAnalysis & { status: "complete" },
+  "normalizedURL" | "target"
+>;
 
 interface JSONWithPageBootstrap {
   props: {
@@ -105,10 +105,11 @@ export default class PatreonPageAnalyzer {
             "http://schema.org/",
             "https://schema.org/"
           ].includes(String(json["@context"]));
-          const matchUrl = matchContext && [
-            "http://www.patreon.com",
-            "https://www.patreon.com"
-          ].includes(String(json["url"]));
+          const matchUrl =
+            matchContext &&
+            ["http://www.patreon.com", "https://www.patreon.com"].includes(
+              String(json["url"])
+            );
           if (
             json["@type"] === "Organization" &&
             json["name"] === "Patreon" &&
@@ -116,15 +117,14 @@ export default class PatreonPageAnalyzer {
           ) {
             return true;
           }
-        }
-        catch (_) {
+        } catch (_) {
           // Do nothing
         }
       }
     }
     return false;
   }
-  
+
   static async analyze(
     html: string,
     signal: AbortSignal,
@@ -137,22 +137,23 @@ export default class PatreonPageAnalyzer {
     if (json) {
       an = this.#analyzePage(json);
       tiers = this.#getTiers(json);
-    }
-    else {
-      const isNextJSStreamingResponse = html.includes('self.__next_f.push');
+    } else {
+      const isNextJSStreamingResponse = html.includes("self.__next_f.push");
       if (isNextJSStreamingResponse) {
         an = this.#analyzeNextJSStreamingResponse(html);
         try {
-          tiers = await this.#getTiersFromStreamingResponse(html, signal, requestOptions);
-        }
-        catch (error) {
+          tiers = await this.#getTiersFromStreamingResponse(
+            html,
+            signal,
+            requestOptions
+          );
+        } catch (error) {
           if (!signal.aborted) {
             throw error;
           }
         }
         bootstrapNotFound = !an && !tiers;
-      }
-      else {
+      } else {
         bootstrapNotFound = true;
       }
     }
@@ -164,7 +165,7 @@ export default class PatreonPageAnalyzer {
     }
     if (bootstrapNotFound) {
       return {
-        status: 'bootstrapNotFound'
+        status: "bootstrapNotFound"
       };
     }
     return {
@@ -197,9 +198,7 @@ export default class PatreonPageAnalyzer {
     return null;
   }
 
-  static #analyzePage(
-    json: JSONWithPageBootstrap
-  ): PageAnalysis | null {
+  static #analyzePage(json: JSONWithPageBootstrap): PageAnalysis | null {
     /**
      * Perform our own analysis based on pageBootStrap,
      * This gives more accurate result than patreon-dl's URLHelper.analyzeURL().
@@ -211,7 +210,10 @@ export default class PatreonPageAnalyzer {
      */
     const page = json.page;
     console.debug('PatreonPageAnalyzer: "page" value in bootstrap:', page);
-    console.debug('PatreonPageAnalyzer: "query" value in bootstrap:', json.query);
+    console.debug(
+      'PatreonPageAnalyzer: "query" value in bootstrap:',
+      json.query
+    );
     if (!page || typeof page !== "string") {
       return null;
     }
@@ -230,7 +232,7 @@ export default class PatreonPageAnalyzer {
         return {
           slug: null,
           id: s
-        }
+        };
       }
       const match = /(.+)-(\d+)$/.exec(s);
       if (match?.length === 3) {
@@ -337,17 +339,25 @@ export default class PatreonPageAnalyzer {
   }
 
   static #analyzeNextJSStreamingResponse(html: string): PageAnalysis | null {
-    const urlRuleRegex = /\\(?:\\?)"url_rule\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
+    const urlRuleRegex =
+      /\\(?:\\?)"url_rule\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
     const urlRuleMatch = urlRuleRegex.exec(html);
-    const urlRule = urlRuleMatch && urlRuleMatch[1].replaceAll('\\\\', '\\');
-    console.debug('PatreonPageAnalyzer: "url_rule" value in Next.js streaming response:', urlRule);
+    const urlRule = urlRuleMatch && urlRuleMatch[1].replaceAll("\\\\", "\\");
+    console.debug(
+      'PatreonPageAnalyzer: "url_rule" value in Next.js streaming response:',
+      urlRule
+    );
     if (!urlRule) {
       return null;
     }
-    const vanityRegex = /\\(?:\\?)"vanity\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
+    const vanityRegex =
+      /\\(?:\\?)"vanity\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
     const vanityMatch = vanityRegex.exec(html);
     const vanity = vanityMatch && vanityMatch[1];
-    console.debug('PatreonPageAnalyzer: "vanity" value in Next.js streaming response:', vanity);
+    console.debug(
+      'PatreonPageAnalyzer: "vanity" value in Next.js streaming response:',
+      vanity
+    );
     if (URL_RULES.postsByUser.includes(urlRule) && vanity) {
       const an: URLAnalysis = {
         type: "postsByUser",
@@ -364,22 +374,36 @@ export default class PatreonPageAnalyzer {
     return null;
   }
 
-  static async #getTiersFromStreamingResponse(html: string, signal: AbortSignal, requestOptions: AnalyzerRequestOptions): Promise<Tier[] | null> {
-    const campaignIdRegex = /campaign_id\\(?:\\?)",\\(?:\\?)"unit_id\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
+  static async #getTiersFromStreamingResponse(
+    html: string,
+    signal: AbortSignal,
+    requestOptions: AnalyzerRequestOptions
+  ): Promise<Tier[] | null> {
+    const campaignIdRegex =
+      /campaign_id\\(?:\\?)",\\(?:\\?)"unit_id\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
     const campaignIdMatch = campaignIdRegex.exec(html);
     const campaignId = campaignIdMatch && campaignIdMatch[1];
     if (!campaignId) {
-      console.warn('PatreonPageAnalyzer: "campaign_id" not found in Next.js streaming response');
+      console.warn(
+        'PatreonPageAnalyzer: "campaign_id" not found in Next.js streaming response'
+      );
       return null;
     }
-    console.debug('PatreonPageAnalyzer: "campaign_id" value in Next.js streaming response:', campaignId);
-    const campaign = await PatreonDownloader.getCampaign({ campaignId }, signal, {
-      cookie: requestOptions.cookie,
-      request: {
-        proxy: requestOptions.proxy,
-        userAgent: requestOptions.userAgent
+    console.debug(
+      'PatreonPageAnalyzer: "campaign_id" value in Next.js streaming response:',
+      campaignId
+    );
+    const campaign = await PatreonDownloader.getCampaign(
+      { campaignId },
+      signal,
+      {
+        cookie: requestOptions.cookie,
+        request: {
+          proxy: requestOptions.proxy,
+          userAgent: requestOptions.userAgent
+        }
       }
-    });
+    );
     if (campaign) {
       const __parseTierTitle = (id: string, value: string | null) =>
         value || (id === "-1" ? "Public" : `Tier #${id}`);

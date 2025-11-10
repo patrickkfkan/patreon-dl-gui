@@ -37,12 +37,14 @@ export function validateProxyURL(url: string): ValidateProxyURLResult {
   }
 }
 
-export function normalizeMaxVideoResolution(value: string | number | null): MaxVideoResolution {
+export function normalizeMaxVideoResolution(
+  value: string | number | null
+): MaxVideoResolution {
   if (!value || (typeof value === "number" && value < 0)) {
     return "none";
   }
-  let s = typeof value === 'string' ? value.trim() : String(value);
-  if (!s.endsWith('p')) {
+  let s = typeof value === "string" ? value.trim() : String(value);
+  if (!s.endsWith("p")) {
     s = `${s}p`;
   }
   if (MAX_VIDEO_RESOLUTIONS.includes(s as MaxVideoResolution)) {

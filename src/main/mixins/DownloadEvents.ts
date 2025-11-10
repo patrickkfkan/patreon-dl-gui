@@ -111,6 +111,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     #getDisplayConfig(config: ReturnType<PatreonDownloader<any>["getConfig"]>) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const displayConfig = _.cloneDeep(config) as any;
       delete displayConfig.type;
       delete displayConfig.postFetch;
@@ -126,22 +127,20 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
       if (config.include?.mediaByFilename) {
         for (const [k, v] of Object.entries(config.include.mediaByFilename)) {
           if (v) {
-            if (v.startsWith('!')) {
+            if (v.startsWith("!")) {
               const stripped = v.substring(1);
               if (!stripped) {
                 delete displayConfig.include.mediaByFilename[k];
-              }
-              else {
+              } else {
                 displayConfig.include.mediaByFilename[k] = {
                   pattern: v.substring(1),
-                  'case-sensitive': false
+                  "case-sensitive": false
                 };
               }
-            }
-            else {
+            } else {
               displayConfig.include.mediaByFilename[k] = {
                 pattern: v,
-                'case-sensitive': true
+                "case-sensitive": true
               };
             }
           }
@@ -150,20 +149,31 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
       return displayConfig;
     }
 
-    async #showDenoMissingWarningDialog(config: ReturnType<PatreonDownloader<any>["getConfig"]>) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async #showDenoMissingWarningDialog(
+      config: ReturnType<PatreonDownloader<any>["getConfig"]>
+    ) {
       if (!this.#showDenoMissingWarning) {
         return;
       }
-      const ytExternalDownloader = config.embedDownloaders && config.embedDownloaders.find((downloader) => downloader.provider === 'YouTube' && downloader.exec);
-      if(!ytExternalDownloader && !isDenoInstalled(config.pathToDeno || undefined).installed) {
+      const ytExternalDownloader =
+        config.embedDownloaders &&
+        config.embedDownloaders.find(
+          (downloader) => downloader.provider === "YouTube" && downloader.exec
+        );
+      if (
+        !ytExternalDownloader &&
+        !isDenoInstalled(config.pathToDeno || undefined).installed
+      ) {
         const result = await dialog.showMessageBox(this.win, {
-          type: 'warning',
-          buttons: ['Got it'],
-          checkboxLabel: 'Do not show me again for the rest of this session',
+          type: "warning",
+          buttons: ["Got it"],
+          checkboxLabel: "Do not show me again for the rest of this session",
           defaultId: 0,
-          title: 'Warning',
+          title: "Warning",
           message: `Deno not found`,
-          detail: 'Deno (https://deno.com) is not found on this system. For embedded YouTube videos, the downloader needs to run code obtained from YouTube / Google servers. Without Deno, such code will be executed without sandboxing. Running un-sandboxed code exposes your system to potential security vulnerabilities, including unauthorized access, data corruption, or malicious operations. If you do have Deno installed, you may specify its path manually in the "Other" tab. Otherwise, procceed at your own discretion.',
+          detail:
+            'Deno (https://deno.com) is not found on this system. For embedded YouTube videos, the downloader needs to run code obtained from YouTube / Google servers. Without Deno, such code will be executed without sandboxing. Running un-sandboxed code exposes your system to potential security vulnerabilities, including unauthorized access, data corruption, or malicious operations. If you do have Deno installed, you may specify its path manually in the "Other" tab. Otherwise, procceed at your own discretion.'
         });
         if (result.checkboxChecked) {
           this.#showDenoMissingWarning = false;

@@ -1,4 +1,8 @@
-import type { CustomSelectionValue, MaxVideoResolution, UIConfig } from "./types/UIConfig";
+import type {
+  CustomSelectionValue,
+  MaxVideoResolution,
+  UIConfig
+} from "./types/UIConfig";
 import { convertUIConfigToFileContents } from "./config/FileConfig";
 import DownloaderConsoleLogger from "./DownloaderConsoleLogger";
 import type {
@@ -43,7 +47,9 @@ export function convertUIConfigToPatreonDLOptions(
       ) ?
         YT_CREDS_PATH
       : undefined,
-    maxVideoResolution: getMaxVideoResolutionValue(uiConfig.downloader["max.video.resolution"]),
+    maxVideoResolution: getMaxVideoResolutionValue(
+      uiConfig.downloader["max.video.resolution"]
+    ),
     useStatusCache: uiConfig.downloader["use.status.cache"],
     stopOn: uiConfig.downloader["stop.on"],
     dryRun: uiConfig.downloader["dry.run"],
@@ -210,19 +216,17 @@ function getVimeoHelperExec(config: UIConfig["embed.downloader.vimeo"]) {
     );
   }
   if (config["helper.ytdlp.args"].trim()) {
-    args.push(
-      "--",
-      config["helper.ytdlp.args"].trim()
-    );
+    args.push("--", config["helper.ytdlp.args"].trim());
   }
   return [shescape.quote(VIMEO_HELPER_SCRIPT_PATH), ...args].join(" ");
 }
 
-function getMaxVideoResolutionValue(value: MaxVideoResolution): DownloaderOptions['maxVideoResolution'] {
+function getMaxVideoResolutionValue(
+  value: MaxVideoResolution
+): DownloaderOptions["maxVideoResolution"] {
   if (value === "none") {
     return null;
-  }
-  else {
+  } else {
     return Number(value.substring(0, value.length - 1)) || null;
   }
 }
