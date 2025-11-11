@@ -25,9 +25,17 @@ An Electron app that provides a GUI for [patreon-dl](https://github.com/patrickk
 
 [Download](https://github.com/patrickkfkan/patreon-dl-gui/releases) and install the package suitable for your system. Linux (RPM and DEB) and Windows x64 versions are provided. If you are on a different system, you may [run or package the app from source](#running--packaging-the-app-from-source).
 
+#### FFmpeg
+
 If you are going to download videos, you should also install [FFmpeg](https://www.ffmpeg.org/). This is required for most videos found on Patreon.
 
-Furthermore, if you intend to download embedded Vimeo videos, you are recommended to install [yt-dlp](https://github.com/yt-dlp/yt-dlp) and use the bundled helper script. See [Downloading embedded Vimeo videos using helper script](#downloading-embedded-vimeo-videos-using-helper-script).
+#### yt-dlp
+
+If you intend to download embedded Vimeo videos, you are recommended to install [yt-dlp](https://github.com/yt-dlp/yt-dlp) and use the bundled helper script. See [Downloading embedded Vimeo videos using helper script](#downloading-embedded-vimeo-videos-using-helper-script).
+
+#### Deno
+
+If you intend to download embedded YouTube videos with the built-in YouTube downloader, you are recommended to install [Deno](https://deno.com/). It is used to sandbox code obtained from YouTube / Google servers. Without Deno, the code runs without isolation, increasing the risk of security vulnerabilities such as unauthorized access, data corruption, or malicious behavior.
 
 ## Quick start guide
 
@@ -108,6 +116,7 @@ The following table lists the version of `patreon-dl` used by each version of `p
 | v2.4.0                   | v3.2.0                    |
 | v2.4.1                   | v3.2.1                    |
 | v2.4.2                   | v3.3.1                    |
+| v2.5.0                   | v3.4.0                    |
 
 ## Running / packaging the app from source
 
@@ -132,6 +141,15 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.5.0
+- Update `patreon-dl` library to v3.4.0
+  - Fix YouTube download error ([#31](https://github.com/patrickkfkan/patreon-dl-gui/issues/31))
+  - Fix "no posts found" on "cw" pages ([#30](https://github.com/patrickkfkan/patreon-dl-gui/issues/30))
+  - [Full changelog](https://github.com/patrickkfkan/patreon-dl?tab=readme-ov-file#changelog)
+- New settings in "Other" tab:
+  - Path to Deno
+  - Max video resolution
 
 v2.4.2
 - Update `patreon-dl` library to v3.3.1
