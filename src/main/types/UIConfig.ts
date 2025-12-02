@@ -51,7 +51,7 @@ export interface UIConfig {
     "path.to.deno": string;
     "max.video.resolution": MaxVideoResolution;
     "use.status.cache": boolean;
-    "stop.on": StopOnCondition;
+    "stop.on": Exclude<StopOnCondition, "postPreviouslyDownloaded" | "postPublishDateOutOfRange">;
     "no.prompt": boolean;
     "dry.run": boolean;
   };
