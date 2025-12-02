@@ -32,6 +32,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
               try {
                 const {
                   targetURL,
+                  bootstrapData,
                   downloaderOptions,
                   consoleLogger,
                   fileLogger,
@@ -39,9 +40,15 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                 } = convertUIConfigToPatreonDLOptions(editor.config, {
                   userAgent: this.resolvedUserAgent
                 });
+                if (bootstrapData) {
+                  console.debug("DownloadEvent: instantiating PatreonDownloader with bootstrapData:", bootstrapData);
+                }
+                else {
+                  console.debug("DownloadEvent: bootstrapData not available - instantiating PatreonDownloader with targetURL:", targetURL);
+                }
                 this.downloader = {
                   instance: await PatreonDownloader.getInstance(
-                    targetURL,
+                    bootstrapData || targetURL,
                     downloaderOptions
                   ),
                   consoleLogger,

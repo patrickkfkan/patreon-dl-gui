@@ -33,6 +33,8 @@ export function convertUIConfigToPatreonDLOptions(
     throw Error("No target URL");
   }
 
+  const bootstrapData = uiConfig["support.data"].bootstrapData;
+
   const fileConfig = convertUIConfigToFileContents(uiConfig, extra);
 
   const downloaderOptions: DownloaderOptions = {
@@ -174,6 +176,7 @@ export function convertUIConfigToPatreonDLOptions(
 
   return {
     targetURL,
+    bootstrapData,
     downloaderOptions,
     consoleLogger,
     fileLogger,

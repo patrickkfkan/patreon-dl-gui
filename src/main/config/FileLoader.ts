@@ -933,7 +933,8 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         url: defaultConfig["request"]["proxy.url"],
         rejectUnauthorizedTLS:
           defaultConfig["request"]["proxy.reject.unauthorized.tls"]
-      }
+      },
+      bootstrapData: null
     }
   };
 
