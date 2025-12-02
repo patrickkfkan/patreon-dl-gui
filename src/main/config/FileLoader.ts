@@ -437,6 +437,26 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
     return result;
   };
 
+  let stopOn = __fromFileConfigValue(
+    "downloader",
+    "stop.on",
+    defaultConfig.downloader["stop.on"],
+    (value) =>
+      toOneOf<StopOnCondition>(value, [
+        "never",
+        "previouslyDownloaded",
+        "publishDateOutOfRange",
+        "postPreviouslyDownloaded",
+        "postPublishDateOutOfRange"
+      ])
+  );
+  if (stopOn === "postPreviouslyDownloaded") {
+    stopOn = "previouslyDownloaded";
+  }
+  else if (stopOn === "postPublishDateOutOfRange") {
+    stopOn = "publishDateOutOfRange";
+  }
+
   const config: UIConfig = {
     downloader: {
       target: __fromFileConfigValue(
@@ -475,17 +495,7 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         defaultConfig.downloader["use.status.cache"],
         toBoolean
       ),
-      "stop.on": __fromFileConfigValue(
-        "downloader",
-        "stop.on",
-        defaultConfig.downloader["stop.on"],
-        (value) =>
-          toOneOf<StopOnCondition>(value, [
-            "never",
-            "postPreviouslyDownloaded",
-            "postPublishDateOutOfRange"
-          ])
-      ),
+      "stop.on": stopOn,
       "no.prompt": __fromFileConfigValue(
         "downloader",
         "no.prompt",

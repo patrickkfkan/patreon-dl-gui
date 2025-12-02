@@ -43,6 +43,12 @@ function convertPatreonDLOptionsToUIConfig(
   } catch (_) {
     maxVideoResolution = "none";
   }
+
+  // Ensure deprecated stopOn values not used
+  const stopOn = p.stopOn === 'postPreviouslyDownloaded' ? 'previouslyDownloaded'
+    : p.stopOn === 'postPublishDateOutOfRange' ? 'publishDateOutOfRange'
+    : p.stopOn;
+
   const conf: UIConfig = {
     downloader: {
       target: {
@@ -59,7 +65,7 @@ function convertPatreonDLOptionsToUIConfig(
       "path.to.deno": p.pathToDeno || "",
       "max.video.resolution": maxVideoResolution,
       "use.status.cache": p.useStatusCache,
-      "stop.on": p.stopOn,
+      "stop.on": stopOn,
       "no.prompt": false,
       "dry.run": p.dryRun
     },
