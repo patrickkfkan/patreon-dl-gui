@@ -23,6 +23,7 @@ import { existsSync } from "fs";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { normalizeMaxVideoResolution } from "../util/Config";
+import { getErrorString } from "../../common/util/Misc";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -228,7 +229,7 @@ function toDateTimePickerValue(value: string): ParseValueResult<string> {
       messages: [
         {
           type: "error",
-          text: `Error parsing date value "${value}": ${error instanceof Error ? error.message : error}`
+          text: `Error parsing date value "${value}": ${getErrorString(error)}`
         }
       ]
     };
@@ -250,7 +251,7 @@ function toMaxVideoResolution(
       messages: [
         {
           type: "warn",
-          text: error instanceof Error ? error.message : String(error)
+          text: getErrorString(error)
         }
       ]
     };
@@ -323,11 +324,7 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
       alerts: [
         {
           type: "error",
-          text: `Could not load config from "${filePath}": ${
-            error instanceof Error ? error.message
-            : typeof error === "object" ? JSON.stringify(error)
-            : error
-          }`
+          text: `Could not load config from "${filePath}": ${getErrorString(error)}`
         }
       ]
     };
@@ -1021,7 +1018,7 @@ function parseURL(value: string): ParseValueResult<string> {
       messages: [
         {
           type: "error",
-          text: `Error parsing URL "${value}": ${error instanceof Error ? error.message : error}`
+          text: `Error parsing URL "${value}": ${getErrorString(error)}`
         }
       ]
     };

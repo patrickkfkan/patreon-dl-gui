@@ -8,6 +8,7 @@ import dateFormat from "dateformat";
 import { EOL } from "os";
 import { openSync, writeSync } from "fs";
 import type { SaveFileConfigResult } from "../types/MainEvents";
+import { getErrorString } from "../../common/util/Misc";
 
 const TRUE_STRING = "1";
 const FALSE_STRING = "0";
@@ -272,7 +273,7 @@ export function saveFileConfig(
   } catch (error: unknown) {
     return {
       hasError: true,
-      error: `Error writing config to "${config.filePath}": ${error instanceof Error ? error.message : error}`
+      error: `Error writing config to "${config.filePath}": ${getErrorString(error)}`
     };
   }
 }

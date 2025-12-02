@@ -19,6 +19,7 @@ import {
   VIMEO_HELPER_SCRIPT_PATH
 } from "./Constants";
 import { Shescape } from "shescape";
+import { getErrorString } from "../common/util/Misc";
 
 const shescape = new Shescape({
   shell: process.platform === "darwin" ? "zsh" : true
@@ -206,7 +207,7 @@ function toDateTime(value: string): DateTime | null {
     return DateTime.from(value);
   } catch (error: unknown) {
     console.error(
-      `Could not convert "${value}" to DateTime: ${error instanceof Error ? error.message : error}`
+      `Could not convert "${value}" to DateTime: ${getErrorString(error)}`
     );
     return null;
   }

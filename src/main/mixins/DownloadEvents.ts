@@ -5,6 +5,7 @@ import type { Editor } from "../types/App";
 import ObjectHelper from "../util/ObjectHelper";
 import { dialog } from "electron";
 import _ from "lodash";
+import { getErrorString } from "../../common/util/Misc";
 
 export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -85,8 +86,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                   { once: true }
                 );
               } catch (error: unknown) {
-                const errMsg =
-                  error instanceof Error ? error.message : String(error);
+                const errMsg = getErrorString(error)
                 this.downloader = null;
                 this.emitRendererEvent(this.win.modalView, "downloaderInit", {
                   hasError: true,
@@ -229,7 +229,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
         this.downloader.status = "end";
         this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
           hasError: true,
-          error: error instanceof Error ? error.message : String(error)
+          error: getErrorString(error)
         });
       } finally {
         this.downloader.consoleLogger.removeAllListeners();
