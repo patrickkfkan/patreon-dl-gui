@@ -362,7 +362,10 @@ export default class WebBrowserView extends WebContentsView {
           postFetch: {
             type: 'byCollection',
             collectionId: analysis.target.collectionId,
-            campaignId: analysis.campaignId || undefined
+            campaignId: analysis.campaignId || undefined,
+            filters: {
+              'collection_id': analysis.target.collectionId
+            }
           }
         };
         break;
