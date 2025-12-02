@@ -75,6 +75,7 @@ export function convertUIConfigToPatreonDLOptions(
       contentMedia: fromCustomSelectionValue(uiConfig.include["content.media"]),
       previewMedia: fromCustomSelectionValue(uiConfig.include["preview.media"]),
       allMediaVariants: uiConfig.include["all.media.variants"],
+      mediaThumbnails: uiConfig.include["media.thumbnails"],
       mediaByFilename: {
         images: fileConfig.include["images.by.filename"],
         audio: fileConfig.include["audio.by.filename"],
