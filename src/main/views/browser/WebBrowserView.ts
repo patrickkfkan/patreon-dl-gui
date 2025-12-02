@@ -7,6 +7,7 @@ import type { WebBrowserPageNavigatedInfo } from "../../types/MainEvents";
 import normalizeUrl from "normalize-url";
 import { anonymizeProxy, closeAnonymizedProxy } from "proxy-chain";
 import portfinder from "portfinder";
+import { PostDownloaderBootstrapData, ProductDownloaderBootstrapData } from "patreon-dl/dist";
 
 export default class WebBrowserView extends WebContentsView {
   static #userAgent: string = "";
@@ -222,7 +223,8 @@ export default class WebBrowserView extends WebContentsView {
         status: "complete",
         normalizedURL: null,
         target: null,
-        tiers: null
+        tiers: null,
+        campaignId: null
       },
       await this.#getCookie()
     );
@@ -316,13 +318,90 @@ export default class WebBrowserView extends WebContentsView {
     analysis: PatreonPageAnalysis & { status: "complete" },
     cookie: string
   ) {
+    let bootstrapData: PostDownloaderBootstrapData | ProductDownloaderBootstrapData | null = null;
+    switch (analysis.target?.type) {
+      case 'post': {
+        bootstrapData = {
+          type: 'post',
+          targetURL: analysis.normalizedURL || '',
+          postFetch: {
+            type: 'single',
+            postId: analysis.target.postId
+          }
+        };
+        break;
+      }
+      case 'postsByUser': {
+        bootstrapData = {
+          type: 'post',
+          targetURL: analysis.normalizedURL || '',
+          postFetch: {
+            type: 'byUser',
+            vanity: analysis.target.vanity,
+            campaignId: analysis.campaignId || undefined
+          }
+        };
+        break;
+      }
+      case 'postsByUserId': {
+        bootstrapData = {
+          type: 'post',
+          targetURL: analysis.normalizedURL || '',
+          postFetch: {
+            type: 'byUserId',
+            userId: analysis.target.userId,
+            campaignId: analysis.campaignId || undefined
+          }
+        };
+        break;
+      }
+      case 'postsByCollection': {
+        bootstrapData = {
+          type: 'post',
+          targetURL: analysis.normalizedURL || '',
+          postFetch: {
+            type: 'byCollection',
+            collectionId: analysis.target.collectionId,
+            campaignId: analysis.campaignId || undefined
+          }
+        };
+        break;
+      }
+      case 'product': {
+        bootstrapData = {
+          type: 'product',
+          targetURL: analysis.normalizedURL || '',
+          productFetch: {
+            type: 'single',
+            productId: analysis.target.productId,
+          }
+        };
+        break;
+      }
+      case 'shop': {
+        bootstrapData = {
+          type: 'product',
+          targetURL: analysis.normalizedURL || '',
+          productFetch: {
+            type: 'byShop',
+            vanity: analysis.target.vanity,
+            campaignId: analysis.campaignId || undefined
+          }
+        };
+        break;
+      }
+    }
+
+    console.debug('WebBrowserView: bootstrapData:', bootstrapData);
+
     this.emitWebBrowserViewEvent("pageInfo", {
       url: analysis.normalizedURL || null,
       title: this.webContents.getTitle(),
       pageDescription: analysis.target?.description || "No target identified",
       cookie,
       cookieDescription: cookie || "No cookie found",
-      tiers: analysis?.tiers || null
+      tiers: analysis.tiers || null,
+      bootstrapData
     });
   }
 

@@ -67,7 +67,7 @@ interface JSONWithPageBootstrap {
   props: {
     pageProps: {
       bootstrapEnvelope: {
-        pageBootstrap: object;
+        pageBootstrap: Record<string, any>;
       };
     };
   };
@@ -87,6 +87,7 @@ export type PatreonPageAnalysis =
       normalizedURL: string | null;
       target: (URLAnalysis & { description: string }) | null;
       tiers: Tier[] | null;
+      campaignId: string | null;
     }
   | {
       status: "bootstrapNotFound";
@@ -132,21 +133,25 @@ export default class PatreonPageAnalyzer {
   ): Promise<PatreonPageAnalysis> {
     let an: PageAnalysis | null = null;
     let tiers: Tier[] | null = null;
+    let campaignId: string | null = null;
     let bootstrapNotFound = false;
     const json = await this.#getJSONWithPageBootstrap(html);
     if (json) {
-      an = this.#analyzePage(json);
+      const _an = an = this.#analyzePage(json);
       tiers = this.#getTiers(json);
+      campaignId = _an?.campaignId ?? null;
     } else {
       const isNextJSStreamingResponse = html.includes("self.__next_f.push");
       if (isNextJSStreamingResponse) {
         an = this.#analyzeNextJSStreamingResponse(html);
         try {
-          tiers = await this.#getTiersFromStreamingResponse(
+          const ct = await this.#getCampaignIdAndTiersFromStreamingResponse(
             html,
             signal,
             requestOptions
           );
+          campaignId = ct?.campaignId ?? null;
+          tiers = ct?.tiers ?? null;
         } catch (error) {
           if (!signal.aborted) {
             throw error;
@@ -172,7 +177,8 @@ export default class PatreonPageAnalyzer {
       status: "complete",
       normalizedURL: an?.normalizedURL || null,
       target: an?.target || null,
-      tiers
+      tiers,
+      campaignId
     };
   }
 
@@ -198,7 +204,7 @@ export default class PatreonPageAnalyzer {
     return null;
   }
 
-  static #analyzePage(json: JSONWithPageBootstrap): PageAnalysis | null {
+  static #analyzePage(json: JSONWithPageBootstrap): PageAnalysis & { campaignId: string | null; } | null {
     /**
      * Perform our own analysis based on pageBootStrap,
      * This gives more accurate result than patreon-dl's URLHelper.analyzeURL().
@@ -225,6 +231,12 @@ export default class PatreonPageAnalyzer {
       collectionId,
       productId
     } = json.query && typeof json.query === "object" ? json.query : {};
+
+    const campaignId = json.props.pageProps.bootstrapEnvelope.pageBootstrap.campaign?.data?.id || null;
+    console.debug(
+      'PatreonPageAnalyzer: "campaign_id" value in bootstrap:',
+      campaignId
+    );
 
     const __parseSlugId = (s: string) => {
       // Check if ID only - no slug
@@ -257,7 +269,8 @@ export default class PatreonPageAnalyzer {
         target: {
           ...an,
           description: this.#getTargetDesc(an)
-        }
+        },
+        campaignId
       };
     }
     if (
@@ -273,7 +286,8 @@ export default class PatreonPageAnalyzer {
         target: {
           ...an,
           description: this.#getTargetDesc(an)
-        }
+        },
+        campaignId
       };
     }
     if (
@@ -292,7 +306,8 @@ export default class PatreonPageAnalyzer {
           target: {
             ...an,
             description: this.#getTargetDesc(an)
-          }
+          },
+          campaignId
         };
       }
       return null;
@@ -310,7 +325,8 @@ export default class PatreonPageAnalyzer {
         target: {
           ...an,
           description: this.#getTargetDesc(an)
-        }
+        },
+        campaignId
       };
     }
     if (
@@ -330,7 +346,8 @@ export default class PatreonPageAnalyzer {
           target: {
             ...an,
             description: this.#getTargetDesc(an)
-          }
+          },
+          campaignId
         };
       }
       return null;
@@ -374,11 +391,11 @@ export default class PatreonPageAnalyzer {
     return null;
   }
 
-  static async #getTiersFromStreamingResponse(
+  static async #getCampaignIdAndTiersFromStreamingResponse(
     html: string,
     signal: AbortSignal,
     requestOptions: AnalyzerRequestOptions
-  ): Promise<Tier[] | null> {
+  ) {
     const campaignIdRegex =
       /campaign_id\\(?:\\?)",\\(?:\\?)"unit_id\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
     const campaignIdMatch = campaignIdRegex.exec(html);
@@ -407,10 +424,14 @@ export default class PatreonPageAnalyzer {
     if (campaign) {
       const __parseTierTitle = (id: string, value: string | null) =>
         value || (id === "-1" ? "Public" : `Tier #${id}`);
-      return campaign?.rewards.map<Tier>((reward) => ({
+      const tiers = campaign?.rewards.map<Tier>((reward) => ({
         id: reward.id,
         title: __parseTierTitle(reward.id, reward.title)
       }));
+      return {
+        tiers,
+        campaignId
+      }
     }
     return null;
   }

@@ -185,7 +185,8 @@ function convertPatreonDLOptionsToUIConfig(
       appliedProxySettings: {
         url: p.request.proxy?.url ?? "",
         rejectUnauthorizedTLS: p.request.proxy?.rejectUnauthorizedTLS ?? true
-      }
+      },
+      bootstrapData: null
     }
   };
   for (const { provider, exec } of p.embedDownloaders) {

@@ -1,4 +1,4 @@
-import type { FileExistsAction, LogLevel, StopOnCondition } from "patreon-dl";
+import type { FileExistsAction, LogLevel, PostDownloaderBootstrapData, ProductDownloaderBootstrapData, StopOnCondition } from "patreon-dl";
 import type { ObjectKeysByValueType } from "../../common/types/Utility";
 
 export interface Tier {
@@ -13,6 +13,7 @@ export interface PageInfo {
   tiers: Tier[] | null;
   cookie: string | null;
   cookieDescription: string;
+  bootstrapData: PostDownloaderBootstrapData | ProductDownloaderBootstrapData | null;
 }
 
 export interface BrowserObtainableInput {
@@ -144,6 +145,9 @@ export interface UIConfig {
       url: string;
       rejectUnauthorizedTLS: boolean;
     };
+    bootstrapData: PostDownloaderBootstrapData
+      | ProductDownloaderBootstrapData
+      | null;
   };
 }
 
