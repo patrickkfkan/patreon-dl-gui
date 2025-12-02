@@ -88,6 +88,11 @@ export interface UIConfig {
       after: string;
       before: string;
     };
+    "products.published": {
+      type: "anytime" | "after" | "before" | "between";
+      after: string;
+      before: string;
+    };
     comments: boolean;
   };
   request: {

@@ -88,6 +88,10 @@ export function convertUIConfigToPatreonDLOptions(
         after: toDateTime(fileConfig.include["posts.published.after"]),
         before: toDateTime(fileConfig.include["posts.published.before"])
       },
+      productsPublished: {
+        after: toDateTime(fileConfig.include["products.published.after"]),
+        before: toDateTime(fileConfig.include["products.published.before"])
+      },
       comments: uiConfig.include.comments
     },
     request: {

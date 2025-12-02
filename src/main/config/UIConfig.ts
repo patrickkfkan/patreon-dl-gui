@@ -37,6 +37,12 @@ function convertPatreonDLOptionsToUIConfig(
   const postsPublishedBefore = __convertPublishDate(
     p.include.postsPublished.before
   );
+  const productsPublishedAfter = __convertPublishDate(
+    p.include.productsPublished.after
+  );
+  const productsPublishedBefore = __convertPublishDate(
+    p.include.productsPublished.before
+  );
   let maxVideoResolution: MaxVideoResolution;
   try {
     maxVideoResolution = normalizeMaxVideoResolution(p.maxVideoResolution);
@@ -128,6 +134,15 @@ function convertPatreonDLOptionsToUIConfig(
           : "anytime",
         after: postsPublishedAfter,
         before: postsPublishedBefore
+      },
+      "products.published": {
+        type:
+          productsPublishedAfter && productsPublishedBefore ? "between"
+          : productsPublishedAfter ? "after"
+          : productsPublishedBefore ? "before"
+          : "anytime",
+        after: productsPublishedAfter,
+        before: productsPublishedBefore
       },
       comments: p.include.comments
     },

@@ -131,6 +131,14 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
         displayConfig.include.postsPublished.before =
           config.include.postsPublished.before.toString();
       }
+      if (config.include?.productsPublished?.after) {
+        displayConfig.include.productsPublished.after =
+          config.include.productsPublished.after.toString();
+      }
+      if (config.include?.productsPublished?.before) {
+        displayConfig.include.productsPublished.before =
+          config.include.productsPublished.before.toString();
+      }
       if (config.include?.mediaByFilename) {
         for (const [k, v] of Object.entries(config.include.mediaByFilename)) {
           if (v) {
