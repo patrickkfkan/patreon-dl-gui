@@ -7,6 +7,7 @@ import {
   getWebBrowseSettings,
   saveWebBrowserSettings
 } from "../config/WebBrowserSettings";
+import { getErrorString } from "../../common/util/Misc";
 
 export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -50,7 +51,7 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
             } catch (error: unknown) {
               dialog.showErrorBox(
                 "Error",
-                error instanceof Error ? error.message : String(error)
+                getErrorString(error)
               );
               this.win.hideModalView();
               resolve();
@@ -168,7 +169,7 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
           } catch (error: unknown) {
             await dialog.showMessageBox(this.win, {
               title: "Error",
-              message: `An error occurred while saving settings: ${error instanceof Error ? error.message : String(error)}`,
+              message: `An error occurred while saving settings: ${getErrorString(error)}`,
               buttons: ["OK"]
             });
           }
