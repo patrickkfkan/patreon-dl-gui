@@ -32,6 +32,22 @@ export function convertUIConfigToFileContents(
       break;
   }
 
+  const productsPublished = config.include["products.published"];
+  let productsPublishedAfter = "",
+    productsPublishedBefore = "";
+  switch (productsPublished.type) {
+    case "after":
+      productsPublishedAfter = getDateTimePickerValue(productsPublished.after);
+      break;
+    case "before":
+      productsPublishedBefore = getDateTimePickerValue(productsPublished.before);
+      break;
+    case "between":
+      productsPublishedAfter = getDateTimePickerValue(productsPublished.after);
+      productsPublishedBefore = getDateTimePickerValue(productsPublished.before);
+      break;
+  }
+
   const tierIds = config["support.data"].browserObtainedValues.tiers?.map(
     (tier) => tier.id
   );
@@ -86,6 +102,8 @@ export function convertUIConfigToFileContents(
       ),
       "posts.published.after": postsPublishedAfter,
       "posts.published.before": postsPublishedBefore,
+      "products.published.after": productsPublishedAfter,
+      "products.published.before": productsPublishedBefore,
       "campaign.info": booleanToString(config.include["campaign.info"]),
       "content.info": booleanToString(config.include["content.info"]),
       "content.media": getCustomSelectionValue(config.include["content.media"]),

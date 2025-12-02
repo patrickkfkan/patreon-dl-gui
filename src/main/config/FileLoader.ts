@@ -710,6 +710,46 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
           };
         }
       ),
+      "products.published": __fromFileConfigValues(
+        "include",
+        ["products.published.after", "products.published.before"],
+        defaultConfig.include["products.published"],
+        (values) => {
+          const rmsg: Partial<Record<keyof typeof values, AlertMessage[]>> = {};
+          const __parseDate = (key: keyof typeof values) => {
+            if (values[key]) {
+              const { result, hasError, messages } = toDateTimePickerValue(
+                values[key]
+              );
+              if (messages) {
+                rmsg[key] = messages;
+              }
+              if (hasError) {
+                return "";
+              }
+              return result;
+            }
+            return "";
+          };
+          const after = __parseDate("products.published.after");
+          const before = __parseDate("products.published.before");
+          let type: "anytime" | "after" | "before" | "between";
+          if (after && before) {
+            type = "between";
+          } else if (after) {
+            type = "after";
+          } else if (before) {
+            type = "before";
+          } else {
+            type = "anytime";
+          }
+          return {
+            result: { type, after, before },
+            hasError: false,
+            messages: rmsg
+          };
+        }
+      ),
       comments: __fromFileConfigValue(
         "include",
         "comments",

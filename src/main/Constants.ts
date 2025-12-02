@@ -48,6 +48,8 @@ export const FILE_CONFIG_SECTION_PROPS = {
     "posts.with.media.type",
     "posts.published.after",
     "posts.published.before",
+    "products.published.after",
+    "products.published.before",
     "campaign.info",
     "content.info",
     "content.media",
