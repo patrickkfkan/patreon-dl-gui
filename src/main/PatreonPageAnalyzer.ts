@@ -47,6 +47,15 @@ const PAGE_PATHNAME_FORMATS = {
     "/[vanity]/shop/[productId]",
     // Custom domain
     "/_customdomain/shop/[productId]"
+  ],
+  shop: [
+    "/[vanity]/shop",
+    "/c/[vanity]/shop",
+    "/cw/[vanity]/shop",
+    // Custom domain
+    "/_customdomain/shop",
+    "/c/_customdomain/shop",
+    "/cw/_customdomain/shop"
   ]
 };
 
@@ -55,6 +64,11 @@ const URL_RULES = {
     "/cw/\\u003cstring:vanity\\u003e/posts",
     // Custom domain
     "/_customdomain/posts"
+  ],
+  shop: [
+    "/cw/\\u003cstring:vanity\\u003e/shop",
+    // Custom domain
+    "/_customdomain/shop"
   ]
 };
 
@@ -352,6 +366,23 @@ export default class PatreonPageAnalyzer {
       }
       return null;
     }
+    if (
+      PAGE_PATHNAME_FORMATS.shop.includes(page) &&
+      typeof vanity === "string"
+    ) {
+      const an: URLAnalysis = {
+        type: "shop",
+        vanity
+      };
+      return {
+        normalizedURL: `${PATREON_URL}/${vanity}/shop`,
+        target: {
+          ...an,
+          description: this.#getTargetDesc(an)
+        },
+        campaignId
+      };
+    }
     return null;
   }
 
@@ -382,6 +413,19 @@ export default class PatreonPageAnalyzer {
       };
       return {
         normalizedURL: `${PATREON_URL}/${vanity}/posts`,
+        target: {
+          ...an,
+          description: this.#getTargetDesc(an)
+        }
+      };
+    }
+    if (URL_RULES.shop.includes(urlRule) && vanity) {
+      const an: URLAnalysis = {
+        type: "shop",
+        vanity
+      };
+      return {
+        normalizedURL: `${PATREON_URL}/${vanity}/shop`,
         target: {
           ...an,
           description: this.#getTargetDesc(an)
@@ -448,6 +492,8 @@ export default class PatreonPageAnalyzer {
         return `Posts by user #${target.userId}`;
       case "product":
         return `Product #${target.productId}`;
+      case "shop":
+        return `Shop of user "${target.vanity}"`;
       default:
         return "";
     }
