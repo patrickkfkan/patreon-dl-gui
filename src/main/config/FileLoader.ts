@@ -624,6 +624,12 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         defaultConfig.include["all.media.variants"],
         toBoolean
       ),
+      "media.thumbnails": __fromFileConfigValue(
+        "include",
+        "media.thumbnails",
+        defaultConfig.include["media.thumbnails"],
+        toBoolean
+      ),
       "images.by.filename": __fromFileConfigValue(
         "include",
         "images.by.filename",

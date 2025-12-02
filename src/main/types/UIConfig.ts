@@ -75,6 +75,7 @@ export interface UIConfig {
     >;
     "preview.media": CustomSelectionValue<boolean, "image" | "video" | "audio">;
     "all.media.variants": boolean;
+    "media.thumbnails": boolean;
     "images.by.filename": string;
     "audio.by.filename": string;
     "attachments.by.filename": string;

@@ -111,6 +111,9 @@ export function convertUIConfigToFileContents(
       "all.media.variants": booleanToString(
         config.include["all.media.variants"]
       ),
+      "media.thumbnails": booleanToString(
+        config.include["media.thumbnails"]
+      ),
       "images.by.filename": config.include["images.by.filename"].trim(),
       "audio.by.filename": config.include["audio.by.filename"].trim(),
       "attachments.by.filename":

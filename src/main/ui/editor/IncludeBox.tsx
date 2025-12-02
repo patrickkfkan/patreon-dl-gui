@@ -27,6 +27,7 @@ interface IncludeBoxState {
   contentMedia: UIConfig["include"]["content.media"];
   previewMedia: UIConfig["include"]["preview.media"];
   allMediaVariants: boolean;
+  mediaThumbnails: boolean;
   imagesByFilename: string;
   audioByFilename: string;
   attachmentsByFilename: string;
@@ -79,6 +80,7 @@ function getIncludeBoxState(config: UIConfig): IncludeBoxState {
     contentMedia: config.include["content.media"],
     previewMedia: config.include["preview.media"],
     allMediaVariants: config.include["all.media.variants"],
+    mediaThumbnails: config.include["media.thumbnails"],
     imagesByFilename: config.include["images.by.filename"],
     audioByFilename: config.include["audio.by.filename"],
     attachmentsByFilename: config.include["attachments.by.filename"],
@@ -372,6 +374,12 @@ function IncludeBox() {
               helpTooltip="Download all media variants."
               helpHasMoreInfo
               ariaLabel="Download all media variants"
+            />
+            <CheckboxRow
+              config={["include", "media.thumbnails"]}
+              label="Media thumbnails"
+              helpTooltip="Download media thumbnails."
+              ariaLabel="Download media thumbnails"
             />
             <Row className="py-1">
               <Col xs={4}>Filter by filename:</Col>
