@@ -5,6 +5,7 @@ import type { Editor } from "../types/App";
 import ObjectHelper from "../util/ObjectHelper";
 import { dialog } from "electron";
 import _ from "lodash";
+import { getErrorString } from "../../common/util/Misc";
 
 export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -32,6 +33,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
               try {
                 const {
                   targetURL,
+                  bootstrapData,
                   downloaderOptions,
                   consoleLogger,
                   fileLogger,
@@ -39,9 +41,15 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                 } = convertUIConfigToPatreonDLOptions(editor.config, {
                   userAgent: this.resolvedUserAgent
                 });
+                if (bootstrapData) {
+                  console.debug("DownloadEvent: instantiating PatreonDownloader with bootstrapData:", bootstrapData);
+                }
+                else {
+                  console.debug("DownloadEvent: bootstrapData not available - instantiating PatreonDownloader with targetURL:", targetURL);
+                }
                 this.downloader = {
                   instance: await PatreonDownloader.getInstance(
-                    targetURL,
+                    bootstrapData || targetURL,
                     downloaderOptions
                   ),
                   consoleLogger,
@@ -78,8 +86,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                   { once: true }
                 );
               } catch (error: unknown) {
-                const errMsg =
-                  error instanceof Error ? error.message : String(error);
+                const errMsg = getErrorString(error)
                 this.downloader = null;
                 this.emitRendererEvent(this.win.modalView, "downloaderInit", {
                   hasError: true,
@@ -123,6 +130,14 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
       if (config.include?.postsPublished?.before) {
         displayConfig.include.postsPublished.before =
           config.include.postsPublished.before.toString();
+      }
+      if (config.include?.productsPublished?.after) {
+        displayConfig.include.productsPublished.after =
+          config.include.productsPublished.after.toString();
+      }
+      if (config.include?.productsPublished?.before) {
+        displayConfig.include.productsPublished.before =
+          config.include.productsPublished.before.toString();
       }
       if (config.include?.mediaByFilename) {
         for (const [k, v] of Object.entries(config.include.mediaByFilename)) {
@@ -214,7 +229,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
         this.downloader.status = "end";
         this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
           hasError: true,
-          error: error instanceof Error ? error.message : String(error)
+          error: getErrorString(error)
         });
       } finally {
         this.downloader.consoleLogger.removeAllListeners();

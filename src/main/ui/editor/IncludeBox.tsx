@@ -27,12 +27,14 @@ interface IncludeBoxState {
   contentMedia: UIConfig["include"]["content.media"];
   previewMedia: UIConfig["include"]["preview.media"];
   allMediaVariants: boolean;
+  mediaThumbnails: boolean;
   imagesByFilename: string;
   audioByFilename: string;
   attachmentsByFilename: string;
   postsInTier: UIConfig["include"]["posts.in.tier"];
   postsWithMediaType: UIConfig["include"]["posts.with.media.type"];
   postsPublished: UIConfig["include"]["posts.published"];
+  productsPublished: UIConfig["include"]["products.published"];
   comments: boolean;
   tiers: Tier[] | null;
 }
@@ -78,12 +80,14 @@ function getIncludeBoxState(config: UIConfig): IncludeBoxState {
     contentMedia: config.include["content.media"],
     previewMedia: config.include["preview.media"],
     allMediaVariants: config.include["all.media.variants"],
+    mediaThumbnails: config.include["media.thumbnails"],
     imagesByFilename: config.include["images.by.filename"],
     audioByFilename: config.include["audio.by.filename"],
     attachmentsByFilename: config.include["attachments.by.filename"],
     postsInTier: config.include["posts.in.tier"],
     postsWithMediaType: config.include["posts.with.media.type"],
     postsPublished: config.include["posts.published"],
+    productsPublished: config.include["products.published"],
     comments: config.include["comments"],
     tiers: config["support.data"].browserObtainedValues.tiers
   };
@@ -246,7 +250,7 @@ function IncludeBox() {
   );
 
   return useMemo(() => {
-    const { tiers, postsPublished } = state;
+    const { tiers, postsPublished, productsPublished } = state;
 
     const postsPublishedAfterPicker = (
       <Form.Control
@@ -270,6 +274,34 @@ function IncludeBox() {
         onChange={(e) =>
           setConfigValue("include", "posts.published", {
             ...state.postsPublished,
+            before: e.currentTarget.value
+          })
+        }
+      />
+    );
+
+    const productsPublishedAfterPicker = (
+      <Form.Control
+        type="datetime-local"
+        size="sm"
+        value={productsPublished.after}
+        onChange={(e) =>
+          setConfigValue("include", "products.published", {
+            ...state.productsPublished,
+            after: e.currentTarget.value
+          })
+        }
+      />
+    );
+
+    const productsPublishedBeforePicker = (
+      <Form.Control
+        type="datetime-local"
+        size="sm"
+        value={productsPublished.before}
+        onChange={(e) =>
+          setConfigValue("include", "products.published", {
+            ...state.productsPublished,
             before: e.currentTarget.value
           })
         }
@@ -342,6 +374,12 @@ function IncludeBox() {
               helpTooltip="Download all media variants."
               helpHasMoreInfo
               ariaLabel="Download all media variants"
+            />
+            <CheckboxRow
+              config={["include", "media.thumbnails"]}
+              label="Media thumbnails"
+              helpTooltip="Download media thumbnails."
+              ariaLabel="Download media thumbnails"
             />
             <Row className="py-1">
               <Col xs={4}>Filter by filename:</Col>
@@ -480,6 +518,63 @@ function IncludeBox() {
               helpTooltip="Download comments"
               ariaLabel="Download comments"
             />
+          </Container>
+        </Tab>
+
+        <Tab className="pb-2" eventKey="include-products" title="Products">
+          <Container fluid>
+            <Row className="py-1">
+              <Col xs={4}>Published:</Col>
+              <Col>
+                <div className="d-flex align-items-center">
+                  <Form.Select
+                    size="sm"
+                    value={state.productsPublished.type}
+                    onChange={(e) =>
+                      setConfigValue("include", "products.published", {
+                        ...state.productsPublished,
+                        type: e.currentTarget
+                          .value as unknown as UIConfig["include"]["products.published"]["type"]
+                      })
+                    }
+                    aria-label="Include products by publish date"
+                  >
+                    <option value="anytime">Any time</option>
+                    <option value="after">After</option>
+                    <option value="before">Before</option>
+                    <option value="between">Between</option>
+                  </Form.Select>
+                  <HelpIcon
+                    className="ms-2"
+                    tooltip="Restrict products downloaded by publish date."
+                  />
+                </div>
+                <div
+                  className="py-2"
+                  hidden={state.productsPublished.type === "anytime"}
+                >
+                  {state.productsPublished.type === "after" ?
+                    productsPublishedAfterPicker
+                  : state.productsPublished.type === "before" ?
+                    productsPublishedBeforePicker
+                  : <>
+                      <InputGroup size="sm" className="mb-2">
+                        <InputGroup.Text id="inputGroup-sizing-sm">
+                          From
+                        </InputGroup.Text>
+                        {productsPublishedAfterPicker}
+                      </InputGroup>
+                      <InputGroup size="sm" className="mb-2">
+                        <InputGroup.Text id="inputGroup-sizing-sm">
+                          To
+                        </InputGroup.Text>
+                        {productsPublishedBeforePicker}
+                      </InputGroup>
+                    </>
+                  }
+                </div>
+              </Col>
+            </Row>
           </Container>
         </Tab>
       </Tabs>

@@ -19,6 +19,7 @@ import {
   VIMEO_HELPER_SCRIPT_PATH
 } from "./Constants";
 import { Shescape } from "shescape";
+import { getErrorString } from "../common/util/Misc";
 
 const shescape = new Shescape({
   shell: process.platform === "darwin" ? "zsh" : true
@@ -32,6 +33,8 @@ export function convertUIConfigToPatreonDLOptions(
   if (!targetURL) {
     throw Error("No target URL");
   }
+
+  const bootstrapData = uiConfig["support.data"].bootstrapData;
 
   const fileConfig = convertUIConfigToFileContents(uiConfig, extra);
 
@@ -73,6 +76,7 @@ export function convertUIConfigToPatreonDLOptions(
       contentMedia: fromCustomSelectionValue(uiConfig.include["content.media"]),
       previewMedia: fromCustomSelectionValue(uiConfig.include["preview.media"]),
       allMediaVariants: uiConfig.include["all.media.variants"],
+      mediaThumbnails: uiConfig.include["media.thumbnails"],
       mediaByFilename: {
         images: fileConfig.include["images.by.filename"],
         audio: fileConfig.include["audio.by.filename"],
@@ -85,6 +89,10 @@ export function convertUIConfigToPatreonDLOptions(
       postsPublished: {
         after: toDateTime(fileConfig.include["posts.published.after"]),
         before: toDateTime(fileConfig.include["posts.published.before"])
+      },
+      productsPublished: {
+        after: toDateTime(fileConfig.include["products.published.after"]),
+        before: toDateTime(fileConfig.include["products.published.before"])
       },
       comments: uiConfig.include.comments
     },
@@ -174,6 +182,7 @@ export function convertUIConfigToPatreonDLOptions(
 
   return {
     targetURL,
+    bootstrapData,
     downloaderOptions,
     consoleLogger,
     fileLogger,
@@ -198,7 +207,7 @@ function toDateTime(value: string): DateTime | null {
     return DateTime.from(value);
   } catch (error: unknown) {
     console.error(
-      `Could not convert "${value}" to DateTime: ${error instanceof Error ? error.message : error}`
+      `Could not convert "${value}" to DateTime: ${getErrorString(error)}`
     );
     return null;
   }

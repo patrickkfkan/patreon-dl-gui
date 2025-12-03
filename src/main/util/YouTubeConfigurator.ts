@@ -3,6 +3,7 @@ import fs from "fs-extra";
 import { YouTubeCredentialsCapturer } from "patreon-dl";
 import { EventEmitter } from "events";
 import { APP_DATA_PATH } from "../../common/Constants";
+import { getErrorString } from "../../common/util/Misc";
 
 export const YT_CREDS_PATH = path.join(
   APP_DATA_PATH,
@@ -53,11 +54,11 @@ export default class YouTubeConfigurator extends EventEmitter {
       } catch (error: unknown) {
         console.error(
           `Error saving credentials to "${YT_CREDS_PATH}": `,
-          error instanceof Error ? error.message : error
+          getErrorString(error)
         );
         this.emit("end", {
           status: "error",
-          error: error instanceof Error ? error.message : String(error)
+          error: getErrorString(error)
         });
       } finally {
         this.endConnect();
@@ -78,7 +79,7 @@ export default class YouTubeConfigurator extends EventEmitter {
     } catch (error: unknown) {
       console.error(
         `Error deleting YouTube credentials file "${YT_CREDS_PATH}`,
-        error instanceof Error ? error.message : error
+        getErrorString(error)
       );
     }
   }
