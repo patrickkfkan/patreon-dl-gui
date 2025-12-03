@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { APP_DATA_PATH } from "../../common/Constants";
+import { getErrorString } from "../../common/util/Misc";
 
 const MAX_ENTRIES = 10;
 
@@ -41,7 +42,7 @@ export default class RecentDocuments {
     } catch (error: unknown) {
       console.error(
         "Failed to load recent documents:",
-        error instanceof Error ? error.message : String(error)
+        getErrorString(error)
       );
     } finally {
       this.#dataFilePath = filePath;
@@ -56,7 +57,7 @@ export default class RecentDocuments {
     } catch (error: unknown) {
       console.error(
         "Failed to write recent documents to file:",
-        error instanceof Error ? error.message : String(error)
+        getErrorString(error)
       );
     }
   }

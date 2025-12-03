@@ -130,23 +130,10 @@ const config: ForgeConfig = {
         if (!fs.existsSync(appDir)) {
           fs.mkdirSync(appDir, { recursive: true });
         }
-        // The "overrides" section is to lock puppeteer version to 24.19.0.
-        // As of this comment, the latest version 24.29.1 will trigger
-        // Cloudflare response when patreon-dl fetches page with Puppeteer.
-        // Something has changed which caused Cloudflare to reject the puppeteer
-        // setup with user-agent set by patreon-dl. Removing the custom
-        // user-agent in patreon-dl seems to resolve this but, until we
-        // have an updated version of patreon-dl, we can work around this by
-        // locking the puppeteer version.
         fs.writeFileSync(`${appDir}/package.json`, JSON.stringify({
           dependencies: {
             "undici": "^6.21.3",
-            "patreon-dl": "^3.4.0"
-          },
-          "overrides": {
-            "patreon-dl": {
-              "puppeteer": "24.19.0"
-            }
+            "patreon-dl": "^3.5.0"
           }
         }, null, 2));
         execSync('npm install --omit=dev', { cwd: appDir, stdio: 'inherit' });

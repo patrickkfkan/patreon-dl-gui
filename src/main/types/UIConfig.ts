@@ -1,4 +1,4 @@
-import type { FileExistsAction, LogLevel, StopOnCondition } from "patreon-dl";
+import type { FileExistsAction, LogLevel, PostDownloaderBootstrapData, ProductDownloaderBootstrapData, StopOnCondition } from "patreon-dl";
 import type { ObjectKeysByValueType } from "../../common/types/Utility";
 
 export interface Tier {
@@ -13,6 +13,7 @@ export interface PageInfo {
   tiers: Tier[] | null;
   cookie: string | null;
   cookieDescription: string;
+  bootstrapData: PostDownloaderBootstrapData | ProductDownloaderBootstrapData | null;
 }
 
 export interface BrowserObtainableInput {
@@ -51,7 +52,7 @@ export interface UIConfig {
     "path.to.deno": string;
     "max.video.resolution": MaxVideoResolution;
     "use.status.cache": boolean;
-    "stop.on": StopOnCondition;
+    "stop.on": Exclude<StopOnCondition, "postPreviouslyDownloaded" | "postPublishDateOutOfRange">;
     "no.prompt": boolean;
     "dry.run": boolean;
   };
@@ -74,6 +75,7 @@ export interface UIConfig {
     >;
     "preview.media": CustomSelectionValue<boolean, "image" | "video" | "audio">;
     "all.media.variants": boolean;
+    "media.thumbnails": boolean;
     "images.by.filename": string;
     "audio.by.filename": string;
     "attachments.by.filename": string;
@@ -83,6 +85,11 @@ export interface UIConfig {
       "image" | "video" | "audio" | "attachment" | "podcast"
     >;
     "posts.published": {
+      type: "anytime" | "after" | "before" | "between";
+      after: string;
+      before: string;
+    };
+    "products.published": {
       type: "anytime" | "after" | "before" | "between";
       after: string;
       before: string;
@@ -144,6 +151,9 @@ export interface UIConfig {
       url: string;
       rejectUnauthorizedTLS: boolean;
     };
+    bootstrapData: PostDownloaderBootstrapData
+      | ProductDownloaderBootstrapData
+      | null;
   };
 }
 

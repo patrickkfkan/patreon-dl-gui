@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import { APP_DATA_PATH } from "../../common/Constants";
 import type { Server } from "../types/Server";
+import { getErrorString } from "../../common/util/Misc";
 
 const SERVERS_FILE_PATH = path.join(APP_DATA_PATH, "/Servers.json");
 
@@ -32,7 +33,7 @@ export function getServers(): Server[] {
   } catch (error: unknown) {
     console.error(
       "Failed to read servers file:",
-      error instanceof Error ? error.message : String(error)
+      getErrorString(error)
     );
     return [];
   }
@@ -44,7 +45,7 @@ export function saveServers(servers: Server[]) {
   } catch (error: unknown) {
     console.error(
       "Failed to write to servers file:",
-      error instanceof Error ? error.message : String(error)
+      getErrorString(error)
     );
   }
 }
