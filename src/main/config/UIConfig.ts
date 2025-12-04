@@ -37,12 +37,24 @@ function convertPatreonDLOptionsToUIConfig(
   const postsPublishedBefore = __convertPublishDate(
     p.include.postsPublished.before
   );
+  const productsPublishedAfter = __convertPublishDate(
+    p.include.productsPublished.after
+  );
+  const productsPublishedBefore = __convertPublishDate(
+    p.include.productsPublished.before
+  );
   let maxVideoResolution: MaxVideoResolution;
   try {
     maxVideoResolution = normalizeMaxVideoResolution(p.maxVideoResolution);
   } catch (_) {
     maxVideoResolution = "none";
   }
+
+  // Ensure deprecated stopOn values not used
+  const stopOn = p.stopOn === 'postPreviouslyDownloaded' ? 'previouslyDownloaded'
+    : p.stopOn === 'postPublishDateOutOfRange' ? 'publishDateOutOfRange'
+    : p.stopOn;
+
   const conf: UIConfig = {
     downloader: {
       target: {
@@ -59,7 +71,7 @@ function convertPatreonDLOptionsToUIConfig(
       "path.to.deno": p.pathToDeno || "",
       "max.video.resolution": maxVideoResolution,
       "use.status.cache": p.useStatusCache,
-      "stop.on": p.stopOn,
+      "stop.on": stopOn,
       "no.prompt": false,
       "dry.run": p.dryRun
     },
@@ -97,6 +109,7 @@ function convertPatreonDLOptionsToUIConfig(
           : p.include.previewMedia
       },
       "all.media.variants": p.include.allMediaVariants,
+      "media.thumbnails": p.include.mediaThumbnails,
       "images.by.filename": p.include.mediaByFilename.images || "",
       "audio.by.filename": p.include.mediaByFilename.audio || "",
       "attachments.by.filename": p.include.mediaByFilename.attachments || "",
@@ -122,6 +135,15 @@ function convertPatreonDLOptionsToUIConfig(
           : "anytime",
         after: postsPublishedAfter,
         before: postsPublishedBefore
+      },
+      "products.published": {
+        type:
+          productsPublishedAfter && productsPublishedBefore ? "between"
+          : productsPublishedAfter ? "after"
+          : productsPublishedBefore ? "before"
+          : "anytime",
+        after: productsPublishedAfter,
+        before: productsPublishedBefore
       },
       comments: p.include.comments
     },
@@ -179,7 +201,8 @@ function convertPatreonDLOptionsToUIConfig(
       appliedProxySettings: {
         url: p.request.proxy?.url ?? "",
         rejectUnauthorizedTLS: p.request.proxy?.rejectUnauthorizedTLS ?? true
-      }
+      },
+      bootstrapData: null
     }
   };
   for (const { provider, exec } of p.embedDownloaders) {

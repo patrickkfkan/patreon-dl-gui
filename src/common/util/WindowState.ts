@@ -1,6 +1,7 @@
 import { APP_DATA_PATH } from "../Constants";
 import path from "path";
 import fs from "fs-extra";
+import { getErrorString } from "./Misc";
 
 export interface WindowState {
   size: { width: number; height: number };
@@ -28,7 +29,7 @@ class CachedWindowStates {
       } catch (error: unknown) {
         console.error(
           `Failed to load last window states from "${WINDOW_STATE_FILE_PATH}":`,
-          error instanceof Error ? error.message : String(error)
+          getErrorString(error)
         );
       }
     }
@@ -71,7 +72,7 @@ export function saveWindowState<T extends WindowState>(
   } catch (error: unknown) {
     console.error(
       `Failed to write ${windowName} window state to file:`,
-      error instanceof Error ? error.message : String(error)
+      getErrorString(error)
     );
   }
 }

@@ -23,6 +23,7 @@ import { existsSync } from "fs";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { normalizeMaxVideoResolution } from "../util/Config";
+import { getErrorString } from "../../common/util/Misc";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -228,7 +229,7 @@ function toDateTimePickerValue(value: string): ParseValueResult<string> {
       messages: [
         {
           type: "error",
-          text: `Error parsing date value "${value}": ${error instanceof Error ? error.message : error}`
+          text: `Error parsing date value "${value}": ${getErrorString(error)}`
         }
       ]
     };
@@ -250,7 +251,7 @@ function toMaxVideoResolution(
       messages: [
         {
           type: "warn",
-          text: error instanceof Error ? error.message : String(error)
+          text: getErrorString(error)
         }
       ]
     };
@@ -323,11 +324,7 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
       alerts: [
         {
           type: "error",
-          text: `Could not load config from "${filePath}": ${
-            error instanceof Error ? error.message
-            : typeof error === "object" ? JSON.stringify(error)
-            : error
-          }`
+          text: `Could not load config from "${filePath}": ${getErrorString(error)}`
         }
       ]
     };
@@ -437,6 +434,26 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
     return result;
   };
 
+  let stopOn = __fromFileConfigValue(
+    "downloader",
+    "stop.on",
+    defaultConfig.downloader["stop.on"],
+    (value) =>
+      toOneOf<StopOnCondition>(value, [
+        "never",
+        "previouslyDownloaded",
+        "publishDateOutOfRange",
+        "postPreviouslyDownloaded",
+        "postPublishDateOutOfRange"
+      ])
+  );
+  if (stopOn === "postPreviouslyDownloaded") {
+    stopOn = "previouslyDownloaded";
+  }
+  else if (stopOn === "postPublishDateOutOfRange") {
+    stopOn = "publishDateOutOfRange";
+  }
+
   const config: UIConfig = {
     downloader: {
       target: __fromFileConfigValue(
@@ -475,17 +492,7 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         defaultConfig.downloader["use.status.cache"],
         toBoolean
       ),
-      "stop.on": __fromFileConfigValue(
-        "downloader",
-        "stop.on",
-        defaultConfig.downloader["stop.on"],
-        (value) =>
-          toOneOf<StopOnCondition>(value, [
-            "never",
-            "postPreviouslyDownloaded",
-            "postPublishDateOutOfRange"
-          ])
-      ),
+      "stop.on": stopOn,
       "no.prompt": __fromFileConfigValue(
         "downloader",
         "no.prompt",
@@ -614,6 +621,12 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         defaultConfig.include["all.media.variants"],
         toBoolean
       ),
+      "media.thumbnails": __fromFileConfigValue(
+        "include",
+        "media.thumbnails",
+        defaultConfig.include["media.thumbnails"],
+        toBoolean
+      ),
       "images.by.filename": __fromFileConfigValue(
         "include",
         "images.by.filename",
@@ -683,6 +696,46 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
           };
           const after = __parseDate("posts.published.after");
           const before = __parseDate("posts.published.before");
+          let type: "anytime" | "after" | "before" | "between";
+          if (after && before) {
+            type = "between";
+          } else if (after) {
+            type = "after";
+          } else if (before) {
+            type = "before";
+          } else {
+            type = "anytime";
+          }
+          return {
+            result: { type, after, before },
+            hasError: false,
+            messages: rmsg
+          };
+        }
+      ),
+      "products.published": __fromFileConfigValues(
+        "include",
+        ["products.published.after", "products.published.before"],
+        defaultConfig.include["products.published"],
+        (values) => {
+          const rmsg: Partial<Record<keyof typeof values, AlertMessage[]>> = {};
+          const __parseDate = (key: keyof typeof values) => {
+            if (values[key]) {
+              const { result, hasError, messages } = toDateTimePickerValue(
+                values[key]
+              );
+              if (messages) {
+                rmsg[key] = messages;
+              }
+              if (hasError) {
+                return "";
+              }
+              return result;
+            }
+            return "";
+          };
+          const after = __parseDate("products.published.after");
+          const before = __parseDate("products.published.before");
           let type: "anytime" | "after" | "before" | "between";
           if (after && before) {
             type = "between";
@@ -923,7 +976,8 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         url: defaultConfig["request"]["proxy.url"],
         rejectUnauthorizedTLS:
           defaultConfig["request"]["proxy.reject.unauthorized.tls"]
-      }
+      },
+      bootstrapData: null
     }
   };
 
@@ -964,7 +1018,7 @@ function parseURL(value: string): ParseValueResult<string> {
       messages: [
         {
           type: "error",
-          text: `Error parsing URL "${value}": ${error instanceof Error ? error.message : error}`
+          text: `Error parsing URL "${value}": ${getErrorString(error)}`
         }
       ]
     };

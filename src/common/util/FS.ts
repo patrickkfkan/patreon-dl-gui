@@ -3,6 +3,7 @@ import type electron from "electron";
 import { dialog } from "electron";
 import fs from "fs";
 import { APP_DATA_PATH } from "../Constants";
+import { getErrorString } from "./Misc";
 
 export type FSChooserResult =
   | {
@@ -39,7 +40,7 @@ export function ensureAppDataPath() {
     } catch (error: unknown) {
       console.error(
         `Failed to create app data path "${APP_DATA_PATH}":`,
-        error instanceof Error ? error.message : String(error)
+        getErrorString(error)
       );
     }
   }
