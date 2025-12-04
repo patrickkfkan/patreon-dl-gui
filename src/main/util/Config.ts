@@ -1,6 +1,7 @@
 import { FileLogger } from "patreon-dl";
 import { MAX_VIDEO_RESOLUTIONS } from "../Constants";
 import { type MaxVideoResolution } from "../types/UIConfig";
+import { getErrorString } from "../../common/util/Misc";
 
 export type ValidateProxyURLResult =
   | {
@@ -32,7 +33,7 @@ export function validateProxyURL(url: string): ValidateProxyURLResult {
   } catch (error: unknown) {
     return {
       isValid: false,
-      error: error instanceof Error ? error.message : String(error)
+      error: getErrorString(error)
     };
   }
 }

@@ -8,6 +8,7 @@ import dateFormat from "dateformat";
 import { EOL } from "os";
 import { openSync, writeSync } from "fs";
 import type { SaveFileConfigResult } from "../types/MainEvents";
+import { getErrorString } from "../../common/util/Misc";
 
 const TRUE_STRING = "1";
 const FALSE_STRING = "0";
@@ -29,6 +30,22 @@ export function convertUIConfigToFileContents(
     case "between":
       postsPublishedAfter = getDateTimePickerValue(postsPublished.after);
       postsPublishedBefore = getDateTimePickerValue(postsPublished.before);
+      break;
+  }
+
+  const productsPublished = config.include["products.published"];
+  let productsPublishedAfter = "",
+    productsPublishedBefore = "";
+  switch (productsPublished.type) {
+    case "after":
+      productsPublishedAfter = getDateTimePickerValue(productsPublished.after);
+      break;
+    case "before":
+      productsPublishedBefore = getDateTimePickerValue(productsPublished.before);
+      break;
+    case "between":
+      productsPublishedAfter = getDateTimePickerValue(productsPublished.after);
+      productsPublishedBefore = getDateTimePickerValue(productsPublished.before);
       break;
   }
 
@@ -86,12 +103,17 @@ export function convertUIConfigToFileContents(
       ),
       "posts.published.after": postsPublishedAfter,
       "posts.published.before": postsPublishedBefore,
+      "products.published.after": productsPublishedAfter,
+      "products.published.before": productsPublishedBefore,
       "campaign.info": booleanToString(config.include["campaign.info"]),
       "content.info": booleanToString(config.include["content.info"]),
       "content.media": getCustomSelectionValue(config.include["content.media"]),
       "preview.media": getCustomSelectionValue(config.include["preview.media"]),
       "all.media.variants": booleanToString(
         config.include["all.media.variants"]
+      ),
+      "media.thumbnails": booleanToString(
+        config.include["media.thumbnails"]
       ),
       "images.by.filename": config.include["images.by.filename"].trim(),
       "audio.by.filename": config.include["audio.by.filename"].trim(),
@@ -251,7 +273,7 @@ export function saveFileConfig(
   } catch (error: unknown) {
     return {
       hasError: true,
-      error: `Error writing config to "${config.filePath}": ${error instanceof Error ? error.message : error}`
+      error: `Error writing config to "${config.filePath}": ${getErrorString(error)}`
     };
   }
 }

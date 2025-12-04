@@ -75,12 +75,12 @@ function DownloadBox() {
               options={[
                 { label: "None (run till the end)", value: "never" },
                 {
-                  label: "Previously downloaded post encountered",
-                  value: "postPreviouslyDownloaded"
+                  label: "Previously downloaded item encountered",
+                  value: "previouslyDownloaded"
                 },
                 {
-                  label: "Publish date of post out of specified range",
-                  value: "postPublishDateOutOfRange"
+                  label: "Publish date of item out of specified range",
+                  value: "publishDateOutOfRange"
                 }
               ]}
               helpTooltip="When to stop the downloader."

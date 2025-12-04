@@ -7,6 +7,7 @@ import type { WebBrowserPageNavigatedInfo } from "../../types/MainEvents";
 import normalizeUrl from "normalize-url";
 import { anonymizeProxy, closeAnonymizedProxy } from "proxy-chain";
 import portfinder from "portfinder";
+import { PostDownloaderBootstrapData, ProductDownloaderBootstrapData } from "patreon-dl/dist";
 
 export default class WebBrowserView extends WebContentsView {
   static #userAgent: string = "";
@@ -47,9 +48,17 @@ export default class WebBrowserView extends WebContentsView {
     await this.webContents.loadURL(url);
   }
 
+  #normalizeNavigatedURL(url: string) {
+    try {
+      return normalizeUrl(url, { defaultProtocol: "https" });
+    } catch {
+      return url;
+    }
+  }
+
   async gotoURL(url: string) {
     try {
-      await this.#loadURL(normalizeUrl(url, { defaultProtocol: "https" }));
+      await this.#loadURL(this.#normalizeNavigatedURL(url));
     } catch (_error) {
       // Do nothing - let errors be shown within the page
     }
@@ -123,6 +132,7 @@ export default class WebBrowserView extends WebContentsView {
           return;
         }
       }
+      const normalizedNavigatedURL = this.#normalizeNavigatedURL(url);
       if (this.#isCloudflareChallengePage(url)) {
         console.debug(
           `WebBrowserView: detected Cloudflare challenge page, skipping analysis`
@@ -133,9 +143,12 @@ export default class WebBrowserView extends WebContentsView {
         return;
       }
       console.debug(`WebBrowserView: target changed: ${url}`);
-      if (this.#lastLoadedURL !== null && this.#lastLoadedURL !== url) {
+      if (
+        this.#lastLoadedURL !== null &&
+        this.#lastLoadedURL !== normalizedNavigatedURL
+      ) {
         e.preventDefault();
-        this.#lastLoadedURL = url;
+        this.#lastLoadedURL = normalizedNavigatedURL;
         console.debug(
           `WebBrowserView: reloading page to get updated bootstrap data...`
         );
@@ -177,14 +190,14 @@ export default class WebBrowserView extends WebContentsView {
         }
         console.error(`Failed to obtain boostrap data from "${url}":`, error);
       } finally {
-        this.#lastLoadedURL = url;
+        this.#lastLoadedURL = normalizedNavigatedURL;
         this.#analyzePageAbortController = null;
       }
     });
     this.webContents.on("did-create-window", async (win, details) => {
       if (details.url.startsWith(PATREON_URL)) {
         win.close();
-        this.#lastLoadedURL = details.url;
+        this.#lastLoadedURL = this.#normalizeNavigatedURL(details.url);
         await this.#loadURL(details.url);
       }
     });
@@ -222,7 +235,8 @@ export default class WebBrowserView extends WebContentsView {
         status: "complete",
         normalizedURL: null,
         target: null,
-        tiers: null
+        tiers: null,
+        campaignId: null
       },
       await this.#getCookie()
     );
@@ -316,13 +330,93 @@ export default class WebBrowserView extends WebContentsView {
     analysis: PatreonPageAnalysis & { status: "complete" },
     cookie: string
   ) {
+    let bootstrapData: PostDownloaderBootstrapData | ProductDownloaderBootstrapData | null = null;
+    switch (analysis.target?.type) {
+      case 'post': {
+        bootstrapData = {
+          type: 'post',
+          targetURL: analysis.normalizedURL || '',
+          postFetch: {
+            type: 'single',
+            postId: analysis.target.postId
+          }
+        };
+        break;
+      }
+      case 'postsByUser': {
+        bootstrapData = {
+          type: 'post',
+          targetURL: analysis.normalizedURL || '',
+          postFetch: {
+            type: 'byUser',
+            vanity: analysis.target.vanity,
+            campaignId: analysis.campaignId || undefined
+          }
+        };
+        break;
+      }
+      case 'postsByUserId': {
+        bootstrapData = {
+          type: 'post',
+          targetURL: analysis.normalizedURL || '',
+          postFetch: {
+            type: 'byUserId',
+            userId: analysis.target.userId,
+            campaignId: analysis.campaignId || undefined
+          }
+        };
+        break;
+      }
+      case 'postsByCollection': {
+        bootstrapData = {
+          type: 'post',
+          targetURL: analysis.normalizedURL || '',
+          postFetch: {
+            type: 'byCollection',
+            collectionId: analysis.target.collectionId,
+            campaignId: analysis.campaignId || undefined,
+            filters: {
+              'collection_id': analysis.target.collectionId
+            }
+          }
+        };
+        break;
+      }
+      case 'product': {
+        bootstrapData = {
+          type: 'product',
+          targetURL: analysis.normalizedURL || '',
+          productFetch: {
+            type: 'single',
+            productId: analysis.target.productId,
+          }
+        };
+        break;
+      }
+      case 'shop': {
+        bootstrapData = {
+          type: 'product',
+          targetURL: analysis.normalizedURL || '',
+          productFetch: {
+            type: 'byShop',
+            vanity: analysis.target.vanity,
+            campaignId: analysis.campaignId || undefined
+          }
+        };
+        break;
+      }
+    }
+
+    console.debug('WebBrowserView: bootstrapData:', bootstrapData);
+
     this.emitWebBrowserViewEvent("pageInfo", {
       url: analysis.normalizedURL || null,
       title: this.webContents.getTitle(),
       pageDescription: analysis.target?.description || "No target identified",
       cookie,
       cookieDescription: cookie || "No cookie found",
-      tiers: analysis?.tiers || null
+      tiers: analysis.tiers || null,
+      bootstrapData
     });
   }
 

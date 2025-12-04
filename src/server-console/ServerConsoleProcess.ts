@@ -19,6 +19,7 @@ import {
   getStartableServerListEntryIds,
   getStoppableServerListEntryIds
 } from "./util/Server";
+import { getErrorString } from "../common/util/Misc";
 
 const processArgs = parseArgs(process.argv);
 
@@ -254,7 +255,7 @@ export default class ServerConsoleProcess extends ProcessBase<"serverConsole"> {
         server: entry.server,
         status: "error",
         action: "start",
-        message: error instanceof Error ? error.message : String(error)
+        message: getErrorString(error)
       };
     } finally {
       this.#emitServerListUpdate();
@@ -287,7 +288,7 @@ export default class ServerConsoleProcess extends ProcessBase<"serverConsole"> {
         server: entry.server,
         status: "error",
         action: "stop",
-        message: error instanceof Error ? error.message : String(error)
+        message: getErrorString(error)
       };
     } finally {
       this.#emitServerListUpdate();
