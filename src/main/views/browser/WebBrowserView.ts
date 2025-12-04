@@ -48,9 +48,17 @@ export default class WebBrowserView extends WebContentsView {
     await this.webContents.loadURL(url);
   }
 
+  #normalizeNavigatedURL(url: string) {
+    try {
+      return normalizeUrl(url, { defaultProtocol: "https" });
+    } catch {
+      return url;
+    }
+  }
+
   async gotoURL(url: string) {
     try {
-      await this.#loadURL(normalizeUrl(url, { defaultProtocol: "https" }));
+      await this.#loadURL(this.#normalizeNavigatedURL(url));
     } catch (_error) {
       // Do nothing - let errors be shown within the page
     }
@@ -124,6 +132,7 @@ export default class WebBrowserView extends WebContentsView {
           return;
         }
       }
+      const normalizedNavigatedURL = this.#normalizeNavigatedURL(url);
       if (this.#isCloudflareChallengePage(url)) {
         console.debug(
           `WebBrowserView: detected Cloudflare challenge page, skipping analysis`
@@ -134,9 +143,12 @@ export default class WebBrowserView extends WebContentsView {
         return;
       }
       console.debug(`WebBrowserView: target changed: ${url}`);
-      if (this.#lastLoadedURL !== null && this.#lastLoadedURL !== url) {
+      if (
+        this.#lastLoadedURL !== null &&
+        this.#lastLoadedURL !== normalizedNavigatedURL
+      ) {
         e.preventDefault();
-        this.#lastLoadedURL = url;
+        this.#lastLoadedURL = normalizedNavigatedURL;
         console.debug(
           `WebBrowserView: reloading page to get updated bootstrap data...`
         );
@@ -178,14 +190,14 @@ export default class WebBrowserView extends WebContentsView {
         }
         console.error(`Failed to obtain boostrap data from "${url}":`, error);
       } finally {
-        this.#lastLoadedURL = url;
+        this.#lastLoadedURL = normalizedNavigatedURL;
         this.#analyzePageAbortController = null;
       }
     });
     this.webContents.on("did-create-window", async (win, details) => {
       if (details.url.startsWith(PATREON_URL)) {
         win.close();
-        this.#lastLoadedURL = details.url;
+        this.#lastLoadedURL = this.#normalizeNavigatedURL(details.url);
         await this.#loadURL(details.url);
       }
     });
