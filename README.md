@@ -117,6 +117,7 @@ The following table lists the version of `patreon-dl` used by each version of `p
 | v2.4.1                   | v3.2.1                    |
 | v2.4.2                   | v3.3.1                    |
 | v2.5.0                   | v3.4.0                    |
+| v2.6.0                   | v3.5.0                    |
 
 ## Running / packaging the app from source
 
@@ -141,6 +142,15 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.6.0
+- Update `patreon-dl` library to v3.5.0:
+  - Support downloading all products from a creator's shop.
+  - Save Collection info when downloading posts; enable browsing posts by collection.
+  - Add search functionality in Browse.
+  - Save post tags; enable filtering posts by tag.
+  - Add `Media thumbnails` option to `Include -> General` tab.
+- Centralize URL normalization ([@wallstop](https://github.com/wallstop) - [#36](https://github.com/patrickkfkan/patreon-dl-gui/pull/36))
 
 v2.5.0
 - Update `patreon-dl` library to v3.4.0
