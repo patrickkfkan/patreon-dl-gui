@@ -5,7 +5,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["src/resources/patreon-dl-vimeo.js"]
+    ignores: ["src/resources/patreon-dl-embed.js"]
   },
   eslint.configs.recommended,
   tseslint.configs.recommended,

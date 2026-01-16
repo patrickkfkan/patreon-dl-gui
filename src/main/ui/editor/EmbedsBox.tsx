@@ -13,6 +13,7 @@ import { useEditor } from "../contexts/EditorContextProvider";
 interface EmbedsBoxState {
   embedDownloaderYouTube: UIConfig["embed.downloader.youtube"];
   embedDownloaderVimeo: UIConfig["embed.downloader.vimeo"];
+  embedDownloaderSproutVideo: UIConfig["embed.downloader.sproutvideo"];
   connectYouTube: UIConfig["patreon.dl.gui"]["connect.youtube"];
 }
 
@@ -22,6 +23,7 @@ function getEmbedsBoxState(config: UIConfig): EmbedsBoxState {
   const state: EmbedsBoxState = {
     embedDownloaderYouTube: config["embed.downloader.youtube"],
     embedDownloaderVimeo: config["embed.downloader.vimeo"],
+    embedDownloaderSproutVideo: config["embed.downloader.sproutvideo"],
     connectYouTube: config["patreon.dl.gui"]["connect.youtube"]
   };
   if (oldState && _.isEqual(oldState, state)) {
@@ -104,7 +106,7 @@ function EmbedsBox() {
   }, [youtubeConnectionStatus]);
 
   return useMemo(() => {
-    const { embedDownloaderYouTube, embedDownloaderVimeo } = state;
+    const { embedDownloaderYouTube, embedDownloaderVimeo, embedDownloaderSproutVideo } = state;
     return (
       <Tabs
         defaultActiveKey="embed-downloader-youtube"
@@ -189,6 +191,53 @@ function EmbedsBox() {
                 label="External command"
                 insertables={EXEC_INSERTABLES}
                 helpTooltip="Command to download embedded Vimeo videos."
+                helpHasMoreInfo
+              />
+            : null}
+          </Container>
+        </Tab>
+        <Tab className="pb-2" eventKey="embed-downloader-sproutvideo" title="SproutVideo">
+          <Container fluid>
+            <SelectRow
+              config={["embed.downloader.sproutvideo", "type"]}
+              label="Download method"
+              options={[
+                {
+                  value: "helper",
+                  label: "Use helper script (requires yt-dlp)"
+                },
+                { value: "custom", label: "Run external command" }
+              ]}
+              helpTooltip="Method to download embedded SproutVideo videos."
+              helpHasMoreInfo
+            />
+            {embedDownloaderSproutVideo.type === "helper" ?
+              <>
+                <TextInputRow
+                  type="file"
+                  config={["embed.downloader.sproutvideo", "helper.ytdlp.path"]}
+                  label="Path to yt-dlp"
+                  helpTooltip="Path to yt-dlp executable."
+                  helpHasMoreInfo
+                />
+                <TextInputRow
+                  config={["embed.downloader.sproutvideo", "helper.password"]}
+                  label="Private video password"
+                  helpTooltip="Password for protected SproutVideo videos"
+                />
+                <TextInputRow
+                  config={["embed.downloader.sproutvideo", "helper.ytdlp.args"]}
+                  label="yt-dlp args"
+                  helpTooltip="Command-line options to pass directly to yt-dlp"
+                />
+              </>
+            : null}
+            {embedDownloaderSproutVideo.type === "custom" ?
+              <TextInputRow
+                config={["embed.downloader.sproutvideo", "exec"]}
+                label="External command"
+                insertables={EXEC_INSERTABLES}
+                helpTooltip="Command to download embedded SproutVideo videos."
                 helpHasMoreInfo
               />
             : null}

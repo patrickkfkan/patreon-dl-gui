@@ -166,6 +166,13 @@ function convertPatreonDLOptionsToUIConfig(
       "helper.password": "",
       "helper.ytdlp.args": ""
     },
+    "embed.downloader.sproutvideo": {
+      type: "custom",
+      exec: "",
+      "helper.ytdlp.path": "",
+      "helper.password": "",
+      "helper.ytdlp.args": ""
+    },
     "logger.console": {
       enabled: consoleLoggerOptions.enabled,
       "log.level": consoleLoggerOptions.logLevel,
@@ -215,6 +222,9 @@ function convertPatreonDLOptionsToUIConfig(
         break;
       case "vimeo":
         conf["embed.downloader.vimeo"]["exec"] = exec;
+        break;
+      case "sproutvideo":
+        conf["embed.downloader.sproutvideo"]["exec"] = exec;
         break;
     }
   }

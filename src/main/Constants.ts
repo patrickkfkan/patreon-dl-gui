@@ -71,6 +71,7 @@ export const FILE_CONFIG_SECTION_PROPS = {
   ],
   "embed.downloader.youtube": ["exec"],
   "embed.downloader.vimeo": ["exec"],
+  "embed.downloader.sproutvideo": ["exec"],
   "logger.console": [
     "enabled",
     "log.level",
@@ -99,24 +100,43 @@ export const FILE_CONFIG_SECTION_PROPS = {
     "vimeo.downloader.type",
     "vimeo.helper.ytdlp.path",
     "vimeo.helper.password",
-    "vimeo.helper.ytdlp.args"
+    "vimeo.helper.ytdlp.args",
+    "sproutvideo.downloader.type",
+    "sproutvideo.helper.ytdlp.path",
+    "sproutvideo.helper.password",
+    "sproutvideo.helper.ytdlp.args"
   ]
 } as const;
 
 const isDevMode = !app.isPackaged;
-const vimeoHelperScriptFile = `patreon-dl-vimeo${process.platform === "win32" ? ".exe" : ""}`;
+
+const vimeoHelperScriptFile = `patreon-dl-embed${process.platform === "win32" ? ".exe" : ""}`;
 export const VIMEO_HELPER_SCRIPT_PATH =
   isDevMode ?
     path.resolve(__dirname, `../../resources_out/bin/${vimeoHelperScriptFile}`)
   : path.resolve(process.resourcesPath, `bin/${vimeoHelperScriptFile}`);
 
-export const VIMEO_HELPER_SCRIPT_EXEC_ARGS = [
+const commonHelperScriptExecArgs = [
   "-o",
   `"{dest.dir}${path.sep}%(title)s.%(ext)s"`,
   "--embed-html",
   '"{embed.html}"',
   "--embed-url",
   '"{embed.url}"'
+];
+
+export const VIMEO_HELPER_SCRIPT_EXEC_ARGS = [
+  "--provider",
+  "vimeo",
+  ...commonHelperScriptExecArgs
+];
+
+export const SPROUTVIDEO_HELPER_SCRIPT_PATH = VIMEO_HELPER_SCRIPT_PATH;
+
+export const SPROUTVIDEO_HELPER_SCRIPT_EXEC_ARGS = [
+  "--provider",
+  "sproutvideo",
+  ...commonHelperScriptExecArgs
 ];
 
 export const DEFAULT_WEB_BROWSER_SETTINGS: WebBrowserSettings = {

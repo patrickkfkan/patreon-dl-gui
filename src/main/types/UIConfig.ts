@@ -115,6 +115,14 @@ export interface UIConfig {
     "helper.password": string;
     "helper.ytdlp.args": string;
   };
+  "embed.downloader.sproutvideo": {
+    type: "helper" | "custom";
+    exec: string;
+    // Helper params
+    "helper.ytdlp.path": string;
+    "helper.password": string;
+    "helper.ytdlp.args": string;
+  };
   "logger.console": {
     enabled: boolean;
     "log.level": LogLevel;

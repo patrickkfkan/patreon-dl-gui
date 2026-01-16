@@ -140,6 +140,9 @@ export function convertUIConfigToFileContents(
     "embed.downloader.vimeo": {
       exec: config["embed.downloader.vimeo"].exec.trim()
     },
+    "embed.downloader.sproutvideo": {
+      exec: config["embed.downloader.sproutvideo"].exec.trim()
+    },
     "logger.console": {
       enabled: booleanToString(config["logger.console"].enabled),
       "log.level": config["logger.console"]["log.level"],
@@ -189,7 +192,14 @@ export function convertUIConfigToFileContents(
       "vimeo.helper.password":
         config["embed.downloader.vimeo"]["helper.password"].trim() || "",
       "vimeo.helper.ytdlp.args":
-        config["embed.downloader.vimeo"]["helper.ytdlp.args"].trim() || ""
+        config["embed.downloader.vimeo"]["helper.ytdlp.args"].trim() || "",
+      "sproutvideo.downloader.type": config["embed.downloader.sproutvideo"].type,
+      "sproutvideo.helper.ytdlp.path":
+        config["embed.downloader.sproutvideo"]["helper.ytdlp.path"].trim() || "",
+      "sproutvideo.helper.password":
+        config["embed.downloader.sproutvideo"]["helper.password"].trim() || "",
+      "sproutvideo.helper.ytdlp.args":
+        config["embed.downloader.sproutvideo"]["helper.ytdlp.args"].trim() || ""
     }
   };
 

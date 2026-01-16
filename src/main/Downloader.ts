@@ -15,6 +15,8 @@ import { ChainLogger, ConsoleLogger, DateTime, FileLogger } from "patreon-dl";
 import { getDefaultFileLoggerOptions } from "./util/Config";
 import YouTubeConfigurator, { YT_CREDS_PATH } from "./util/YouTubeConfigurator";
 import {
+  SPROUTVIDEO_HELPER_SCRIPT_EXEC_ARGS,
+  SPROUTVIDEO_HELPER_SCRIPT_PATH,
   VIMEO_HELPER_SCRIPT_EXEC_ARGS,
   VIMEO_HELPER_SCRIPT_PATH
 } from "./Constants";
@@ -133,6 +135,17 @@ export function convertUIConfigToPatreonDLOptions(
       exec: uiConfig["embed.downloader.vimeo"].exec.trim()
     });
   }
+  if (uiConfig["embed.downloader.sproutvideo"].type === "helper") {
+    embedDownloaders.push({
+      provider: "sproutvideo",
+      exec: getSproutVideoHelperExec(uiConfig["embed.downloader.sproutvideo"])
+    });
+  } else if (uiConfig["embed.downloader.sproutvideo"].exec.trim()) {
+    embedDownloaders.push({
+      provider: "sproutvideo",
+      exec: uiConfig["embed.downloader.sproutvideo"].exec.trim()
+    });
+  }
   if (embedDownloaders.length > 0) {
     downloaderOptions.embedDownloaders = embedDownloaders;
   }
@@ -214,7 +227,17 @@ function toDateTime(value: string): DateTime | null {
 }
 
 function getVimeoHelperExec(config: UIConfig["embed.downloader.vimeo"]) {
-  const args = [...VIMEO_HELPER_SCRIPT_EXEC_ARGS];
+  const args = getYtdlpArgs(VIMEO_HELPER_SCRIPT_EXEC_ARGS, config);
+  return [shescape.quote(VIMEO_HELPER_SCRIPT_PATH), ...args].join(" ");
+}
+
+function getSproutVideoHelperExec(config: UIConfig["embed.downloader.sproutvideo"]) {
+  const args = getYtdlpArgs(SPROUTVIDEO_HELPER_SCRIPT_EXEC_ARGS, config);
+  return [shescape.quote(SPROUTVIDEO_HELPER_SCRIPT_PATH), ...args].join(" ");
+}
+
+function getYtdlpArgs(baseArgs: string[], config: UIConfig["embed.downloader.vimeo" | "embed.downloader.sproutvideo"]) {
+const args = [...baseArgs];
   if (config["helper.ytdlp.path"].trim()) {
     args.push("--yt-dlp", shescape.quote(config["helper.ytdlp.path"].trim()));
   }
@@ -227,7 +250,7 @@ function getVimeoHelperExec(config: UIConfig["embed.downloader.vimeo"]) {
   if (config["helper.ytdlp.args"].trim()) {
     args.push("--", config["helper.ytdlp.args"].trim());
   }
-  return [shescape.quote(VIMEO_HELPER_SCRIPT_PATH), ...args].join(" ");
+  return args;
 }
 
 function getMaxVideoResolutionValue(

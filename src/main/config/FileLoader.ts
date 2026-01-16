@@ -840,6 +840,42 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         toString
       )
     },
+    "embed.downloader.sproutvideo": {
+      type: __fromFileConfigValue(
+        "patreon.dl.gui",
+        "sproutvideo.downloader.type",
+        defaultConfig["embed.downloader.sproutvideo"]["type"],
+        (value) =>
+          toOneOf<UIConfig["embed.downloader.sproutvideo"]["type"]>(value, [
+            "helper",
+            "custom"
+          ])
+      ),
+      exec: __fromFileConfigValue(
+        "embed.downloader.sproutvideo",
+        "exec",
+        defaultConfig["embed.downloader.sproutvideo"]["exec"],
+        toString
+      ),
+      "helper.ytdlp.path": __fromFileConfigValue(
+        "patreon.dl.gui",
+        "sproutvideo.helper.ytdlp.path",
+        defaultConfig["embed.downloader.sproutvideo"]["helper.ytdlp.path"],
+        toString
+      ),
+      "helper.password": __fromFileConfigValue(
+        "patreon.dl.gui",
+        "sproutvideo.helper.password",
+        defaultConfig["embed.downloader.sproutvideo"]["helper.password"],
+        toString
+      ),
+      "helper.ytdlp.args": __fromFileConfigValue(
+        "patreon.dl.gui",
+        "sproutvideo.helper.ytdlp.args",
+        defaultConfig["embed.downloader.sproutvideo"]["helper.ytdlp.args"],
+        toString
+      )
+    },
     "logger.console": {
       enabled: __fromFileConfigValue(
         "logger.console",

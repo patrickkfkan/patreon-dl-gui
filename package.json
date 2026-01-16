@@ -6,7 +6,7 @@
   "type": "module",
   "main": ".vite/build/index.js",
   "scripts": {
-    "prepare": "tsc --noEmit && rimraf ./resources_out && npx pkg --targets node20 --out-path ./resources_out/bin ./src/resources/patreon-dl-vimeo.js",
+    "prepare": "tsc --noEmit && rimraf ./resources_out && npx pkg --targets node20 --out-path ./resources_out/bin ./src/resources/patreon-dl-embed.js",
     "start": "npm run prepare && electron-forge start",
     "package": "cross-env-shell FORGE_PHASE=package \"npm run prepare && electron-forge package\"",
     "make": "cross-env-shell FORGE_PHASE=make \"npm run prepare && electron-forge make\"",

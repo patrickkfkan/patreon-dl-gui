@@ -49,7 +49,7 @@ const config: ForgeConfig = {
         /**
          * Note: we override maker-rpm package with latest version, and set 
          * `specTemplate` to point to our custom spec file. The custom spec
-         * disables stripping of the patreon-dl-vimeo binary, which would otherwise 
+         * disables stripping of the patreon-dl-embed binary, which would otherwise 
          * throw "Pkg: Error reading from file" when executed.
          */
         specTemplate: path.join(__dirname, '/misc/rpm-spec.ejs'),
