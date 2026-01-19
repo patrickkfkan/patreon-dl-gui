@@ -13,7 +13,7 @@ An Electron app that provides a GUI for [patreon-dl](https://github.com/patrickk
   - images
   - audio
   - attachments
-  - embedded YouTube and Vimeo videos
+  - embedded videos from YouTube, Vimeo and SproutVideo
 - Save campaign and content info
 - Extensively configurable, e.g.:
   - Download only certain types of media
@@ -31,7 +31,7 @@ If you are going to download videos, you should also install [FFmpeg](https://ww
 
 #### yt-dlp
 
-If you intend to download embedded Vimeo videos, you are recommended to install [yt-dlp](https://github.com/yt-dlp/yt-dlp) and use the bundled helper script. See [Downloading embedded Vimeo videos using helper script](#downloading-embedded-vimeo-videos-using-helper-script).
+If you intend to download embedded videos from Vimeo or SproutVideo, you are recommended to install [yt-dlp](https://github.com/yt-dlp/yt-dlp) and use the bundled helper script. See [Downloading embedded videos using helper script](#downloading-embedded-videos-using-helper-script).
 
 #### Deno
 
@@ -49,11 +49,11 @@ If you intend to download embedded YouTube videos with the built-in YouTube down
 - Once a target is identified, you can configure the options to suit your needs. To get help about an option, select the "Show Help Icons" item in the Help menu.
 - To begin downloading the target, click the "play" button in the toolbar. You may also save the configuration to file and open it on another occasion.
 
-### Downloading embedded Vimeo videos using helper script
+### Downloading embedded videos using helper script
 
-`patreon-dl-gui` provides a helper script to facilitate downloading of embedded Vimeo videos. The script uses [yt-dlp](https://github.com/yt-dlp/yt-dlp) in the process. The easiest way to set things up would be to:
+`patreon-dl-gui` provides a helper script to facilitate downloading of embedded videos from Vimeo and SproutVideo. The script uses [yt-dlp](https://github.com/yt-dlp/yt-dlp) in the process. The easiest way to set things up would be to:
 1. Download a [precompiled binary](https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#release-files) of `yt-dlp` suitable for your system.
-2. Then, in `patreon-dl-gui`, go to "Embeds" -> "Vimeo".
+2. Then, in `patreon-dl-gui`, go to "Embeds -> Vimeo" / "Embeds -> SproutVideo".
 3. Select "Use helper script" for "Download method".
 4. Click the folder icon for "Path to yt-dlp" and select the downloaded binary.
 
@@ -84,7 +84,7 @@ In `patreon-dl-gui`, say you've downloaded content to destination directory "C:\
 Generally speaking, config files saved in `patreon-dl-gui` can be passed to the `patreon-dl` CLI tool without issue, subject to the following exceptions:
 
 - The "Connect to YouTube account" option found in `patreon-dl-gui` has no equivalent in `patreon-dl` CLI config. You would have to connect to your YouTube account separately through executing `patreon-dl --configure-youtube`.
-- Like `patreon-dl-gui`, `patreon-dl` provides a helper script for downloading embedded Vimeo videos, but you would have to set it up yourself in the config (see [example](https://github.com/patrickkfkan/patreon-dl/blob/23868152f3e37711e0964a7b909d2a41eb464759/example-embed.conf)).
+- Like `patreon-dl-gui`, `patreon-dl` provides helper scripts for downloading embedded videos from Vimeo and SproutVideo, but you would have to set them up yourself in the config (see [example](https://raw.githubusercontent.com/patrickkfkan/patreon-dl/refs/heads/master/example-embed.conf)).
 
 What about the other way round? You should note that the config schema accepted by `patreon-dl` CLI is broader than that for `patreon-dl-gui`. This means, if you have a config file manually created for use by `patreon-dl` CLI, opening it in `patreon-dl-gui` will not necessarily import all the options therein. In particular:
 
@@ -118,6 +118,7 @@ The following table lists the version of `patreon-dl` used by each version of `p
 | v2.4.2                   | v3.3.1                    |
 | v2.5.0                   | v3.4.0                    |
 | v2.6.0                   | v3.5.0                    |
+| v2.7.0                   | v3.6.0                    |
 
 ## Running / packaging the app from source
 
@@ -142,6 +143,10 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.7.0
+- Update `patreon-dl` library to v3.6.0 ([changelog](https://github.com/patrickkfkan/patreon-dl?tab=readme-ov-file#changelog))
+- Add SproutVideo support (requires [yt-dlp](https://github.com/yt-dlp/yt-dlp))
 
 v2.6.0
 - Update `patreon-dl` library to v3.5.0:
