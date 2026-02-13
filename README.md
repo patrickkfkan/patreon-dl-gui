@@ -119,6 +119,7 @@ The following table lists the version of `patreon-dl` used by each version of `p
 | v2.5.0                   | v3.4.0                    |
 | v2.6.0                   | v3.5.0                    |
 | v2.7.0                   | v3.6.0                    |
+| v2.7.1                   | v3.6.1                    |
 
 ## Running / packaging the app from source
 
@@ -143,6 +144,10 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.7.1
+- Update `patreon-dl` library to v3.6.1 ([changelog](https://github.com/patrickkfkan/patreon-dl?tab=readme-ov-file#changelog))
+- Fix Embedly download script error on retrying with alternative URL ([patreon-dl#118](https://github.com/patrickkfkan/patreon-dl/issues/118)).
 
 v2.7.0
 - Update `patreon-dl` library to v3.6.0 ([changelog](https://github.com/patrickkfkan/patreon-dl?tab=readme-ov-file#changelog))
