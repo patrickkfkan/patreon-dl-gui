@@ -145,6 +145,10 @@ $ npm run make
 
 ## Changelog
 
+v2.7.2
+- Fix target identification issues with "cw" pages ([#50](https://github.com/patrickkfkan/patreon-dl-gui/issues/50)).
+- Vimeo download script: include search params in player URL.
+
 v2.7.1
 - Update `patreon-dl` library to v3.6.1 ([changelog](https://github.com/patrickkfkan/patreon-dl?tab=readme-ov-file#changelog))
 - Fix Embedly download script error on retrying with alternative URL ([patreon-dl#118](https://github.com/patrickkfkan/patreon-dl/issues/118)).
