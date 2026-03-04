@@ -65,6 +65,7 @@
     "classnames": "^2.5.1",
     "configparser": "^0.3.10",
     "dateformat": "^5.0.3",
+    "entities": "^7.0.1",
     "env-paths": "^3.0.0",
     "html-entities": "^2.6.0",
     "lodash": "^4.17.21",
