@@ -231,13 +231,18 @@ function getVimeoHelperExec(config: UIConfig["embed.downloader.vimeo"]) {
   return [shescape.quote(VIMEO_HELPER_SCRIPT_PATH), ...args].join(" ");
 }
 
-function getSproutVideoHelperExec(config: UIConfig["embed.downloader.sproutvideo"]) {
+function getSproutVideoHelperExec(
+  config: UIConfig["embed.downloader.sproutvideo"]
+) {
   const args = getYtdlpArgs(SPROUTVIDEO_HELPER_SCRIPT_EXEC_ARGS, config);
   return [shescape.quote(SPROUTVIDEO_HELPER_SCRIPT_PATH), ...args].join(" ");
 }
 
-function getYtdlpArgs(baseArgs: string[], config: UIConfig["embed.downloader.vimeo" | "embed.downloader.sproutvideo"]) {
-const args = [...baseArgs];
+function getYtdlpArgs(
+  baseArgs: string[],
+  config: UIConfig["embed.downloader.vimeo" | "embed.downloader.sproutvideo"]
+) {
+  const args = [...baseArgs];
   if (config["helper.ytdlp.path"].trim()) {
     args.push("--yt-dlp", shescape.quote(config["helper.ytdlp.path"].trim()));
   }

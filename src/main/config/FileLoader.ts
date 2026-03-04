@@ -449,8 +449,7 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
   );
   if (stopOn === "postPreviouslyDownloaded") {
     stopOn = "previouslyDownloaded";
-  }
-  else if (stopOn === "postPublishDateOutOfRange") {
+  } else if (stopOn === "postPublishDateOutOfRange") {
     stopOn = "publishDateOutOfRange";
   }
 

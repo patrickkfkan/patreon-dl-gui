@@ -4,8 +4,7 @@ export function getErrorString(error: unknown): string {
       return `${error.message}: ${getErrorString(error.cause)}`;
     }
     return error.message;
-  }
-  else if (typeof error === 'object') {
+  } else if (typeof error === "object") {
     return JSON.stringify(error);
   }
   return String(error);

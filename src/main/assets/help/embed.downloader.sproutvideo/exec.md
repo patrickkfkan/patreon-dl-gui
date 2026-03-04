@@ -9,7 +9,7 @@ Fields enclosed in curly braces will be replaced with actual values at runtime. 
 | Field                | Description                                                     |
 | -------------------- | --------------------------------------------------------------- |
 | `post.id`            | ID of the post containing the embedded video.                   |
-| `embed.provider`     | Name of the provider, i.e. "SproutVideo".                             |
+| `embed.provider`     | Name of the provider, i.e. "SproutVideo".                       |
 | `embed.provider.url` | Link to the provider's site.                                    |
 | `embed.url`          | Link to the video page supplied by the provider.                |
 | `embed.subject`      | Subject of the video.                                           |

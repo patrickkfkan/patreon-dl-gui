@@ -41,11 +41,15 @@ export function convertUIConfigToFileContents(
       productsPublishedAfter = getDateTimePickerValue(productsPublished.after);
       break;
     case "before":
-      productsPublishedBefore = getDateTimePickerValue(productsPublished.before);
+      productsPublishedBefore = getDateTimePickerValue(
+        productsPublished.before
+      );
       break;
     case "between":
       productsPublishedAfter = getDateTimePickerValue(productsPublished.after);
-      productsPublishedBefore = getDateTimePickerValue(productsPublished.before);
+      productsPublishedBefore = getDateTimePickerValue(
+        productsPublished.before
+      );
       break;
   }
 
@@ -112,9 +116,7 @@ export function convertUIConfigToFileContents(
       "all.media.variants": booleanToString(
         config.include["all.media.variants"]
       ),
-      "media.thumbnails": booleanToString(
-        config.include["media.thumbnails"]
-      ),
+      "media.thumbnails": booleanToString(config.include["media.thumbnails"]),
       "images.by.filename": config.include["images.by.filename"].trim(),
       "audio.by.filename": config.include["audio.by.filename"].trim(),
       "attachments.by.filename":
@@ -193,9 +195,11 @@ export function convertUIConfigToFileContents(
         config["embed.downloader.vimeo"]["helper.password"].trim() || "",
       "vimeo.helper.ytdlp.args":
         config["embed.downloader.vimeo"]["helper.ytdlp.args"].trim() || "",
-      "sproutvideo.downloader.type": config["embed.downloader.sproutvideo"].type,
+      "sproutvideo.downloader.type":
+        config["embed.downloader.sproutvideo"].type,
       "sproutvideo.helper.ytdlp.path":
-        config["embed.downloader.sproutvideo"]["helper.ytdlp.path"].trim() || "",
+        config["embed.downloader.sproutvideo"]["helper.ytdlp.path"].trim() ||
+        "",
       "sproutvideo.helper.password":
         config["embed.downloader.sproutvideo"]["helper.password"].trim() || "",
       "sproutvideo.helper.ytdlp.args":

@@ -106,7 +106,11 @@ function EmbedsBox() {
   }, [youtubeConnectionStatus]);
 
   return useMemo(() => {
-    const { embedDownloaderYouTube, embedDownloaderVimeo, embedDownloaderSproutVideo } = state;
+    const {
+      embedDownloaderYouTube,
+      embedDownloaderVimeo,
+      embedDownloaderSproutVideo
+    } = state;
     return (
       <Tabs
         defaultActiveKey="embed-downloader-youtube"
@@ -196,7 +200,11 @@ function EmbedsBox() {
             : null}
           </Container>
         </Tab>
-        <Tab className="pb-2" eventKey="embed-downloader-sproutvideo" title="SproutVideo">
+        <Tab
+          className="pb-2"
+          eventKey="embed-downloader-sproutvideo"
+          title="SproutVideo"
+        >
           <Container fluid>
             <SelectRow
               config={["embed.downloader.sproutvideo", "type"]}

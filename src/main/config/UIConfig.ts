@@ -51,8 +51,9 @@ function convertPatreonDLOptionsToUIConfig(
   }
 
   // Ensure deprecated stopOn values not used
-  const stopOn = p.stopOn === 'postPreviouslyDownloaded' ? 'previouslyDownloaded'
-    : p.stopOn === 'postPublishDateOutOfRange' ? 'publishDateOutOfRange'
+  const stopOn =
+    p.stopOn === "postPreviouslyDownloaded" ? "previouslyDownloaded"
+    : p.stopOn === "postPublishDateOutOfRange" ? "publishDateOutOfRange"
     : p.stopOn;
 
   const conf: UIConfig = {

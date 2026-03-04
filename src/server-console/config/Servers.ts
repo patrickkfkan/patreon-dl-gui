@@ -31,10 +31,7 @@ export function getServers(): Server[] {
       }
     }
   } catch (error: unknown) {
-    console.error(
-      "Failed to read servers file:",
-      getErrorString(error)
-    );
+    console.error("Failed to read servers file:", getErrorString(error));
     return [];
   }
 }
@@ -43,10 +40,7 @@ export function saveServers(servers: Server[]) {
   try {
     fs.writeJSONSync(SERVERS_FILE_PATH, servers);
   } catch (error: unknown) {
-    console.error(
-      "Failed to write to servers file:",
-      getErrorString(error)
-    );
+    console.error("Failed to write to servers file:", getErrorString(error));
   }
 }
 

@@ -1,8 +1,8 @@
-const EmbedlyDownloader = require('./EmbedlyDownloader');
+const EmbedlyDownloader = require("./EmbedlyDownloader");
 
 class SproutVideoDownloader extends EmbedlyDownloader {
   constructor() {
-    super('SproutVideo', 'videos.sproutvideo.com');
+    super("SproutVideo", "videos.sproutvideo.com");
   }
 }
 

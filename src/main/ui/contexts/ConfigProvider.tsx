@@ -120,7 +120,7 @@ const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
               },
               tiers: info.tiers
             });
-            setConfigValue('support.data', 'bootstrapData', info.bootstrapData);
+            setConfigValue("support.data", "bootstrapData", info.bootstrapData);
           })
         ]
       : [];

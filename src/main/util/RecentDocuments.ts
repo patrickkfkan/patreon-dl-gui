@@ -40,10 +40,7 @@ export default class RecentDocuments {
         }
       }
     } catch (error: unknown) {
-      console.error(
-        "Failed to load recent documents:",
-        getErrorString(error)
-      );
+      console.error("Failed to load recent documents:", getErrorString(error));
     } finally {
       this.#dataFilePath = filePath;
       this.#data = data;

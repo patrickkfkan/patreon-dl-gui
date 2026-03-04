@@ -1,4 +1,10 @@
-import type { FileExistsAction, LogLevel, PostDownloaderBootstrapData, ProductDownloaderBootstrapData, StopOnCondition } from "patreon-dl";
+import type {
+  FileExistsAction,
+  LogLevel,
+  PostDownloaderBootstrapData,
+  ProductDownloaderBootstrapData,
+  StopOnCondition
+} from "patreon-dl";
 import type { ObjectKeysByValueType } from "../../common/types/Utility";
 
 export interface Tier {
@@ -13,7 +19,10 @@ export interface PageInfo {
   tiers: Tier[] | null;
   cookie: string | null;
   cookieDescription: string;
-  bootstrapData: PostDownloaderBootstrapData | ProductDownloaderBootstrapData | null;
+  bootstrapData:
+    | PostDownloaderBootstrapData
+    | ProductDownloaderBootstrapData
+    | null;
 }
 
 export interface BrowserObtainableInput {
@@ -52,7 +61,10 @@ export interface UIConfig {
     "path.to.deno": string;
     "max.video.resolution": MaxVideoResolution;
     "use.status.cache": boolean;
-    "stop.on": Exclude<StopOnCondition, "postPreviouslyDownloaded" | "postPublishDateOutOfRange">;
+    "stop.on": Exclude<
+      StopOnCondition,
+      "postPreviouslyDownloaded" | "postPublishDateOutOfRange"
+    >;
     "no.prompt": boolean;
     "dry.run": boolean;
   };
@@ -159,7 +171,8 @@ export interface UIConfig {
       url: string;
       rejectUnauthorizedTLS: boolean;
     };
-    bootstrapData: PostDownloaderBootstrapData
+    bootstrapData:
+      | PostDownloaderBootstrapData
       | ProductDownloaderBootstrapData
       | null;
   };

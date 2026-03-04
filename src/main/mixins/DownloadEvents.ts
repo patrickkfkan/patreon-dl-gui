@@ -42,10 +42,15 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                   userAgent: this.resolvedUserAgent
                 });
                 if (bootstrapData) {
-                  console.debug("DownloadEvent: instantiating PatreonDownloader with bootstrapData:", bootstrapData);
-                }
-                else {
-                  console.debug("DownloadEvent: bootstrapData not available - instantiating PatreonDownloader with targetURL:", targetURL);
+                  console.debug(
+                    "DownloadEvent: instantiating PatreonDownloader with bootstrapData:",
+                    bootstrapData
+                  );
+                } else {
+                  console.debug(
+                    "DownloadEvent: bootstrapData not available - instantiating PatreonDownloader with targetURL:",
+                    targetURL
+                  );
                 }
                 this.downloader = {
                   instance: await PatreonDownloader.getInstance(
@@ -86,7 +91,7 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                   { once: true }
                 );
               } catch (error: unknown) {
-                const errMsg = getErrorString(error)
+                const errMsg = getErrorString(error);
                 this.downloader = null;
                 this.emitRendererEvent(this.win.modalView, "downloaderInit", {
                   hasError: true,

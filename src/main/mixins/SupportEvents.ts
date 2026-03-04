@@ -49,10 +49,7 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
                 contents
               });
             } catch (error: unknown) {
-              dialog.showErrorBox(
-                "Error",
-                getErrorString(error)
-              );
+              dialog.showErrorBox("Error", getErrorString(error));
               this.win.hideModalView();
               resolve();
             }
