@@ -59,16 +59,16 @@ const PAGE_PATHNAME_FORMATS = {
   ]
 };
 
-const URL_RULES = {
+const NEXTJS_PATHNAME_REGEX = {
   postsByUser: [
-    "/cw/\\u003cstring:vanity\\u003e/posts",
+    /\/cw\/(?:.+)\/posts(?:\?(.+)?)?$/,
     // Custom domain
-    "/_customdomain/posts"
+    /\/_customdomain\/posts/
   ],
   shop: [
-    "/cw/\\u003cstring:vanity\\u003e/shop",
+    /\/cw\/(?:.+)\/shop(?:\?(.+)?)?$/,
     // Custom domain
-    "/_customdomain/shop"
+    /\/_customdomain\/shop/
   ]
 };
 
@@ -151,7 +151,7 @@ export default class PatreonPageAnalyzer {
     let bootstrapNotFound = false;
     const json = await this.#getJSONWithPageBootstrap(html);
     if (json) {
-      const _an = an = this.#analyzePage(json);
+      const _an = (an = this.#analyzePage(json));
       tiers = this.#getTiers(json);
       campaignId = _an?.campaignId ?? null;
     } else {
@@ -218,7 +218,9 @@ export default class PatreonPageAnalyzer {
     return null;
   }
 
-  static #analyzePage(json: JSONWithPageBootstrap): PageAnalysis & { campaignId: string | null; } | null {
+  static #analyzePage(
+    json: JSONWithPageBootstrap
+  ): (PageAnalysis & { campaignId: string | null }) | null {
     /**
      * Perform our own analysis based on pageBootStrap,
      * This gives more accurate result than patreon-dl's URLHelper.analyzeURL().
@@ -246,7 +248,9 @@ export default class PatreonPageAnalyzer {
       productId
     } = json.query && typeof json.query === "object" ? json.query : {};
 
-    const campaignId = json.props.pageProps.bootstrapEnvelope.pageBootstrap.campaign?.data?.id || null;
+    const campaignId =
+      json.props.pageProps.bootstrapEnvelope.pageBootstrap.campaign?.data?.id ||
+      null;
     console.debug(
       'PatreonPageAnalyzer: "campaign_id" value in bootstrap:',
       campaignId
@@ -387,17 +391,6 @@ export default class PatreonPageAnalyzer {
   }
 
   static #analyzeNextJSStreamingResponse(html: string): PageAnalysis | null {
-    const urlRuleRegex =
-      /\\(?:\\?)"url_rule\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
-    const urlRuleMatch = urlRuleRegex.exec(html);
-    const urlRule = urlRuleMatch && urlRuleMatch[1].replaceAll("\\\\", "\\");
-    console.debug(
-      'PatreonPageAnalyzer: "url_rule" value in Next.js streaming response:',
-      urlRule
-    );
-    if (!urlRule) {
-      return null;
-    }
     const vanityRegex =
       /\\(?:\\?)"vanity\\(?:\\?)":\\(?:\\?)"(.+?)\\(?:\\?)"/gm;
     const vanityMatch = vanityRegex.exec(html);
@@ -406,7 +399,22 @@ export default class PatreonPageAnalyzer {
       'PatreonPageAnalyzer: "vanity" value in Next.js streaming response:',
       vanity
     );
-    if (URL_RULES.postsByUser.includes(urlRule) && vanity) {
+
+    const pathnameRegex = /\\"pathname\\":\\"(.+?)\\"/gm;
+    const pathnameMatch = pathnameRegex.exec(html);
+    const pathname = pathnameMatch && pathnameMatch[1];
+    console.debug(
+      'PatreonPageAnalyzer: "pathname" value in Next.js streaming response:',
+      pathname
+    );
+    if (!pathname) {
+      return null;
+    }
+
+    if (
+      NEXTJS_PATHNAME_REGEX.postsByUser.some((regex) => regex.test(pathname)) &&
+      vanity
+    ) {
       const an: URLAnalysis = {
         type: "postsByUser",
         vanity
@@ -419,7 +427,10 @@ export default class PatreonPageAnalyzer {
         }
       };
     }
-    if (URL_RULES.shop.includes(urlRule) && vanity) {
+    if (
+      NEXTJS_PATHNAME_REGEX.shop.some((regex) => regex.test(pathname)) &&
+      vanity
+    ) {
       const an: URLAnalysis = {
         type: "shop",
         vanity
@@ -475,7 +486,7 @@ export default class PatreonPageAnalyzer {
       return {
         tiers,
         campaignId
-      }
+      };
     }
     return null;
   }
