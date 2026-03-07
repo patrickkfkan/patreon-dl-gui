@@ -21,6 +21,10 @@ In addition, a format may contain the following fields:
 | --------------- | ------------------------------------------------------------------------------------------- |
 | `media.type`    | Type of item (e.g. "image" or "video").                                                     |
 | `media.variant` | Where applicable, the variant of the item (e.g. "original", "thumbnailSmall"...for images). |
+| `src.type`      | The type of the items's source: "post", "product", "campaign" or "collection".              |
+| `src.id`        | The ID of the items's source.                                                               |
+| `src.title`     | Title of the item's source.                                                                 |
+| `src.date`      | The publish / creation date of the item's source.                                           |
 
 If you enabled "All media variants", `media.variant` will be appended to the filename regardless of whether you have included it in the format.
 

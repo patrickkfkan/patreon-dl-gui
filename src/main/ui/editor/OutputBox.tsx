@@ -94,7 +94,11 @@ function OutputBox() {
                 { value: "{media.id}", label: "media id" },
                 { value: "{media.filename}", label: "default filename" },
                 { value: "{media.type}", label: "type" },
-                { value: "{media.variant}", label: "variant" }
+                { value: "{media.variant}", label: "variant" },
+                { value: "{src.type}", label: "source type" },
+                { value: "{src.id}", label: "source id" },
+                { value: "{src.title}", label: "source title" },
+                { value: "{src.date}", label: "source date" }
               ]}
               helpTooltip="Media filename format."
               helpHasMoreInfo
