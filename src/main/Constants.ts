@@ -54,6 +54,7 @@ export const FILE_CONFIG_SECTION_PROPS = {
     "content.info",
     "content.media",
     "preview.media",
+    "protected.media",
     "all.media.variants",
     "media.thumbnails",
     "images.by.filename",

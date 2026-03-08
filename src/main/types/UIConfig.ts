@@ -86,6 +86,7 @@ export interface UIConfig {
       "image" | "video" | "audio" | "attachment" | "file"
     >;
     "preview.media": CustomSelectionValue<boolean, "image" | "video" | "audio">;
+    "protected.media": boolean;
     "all.media.variants": boolean;
     "media.thumbnails": boolean;
     "images.by.filename": string;

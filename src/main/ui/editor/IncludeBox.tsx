@@ -26,6 +26,7 @@ interface IncludeBoxState {
   contentInfo: boolean;
   contentMedia: UIConfig["include"]["content.media"];
   previewMedia: UIConfig["include"]["preview.media"];
+  protectedMedia: UIConfig["include"]["protected.media"];
   allMediaVariants: boolean;
   mediaThumbnails: boolean;
   imagesByFilename: string;
@@ -79,6 +80,7 @@ function getIncludeBoxState(config: UIConfig): IncludeBoxState {
     contentInfo: config.include["content.info"],
     contentMedia: config.include["content.media"],
     previewMedia: config.include["preview.media"],
+    protectedMedia: config.include["protected.media"],
     allMediaVariants: config.include["all.media.variants"],
     mediaThumbnails: config.include["media.thumbnails"],
     imagesByFilename: config.include["images.by.filename"],
@@ -368,6 +370,13 @@ function IncludeBox() {
               helpTooltip: "The type of preview media to download.",
               ariaLabel: "Type of preview media to download"
             })}
+            <CheckboxRow
+              config={["include", "protected.media"]}
+              label="Protected media"
+              helpTooltip="Download protected media."
+              helpHasMoreInfo
+              ariaLabel="Download protected media"
+            />
             <CheckboxRow
               config={["include", "all.media.variants"]}
               label="All media variants"

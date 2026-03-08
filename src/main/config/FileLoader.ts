@@ -614,6 +614,12 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
             ["image", "video", "audio"]
           )
       ),
+      "protected.media": __fromFileConfigValue(
+        "include",
+        "protected.media",
+        defaultConfig.include["protected.media"],
+        toBoolean
+      ),
       "all.media.variants": __fromFileConfigValue(
         "include",
         "all.media.variants",

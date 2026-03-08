@@ -109,6 +109,7 @@ function convertPatreonDLOptionsToUIConfig(
             []
           : p.include.previewMedia
       },
+      "protected.media": p.include.protectedMedia,
       "all.media.variants": p.include.allMediaVariants,
       "media.thumbnails": p.include.mediaThumbnails,
       "images.by.filename": p.include.mediaByFilename.images || "",

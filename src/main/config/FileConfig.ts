@@ -113,6 +113,7 @@ export function convertUIConfigToFileContents(
       "content.info": booleanToString(config.include["content.info"]),
       "content.media": getCustomSelectionValue(config.include["content.media"]),
       "preview.media": getCustomSelectionValue(config.include["preview.media"]),
+      "protected.media": booleanToString(config.include["protected.media"]),
       "all.media.variants": booleanToString(
         config.include["all.media.variants"]
       ),
