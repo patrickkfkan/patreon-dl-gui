@@ -21,6 +21,9 @@ An Electron app that provides a GUI for [patreon-dl](https://github.com/patrickk
   - Download through proxy server
 - Access downloaded content through a web browser
 
+> [!NOTE]  
+> Patreon-hosted videos protected by DRM are skipped by default. You can force-download them via "Include -> Protected media", but the downloaded files will remain unplayable due to encryption.
+
 ## Installation
 
 [Download](https://github.com/patrickkfkan/patreon-dl-gui/releases) and install the package suitable for your system. Linux (RPM and DEB) and Windows x64 versions are provided. If you are on a different system, you may [run or package the app from source](#running--packaging-the-app-from-source).
@@ -119,7 +122,8 @@ The following table lists the version of `patreon-dl` used by each version of `p
 | v2.5.0                   | v3.4.0                    |
 | v2.6.0                   | v3.5.0                    |
 | v2.7.0                   | v3.6.0                    |
-| v2.7.1                   | v3.6.1                    |
+| v2.7.1 - v2.7.2          | v3.6.1                    |
+| v2.8.0                   | v3.7.1                    |
 
 ## Running / packaging the app from source
 
@@ -144,6 +148,12 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.8.0
+- Update `patreon-dl` library to v3.7.1 ([changelog](https://github.com/patrickkfkan/patreon-dl?tab=readme-ov-file#changelog))
+- Add more insertable fields to `Output -> Media filenmae format` input
+- Add `Include -> Protected media` option
+- Fix certain collection-type targets not identified
 
 v2.7.2
 - Fix target identification issues with "cw" pages ([#50](https://github.com/patrickkfkan/patreon-dl-gui/issues/50)).
