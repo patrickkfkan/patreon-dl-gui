@@ -69,6 +69,9 @@ const NEXTJS_PATHNAME_REGEX = {
     /\/cw\/(?:.+)\/shop(?:\?(.+)?)?$/,
     // Custom domain
     /\/_customdomain\/shop/
+  ],
+  collection: [
+    /\/collection\/(.+?)(?:\?(.+)?)?$/
   ]
 };
 
@@ -437,6 +440,29 @@ export default class PatreonPageAnalyzer {
       };
       return {
         normalizedURL: `${PATREON_URL}/${vanity}/shop`,
+        target: {
+          ...an,
+          description: this.#getTargetDesc(an)
+        }
+      };
+    }
+    // Collection
+    const collectionId = (() => {
+      for (const regex of NEXTJS_PATHNAME_REGEX.collection) {
+        const m = regex.exec(pathname);
+        if (m && m[1]) {
+          return m[1];
+        }
+      }
+      return null;
+    })();
+    if (collectionId) {
+      const an: URLAnalysis = {
+        type: 'postsByCollection',
+        collectionId
+      };
+      return {
+        normalizedURL: `${PATREON_URL}/collection/${collectionId}`,
         target: {
           ...an,
           description: this.#getTargetDesc(an)
