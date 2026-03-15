@@ -2,6 +2,7 @@
 
 const parseArgs = require("yargs-parser");
 const SproutVideoDownloader = require("./SproutVideoDownloader");
+const StreamableDownloader = require("./StreamableDownloader");
 const VimeoDownloader = require("./VimeoDownloader");
 
 const args = parseArgs(process.argv.slice(2));
@@ -17,6 +18,9 @@ switch (provider) {
     break;
   case "sproutvideo":
     downloader = new SproutVideoDownloader();
+    break;
+  case "streamable":
+    downloader = new StreamableDownloader();
     break;
   default:
     throw Error(`Unknown provider "${provider}"`);

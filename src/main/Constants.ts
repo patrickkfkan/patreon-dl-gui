@@ -73,6 +73,7 @@ export const FILE_CONFIG_SECTION_PROPS = {
   "embed.downloader.youtube": ["exec"],
   "embed.downloader.vimeo": ["exec"],
   "embed.downloader.sproutvideo": ["exec"],
+  "embed.downloader.streamable": ["exec"],
   "logger.console": [
     "enabled",
     "log.level",
@@ -105,7 +106,11 @@ export const FILE_CONFIG_SECTION_PROPS = {
     "sproutvideo.downloader.type",
     "sproutvideo.helper.ytdlp.path",
     "sproutvideo.helper.password",
-    "sproutvideo.helper.ytdlp.args"
+    "sproutvideo.helper.ytdlp.args",
+    "streamable.downloader.type",
+    "streamable.helper.ytdlp.path",
+    "streamable.helper.password",
+    "streamable.helper.ytdlp.args"
   ]
 } as const;
 
@@ -137,6 +142,14 @@ export const SPROUTVIDEO_HELPER_SCRIPT_PATH = VIMEO_HELPER_SCRIPT_PATH;
 export const SPROUTVIDEO_HELPER_SCRIPT_EXEC_ARGS = [
   "--provider",
   "sproutvideo",
+  ...commonHelperScriptExecArgs
+];
+
+export const STREAMABLE_HELPER_SCRIPT_PATH = VIMEO_HELPER_SCRIPT_PATH;
+
+export const STREAMABLE_HELPER_SCRIPT_EXEC_ARGS = [
+  "--provider",
+  "streamable",
   ...commonHelperScriptExecArgs
 ];
 

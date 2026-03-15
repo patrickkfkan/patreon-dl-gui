@@ -881,6 +881,42 @@ export function loadUIConfigFromFile(filePath: string): LoadFileResult {
         toString
       )
     },
+    "embed.downloader.streamable": {
+      type: __fromFileConfigValue(
+        "patreon.dl.gui",
+        "streamable.downloader.type",
+        defaultConfig["embed.downloader.streamable"]["type"],
+        (value) =>
+          toOneOf<UIConfig["embed.downloader.streamable"]["type"]>(value, [
+            "helper",
+            "custom"
+          ])
+      ),
+      exec: __fromFileConfigValue(
+        "embed.downloader.streamable",
+        "exec",
+        defaultConfig["embed.downloader.streamable"]["exec"],
+        toString
+      ),
+      "helper.ytdlp.path": __fromFileConfigValue(
+        "patreon.dl.gui",
+        "streamable.helper.ytdlp.path",
+        defaultConfig["embed.downloader.streamable"]["helper.ytdlp.path"],
+        toString
+      ),
+      "helper.password": __fromFileConfigValue(
+        "patreon.dl.gui",
+        "streamable.helper.password",
+        defaultConfig["embed.downloader.streamable"]["helper.password"],
+        toString
+      ),
+      "helper.ytdlp.args": __fromFileConfigValue(
+        "patreon.dl.gui",
+        "streamable.helper.ytdlp.args",
+        defaultConfig["embed.downloader.streamable"]["helper.ytdlp.args"],
+        toString
+      )
+    },
     "logger.console": {
       enabled: __fromFileConfigValue(
         "logger.console",
