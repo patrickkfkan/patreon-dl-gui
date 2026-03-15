@@ -146,6 +146,9 @@ export function convertUIConfigToFileContents(
     "embed.downloader.sproutvideo": {
       exec: config["embed.downloader.sproutvideo"].exec.trim()
     },
+    "embed.downloader.streamable": {
+      exec: config["embed.downloader.streamable"].exec.trim()
+    },
     "logger.console": {
       enabled: booleanToString(config["logger.console"].enabled),
       "log.level": config["logger.console"]["log.level"],
@@ -204,7 +207,14 @@ export function convertUIConfigToFileContents(
       "sproutvideo.helper.password":
         config["embed.downloader.sproutvideo"]["helper.password"].trim() || "",
       "sproutvideo.helper.ytdlp.args":
-        config["embed.downloader.sproutvideo"]["helper.ytdlp.args"].trim() || ""
+        config["embed.downloader.sproutvideo"]["helper.ytdlp.args"].trim() || "",
+      "streamable.downloader.type": config["embed.downloader.streamable"].type,
+      "streamable.helper.ytdlp.path":
+        config["embed.downloader.streamable"]["helper.ytdlp.path"].trim() || "",
+      "streamable.helper.password":
+        config["embed.downloader.streamable"]["helper.password"].trim() || "",
+      "streamable.helper.ytdlp.args":
+        config["embed.downloader.streamable"]["helper.ytdlp.args"].trim() || ""
     }
   };
 
