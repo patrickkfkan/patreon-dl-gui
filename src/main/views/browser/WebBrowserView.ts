@@ -7,7 +7,7 @@ import type { WebBrowserPageNavigatedInfo } from "../../types/MainEvents";
 import normalizeUrl from "normalize-url";
 import { anonymizeProxy, closeAnonymizedProxy } from "proxy-chain";
 import portfinder from "portfinder";
-import {
+import type {
   PostDownloaderBootstrapData,
   ProductDownloaderBootstrapData
 } from "patreon-dl/dist";

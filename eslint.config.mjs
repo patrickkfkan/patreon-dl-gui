@@ -2,10 +2,12 @@ import globals from "globals";
 import eslint from "@eslint/js";
 import reactPlugin from "eslint-plugin-react";
 import tseslint from "typescript-eslint";
+import unusedImports from "eslint-plugin-unused-imports";
+import { defineConfig } from "eslint/config";
 
-export default tseslint.config(
+export default defineConfig(
   {
-    ignores: ["src/resources/patreon-dl-embed.js"]
+    ignores: ["src/resources/*.js"],
   },
   eslint.configs.recommended,
   tseslint.configs.recommended,
@@ -19,7 +21,11 @@ export default tseslint.config(
         ...globals.node
       }
     },
+    plugins: {
+        "unused-imports": unusedImports,
+    },
     rules: {
+      "unused-imports/no-unused-imports": "error",
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {

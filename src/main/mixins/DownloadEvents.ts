@@ -169,8 +169,8 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
       return displayConfig;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async #showDenoMissingWarningDialog(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       config: ReturnType<PatreonDownloader<any>["getConfig"]>
     ) {
       if (!this.#showDenoMissingWarning) {

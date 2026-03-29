@@ -1,4 +1,3 @@
-import _ from "lodash";
 import os from "os";
 import { APP_DATA_PATH } from "../common/Constants";
 import ProcessBase from "../common/ProcessBase";

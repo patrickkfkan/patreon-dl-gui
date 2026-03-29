@@ -4,7 +4,6 @@ import type { UICommand, ExecUICommandParams } from "./types/MainEvents";
 import type DownloaderConsoleLogger from "./DownloaderConsoleLogger";
 import { dialog } from "electron";
 import type PatreonDownloader from "patreon-dl";
-import _ from "lodash";
 import type { AppMenuOptions } from "./mixins/AppMenu";
 import { AppMenuSupportMixin } from "./mixins/AppMenu";
 import { DownloadEventSupportMixin } from "./mixins/DownloadEvents";

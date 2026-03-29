@@ -3,6 +3,7 @@ import { PATREON_URL } from "./Constants";
 import type { URLAnalysis } from "patreon-dl";
 import { load as cheerioLoad } from "cheerio";
 import PatreonDownloader from "patreon-dl";
+import _ from 'lodash';
 
 export interface AnalyzerRequestOptions {
   proxy?: {
@@ -84,7 +85,7 @@ interface JSONWithPageBootstrap {
   props: {
     pageProps: {
       bootstrapEnvelope: {
-        pageBootstrap: Record<string, any>;
+        pageBootstrap: Record<string, unknown>;
       };
     };
   };
@@ -252,8 +253,7 @@ export default class PatreonPageAnalyzer {
     } = json.query && typeof json.query === "object" ? json.query : {};
 
     const campaignId =
-      json.props.pageProps.bootstrapEnvelope.pageBootstrap.campaign?.data?.id ||
-      null;
+      _.get(json, "props.pageProps.bootstrapEnvelope.pageBootstrap.campaign.data.id", null);
     console.debug(
       'PatreonPageAnalyzer: "campaign_id" value in bootstrap:',
       campaignId
