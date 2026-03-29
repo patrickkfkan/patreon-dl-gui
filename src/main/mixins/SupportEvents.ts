@@ -8,6 +8,7 @@ import {
   saveWebBrowserSettings
 } from "../config/WebBrowserSettings";
 import { getErrorString } from "../../common/util/Misc";
+import { resetDefaultConfig, saveDefaultConfig } from "../config/DefaultConfig";
 
 export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -28,6 +29,28 @@ export function SupportEventSupportMixin<TBase extends MainProcessConstructor>(
 
         this.on("uiReady", () => {
           this.#emitYouTubeConnectionStatusEvent();
+        }),
+
+        this.handle("saveCurrentConfigAsDefault", (editor) => {
+          const result = saveDefaultConfig(editor.config, {
+            userAgent: this.resolvedUserAgent
+          });
+          if (result.hasError) {
+            dialog.showErrorBox("Error", getErrorString(result.error));
+            return { success: false };
+          }
+          return { success: true };
+        }),
+
+        this.handle("resetDefaultConfig", () => {
+          try {
+            resetDefaultConfig();
+          }
+          catch (error: unknown) {
+            dialog.showErrorBox("Error", getErrorString(error));
+            return { success: false };
+          }
+          return { success: true };
         }),
 
         this.handle("requestHelp", (section, prop) => {

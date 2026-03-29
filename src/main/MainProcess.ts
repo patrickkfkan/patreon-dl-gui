@@ -23,6 +23,7 @@ import {
 import { getWebBrowseSettings } from "./config/WebBrowserSettings";
 import { ensureAppDataPath } from "../common/util/FS";
 import { DEFAULT_MAIN_WINDOW_PROPS } from "./Constants";
+import { loadDefaultConfig } from "./config/DefaultConfig";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MainProcessConstructor = new (...args: any[]) => MainProcessBase;
@@ -129,7 +130,19 @@ class MainProcessBase extends ProcessBase<"main"> {
     props?: Pick<Editor, "config" | "filePath" | "name" | "loadAlerts"> | null,
     editorCallback?: (editor: Editor) => void
   ) {
-    const config = props?.config || null;
+    let config = props?.config;
+    let alerts = props?.loadAlerts;
+    if (!config) {
+      const {config: defaultConfig, alerts: defaultConfigAlerts} = loadDefaultConfig() || {};
+      if (defaultConfig) {
+        config = defaultConfig;
+        alerts = defaultConfigAlerts;
+      }
+    }
+    if (!config) {
+      config = getStartupUIConfig();
+    }
+
     const filePath = props?.filePath || null;
     const name = props?.name || null;
     const editorId = this.#lastCreatedEditorId;
@@ -137,12 +150,12 @@ class MainProcessBase extends ProcessBase<"main"> {
       id: editorId,
       name: name || (editorId > 0 ? `Untitled-${editorId}` : "Untitled"),
       filePath: filePath,
-      config: config || getStartupUIConfig(),
+      config,
       modified: false,
       promptOnSave: !!filePath
     };
-    if (props?.loadAlerts && props.loadAlerts.length > 0) {
-      editor.loadAlerts = props.loadAlerts;
+    if (alerts && alerts.length > 0) {
+      editor.loadAlerts = alerts;
     }
     this.#lastCreatedEditorId++;
 

@@ -55,6 +55,8 @@ export type UICommand =
   | "preview"
   | "save"
   | "saveAs"
+  | "saveCurrentConfigAsDefault"
+  | "resetDefaultConfig"
   | "startDownload"
   | "showHelpIcons"
   | "showAbout"

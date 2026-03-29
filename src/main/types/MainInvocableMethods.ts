@@ -13,6 +13,8 @@ export type MainProcessInvocableMethod =
   | "save"
   | "saveAs"
   | "preview"
+  | "saveCurrentConfigAsDefault"
+  | "resetDefaultConfig"
   | "openFSChooser"
   | "applyProxy"
   | "requestHelp"
@@ -43,6 +45,8 @@ export type MainProcessInvocableMethodHandler<
     (currentEditors: Editor[], filePath?: string) => Promise<OpenFileResult>
   : M extends "save" ? (editor: Editor) => Promise<SaveFileConfigResult>
   : M extends "saveAs" ? (editor: Editor) => Promise<SaveFileConfigResult>
+  : M extends "saveCurrentConfigAsDefault" ? (editor: Editor) => { success: boolean; }
+  : M extends "resetDefaultConfig" ? () => { success: boolean; }
   : M extends "preview" ? (editor: Editor) => void
   : M extends "openFSChooser" ?
     (dialogOptions: OpenDialogOptions) => Promise<FSChooserResult>

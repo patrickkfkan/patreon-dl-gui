@@ -128,6 +128,23 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
     await window.mainAPI.invoke("preview", activeEditor);
   }, [activeEditor]);
 
+  const saveCurrentConfigAsDefault = useCallback(async () => {
+    if (!activeEditor) {
+      return;
+    }
+    const { success } = await window.mainAPI.invoke("saveCurrentConfigAsDefault", activeEditor);
+    if (success) {
+      showToast("success", "Default settings saved");
+    }
+  }, [activeEditor]);
+
+  const resetDefaultConfig = useCallback(async () => {
+    const { success } = await window.mainAPI.invoke("resetDefaultConfig");
+    if (success) {
+      showToast("success", "Default settings reset");
+    }
+  }, []);
+
   const startDownload = useCallback(async () => {
     if (!activeEditor) {
       return;
@@ -190,6 +207,8 @@ const CommandsProvider = ({ children }: { children: React.ReactNode }) => {
     preview,
     save,
     saveAs,
+    saveCurrentConfigAsDefault,
+    resetDefaultConfig,
     startDownload,
     showHelpIcons,
     requestHelp,

@@ -90,6 +90,22 @@ export function AppMenuSupportMixin<TBase extends MainProcessConstructor>(
                 type: "separator"
               },
               {
+                label: "Default Settings",
+                submenu: [
+                  {
+                    label: "Save Current Settings as Default",
+                    click: () => this.execUICommand("saveCurrentConfigAsDefault")
+                  },
+                  {
+                    label: "Reset",
+                    click: () => this.execUICommand("resetDefaultConfig")
+                  }
+                ]
+              },
+              {
+                type: "separator"
+              },
+              {
                 label: "E&xit",
                 click: () => this.end()
               }
