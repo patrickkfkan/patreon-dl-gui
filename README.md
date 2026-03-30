@@ -124,6 +124,7 @@ The following table lists the version of `patreon-dl` used by each version of `p
 | v2.7.0                   | v3.6.0                    |
 | v2.7.1 - v2.7.2          | v3.6.1                    |
 | v2.8.0                   | v3.7.1                    |
+| v2.9.0                   | v3.8.1                    |
 
 ## Running / packaging the app from source
 
@@ -148,6 +149,10 @@ $ npm run make
 ```
 
 ## Changelog
+
+v2.9.0
+- Update `patreon-dl` library to v3.8.1 ([changelog](https://github.com/patrickkfkan/patreon-dl?tab=readme-ov-file#changelog)).
+- Add function to save / reset default settings. Access via `File -> Default Settings` menu.
 
 v2.8.0
 - Update `patreon-dl` library to v3.7.1 ([changelog](https://github.com/patrickkfkan/patreon-dl?tab=readme-ov-file#changelog))
