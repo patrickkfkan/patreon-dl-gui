@@ -48,7 +48,20 @@ export default class WebBrowserView extends WebContentsView {
   }
 
   async #loadURL(url: string) {
-    await this.webContents.loadURL(url);
+    try {
+      await this.webContents.loadURL(url);
+    } catch (error: unknown) {
+      // Electron rejects loadURL() when a navigation is superseded by another
+      // navigation. This is expected during Patreon's client-side redirects.
+      if (
+        error instanceof Error &&
+        (Reflect.get(error, "code") === "ERR_ABORTED" ||
+          error.message.includes("ERR_ABORTED (-3)"))
+      ) {
+        return;
+      }
+      throw error;
+    }
   }
 
   #normalizeNavigatedURL(url: string) {
@@ -104,15 +117,12 @@ export default class WebBrowserView extends WebContentsView {
       if (!url.startsWith(PATREON_URL)) {
         if (isMainFrame) {
           this.#emitPageNavigatedEvent(url);
-          this.#analyzePageAbortController = new AbortController();
+          const controller = new AbortController();
+          this.#analyzePageAbortController = controller;
           // Sometimes creators have their own domain names, so we also need to check
           // if it is a Patreon-page.
           try {
-            if (
-              !(await this.#isPatreonPage(
-                this.#analyzePageAbortController.signal
-              ))
-            ) {
+            if (!(await this.#isPatreonPage(controller.signal))) {
               this.#lastLoadedURL = null;
               await this.#emitEmptyPageInfoEvent();
               return;
@@ -129,7 +139,9 @@ export default class WebBrowserView extends WebContentsView {
               error
             );
           } finally {
-            this.#analyzePageAbortController = null;
+            if (this.#analyzePageAbortController === controller) {
+              this.#analyzePageAbortController = null;
+            }
           }
         } else {
           return;
@@ -159,13 +171,15 @@ export default class WebBrowserView extends WebContentsView {
         return;
       }
       this.#emitPageNavigatedEvent(url);
-      this.#analyzePageAbortController = new AbortController();
+      const controller = new AbortController();
+      this.#analyzePageAbortController = controller;
       try {
         const cookie = await this.#getCookie();
         console.debug(`WebBrowserView: run PatreonPageAnalyzer on "${url}"`);
         const analysis = await this.#analyzePage(
-          this.#analyzePageAbortController.signal,
-          cookie
+          controller.signal,
+          cookie,
+          url
         );
         console.debug(
           `WebBrowserView: got the following from page:`,
@@ -194,7 +208,9 @@ export default class WebBrowserView extends WebContentsView {
         console.error(`Failed to obtain boostrap data from "${url}":`, error);
       } finally {
         this.#lastLoadedURL = normalizedNavigatedURL;
-        this.#analyzePageAbortController = null;
+        if (this.#analyzePageAbortController === controller) {
+          this.#analyzePageAbortController = null;
+        }
       }
     });
     this.webContents.on("did-create-window", async (win, details) => {
@@ -426,7 +442,7 @@ export default class WebBrowserView extends WebContentsView {
     });
   }
 
-  #analyzePage(signal: AbortSignal, cookie: string) {
+  #analyzePage(signal: AbortSignal, cookie: string, pageURL: string) {
     return new Promise<PatreonPageAnalysis & { status: "complete" }>(
       (resolve, reject) => {
         let lastObtainedHTML = "";
@@ -445,7 +461,8 @@ export default class WebBrowserView extends WebContentsView {
               const an = await PatreonPageAnalyzer.analyze(html, signal, {
                 proxy: this.#proxy,
                 userAgent: WebBrowserView.#userAgent,
-                cookie
+                cookie,
+                pageURL
               });
               if (an.status === "complete") {
                 resolve(an);

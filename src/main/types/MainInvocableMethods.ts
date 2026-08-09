@@ -45,8 +45,9 @@ export type MainProcessInvocableMethodHandler<
     (currentEditors: Editor[], filePath?: string) => Promise<OpenFileResult>
   : M extends "save" ? (editor: Editor) => Promise<SaveFileConfigResult>
   : M extends "saveAs" ? (editor: Editor) => Promise<SaveFileConfigResult>
-  : M extends "saveCurrentConfigAsDefault" ? (editor: Editor) => { success: boolean; }
-  : M extends "resetDefaultConfig" ? () => { success: boolean; }
+  : M extends "saveCurrentConfigAsDefault" ?
+    (editor: Editor) => { success: boolean }
+  : M extends "resetDefaultConfig" ? () => { success: boolean }
   : M extends "preview" ? (editor: Editor) => void
   : M extends "openFSChooser" ?
     (dialogOptions: OpenDialogOptions) => Promise<FSChooserResult>
@@ -61,7 +62,7 @@ export type MainProcessInvocableMethodHandler<
   : M extends "webBrowserForward" ? () => void
   : M extends "webBrowserReload" ? () => void
   : M extends "startDownload" ? (editor: Editor) => void
-  : M extends "abortDownload" ? () => void
+  : M extends "abortDownload" ? () => boolean
   : M extends "configureYouTube" ? () => void
   : M extends "startYouTubeConnect" ? () => void
   : M extends "cancelYouTubeConnect" ? () => void
