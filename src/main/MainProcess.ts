@@ -33,7 +33,9 @@ export interface DownloaderBundle {
   instance: PatreonDownloader<any>;
   consoleLogger: DownloaderConsoleLogger;
   abortController: AbortController;
-  status: "init" | "running" | "end";
+  abortFallbackTimer: NodeJS.Timeout | null;
+  endNotificationSent: boolean;
+  status: "init" | "running" | "aborting" | "end";
 }
 
 export interface MainProcessBaseArgs {
@@ -133,7 +135,8 @@ class MainProcessBase extends ProcessBase<"main"> {
     let config = props?.config;
     let alerts = props?.loadAlerts;
     if (!config) {
-      const {config: defaultConfig, alerts: defaultConfigAlerts} = loadDefaultConfig() || {};
+      const { config: defaultConfig, alerts: defaultConfigAlerts } =
+        loadDefaultConfig() || {};
       if (defaultConfig) {
         config = defaultConfig;
         alerts = defaultConfigAlerts;

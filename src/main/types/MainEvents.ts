@@ -128,6 +128,7 @@ export type DownloaderEndInfo =
       hasError: false;
       error?: undefined;
       aborted: boolean;
+      abortTimedOut?: boolean;
     };
 
 export interface ConfirmStartDownloadResult {

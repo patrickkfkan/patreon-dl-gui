@@ -19,6 +19,9 @@ type DownloaderState =
       status: "running";
     }
   | {
+      status: "aborting";
+    }
+  | {
       status: "end";
       info: DownloaderEndInfo;
     };
@@ -204,6 +207,12 @@ function DownloaderModal() {
             `Downloader exited with uncaught error: ${info.error}`,
             true
           );
+        } else if (info.abortTimedOut) {
+          updateContents(
+            "string",
+            "Abort timed out. The downloader did not confirm shutdown; restart the app if a background process is still running.",
+            true
+          );
         } else if (info.aborted) {
           updateContents("string", `Downloader exited due to abort`, true);
         } else {
@@ -231,8 +240,47 @@ function DownloaderModal() {
   ]);
 
   const abortDownload = useCallback(async () => {
-    await window.mainAPI.invoke("abortDownload");
-  }, []);
+    setState((current) =>
+      current?.status === "running" ? { status: "aborting" } : current
+    );
+    updateContents(
+      "string",
+      "Abort requested. Waiting for active tasks to stop...",
+      true
+    );
+    try {
+      const accepted = await window.mainAPI.invoke("abortDownload");
+      if (!accepted) {
+        updateContents(
+          "string",
+          "Could not abort: the downloader was no longer running.",
+          true
+        );
+        setState((current) =>
+          current?.status === "aborting" ?
+            {
+              status: "end",
+              info: {
+                hasError: true,
+                error: "The downloader was no longer running."
+              }
+            }
+          : current
+        );
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to abort download";
+      updateContents("string", `Could not abort: ${errorMessage}`, true);
+      setState({
+        status: "end",
+        info: {
+          hasError: true,
+          error: errorMessage
+        }
+      });
+    }
+  }, [updateContents]);
 
   const title = useMemo(() => {
     if (!state) {
@@ -245,9 +293,12 @@ function DownloaderModal() {
           : "Downloader ready";
       case "running":
         return "Download in progress...";
+      case "aborting":
+        return "Aborting download...";
       case "end":
         return (
           state.info.hasError ? "Download ended with uncaught error"
+          : state.info.abortTimedOut ? "Abort timed out"
           : state.info.aborted ? "Download aborted"
           : "Download finished"
         );
@@ -340,6 +391,12 @@ function DownloaderModal() {
             Abort
           </Button>
         );
+      case "aborting":
+        return (
+          <Button variant="danger" disabled aria-label="Aborting download">
+            Aborting...
+          </Button>
+        );
       case "end":
         return (
           <Button variant="secondary" onClick={close} aria-label="Close">
@@ -383,7 +440,7 @@ function DownloaderModal() {
         <Modal.Header className="bg-dark">
           <Modal.Title>
             <div className="d-flex flex-column">
-              <span>{title}</span>
+              <span aria-live="polite">{title}</span>
               {message ?
                 <span className="mt-2 fs-5">{message}</span>
               : null}

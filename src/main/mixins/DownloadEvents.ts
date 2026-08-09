@@ -6,6 +6,9 @@ import ObjectHelper from "../util/ObjectHelper";
 import { dialog } from "electron";
 import _ from "lodash";
 import { getErrorString } from "../../common/util/Misc";
+import type { DownloaderEndInfo } from "../types/MainEvents";
+
+const ABORT_FALLBACK_TIMEOUT_MS = 10_000;
 
 export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
   Base: TBase
@@ -19,6 +22,10 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
         ...callbacks,
 
         this.handle("startDownload", (editor: Editor) => {
+          if (this.downloader && this.downloader.status !== "end") {
+            this.win.showModalView();
+            return;
+          }
           return new Promise<void>((resolve) => {
             (async () => {
               this.on(
@@ -59,6 +66,8 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
                   ),
                   consoleLogger,
                   abortController: new AbortController(),
+                  abortFallbackTimer: null,
+                  endNotificationSent: false,
                   status: "init"
                 };
                 const dlConfig = this.downloader.instance.getConfig();
@@ -103,10 +112,29 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
         }),
 
         this.handle("abortDownload", () => {
-          if (!this.#checkDownloaderExists(this.downloader)) {
-            return;
+          const downloader = this.downloader;
+          if (!downloader) {
+            return false;
           }
-          this.downloader.abortController.abort();
+          if (downloader.status === "aborting") {
+            return true;
+          }
+          if (downloader.status !== "running") {
+            return false;
+          }
+          downloader.status = "aborting";
+          downloader.abortController.abort();
+          downloader.abortFallbackTimer = setTimeout(() => {
+            console.warn(
+              `Downloader did not stop within ${ABORT_FALLBACK_TIMEOUT_MS}ms after abort`
+            );
+            this.#notifyDownloaderEnd(downloader, {
+              hasError: false,
+              aborted: true,
+              abortTimedOut: true
+            });
+          }, ABORT_FALLBACK_TIMEOUT_MS);
+          return true;
         })
       ];
     }
@@ -205,41 +233,87 @@ export function DownloadEventSupportMixin<TBase extends MainProcessConstructor>(
       if (!this.#checkDownloaderExists(this.downloader)) {
         return;
       }
+      const downloader = this.downloader;
+      const onDownloaderEnd = (
+        result: Parameters<typeof downloader.instance.emit<"end">>[1]
+      ) => {
+        if (result.error) {
+          this.#notifyDownloaderEnd(downloader, {
+            hasError: true,
+            error: getErrorString(result.error)
+          });
+        } else {
+          this.#notifyDownloaderEnd(downloader, {
+            hasError: false,
+            aborted: result.aborted
+          });
+        }
+      };
       try {
-        this.downloader.consoleLogger.on("message", (message) => {
+        downloader.consoleLogger.on("message", (message) => {
           this.emitRendererEvent(
             this.win.modalView,
             "downloaderLogMessage",
             message
           );
         });
-        this.downloader.status = "running";
+        downloader.instance.once("end", onDownloaderEnd);
+        downloader.status = "running";
         this.emitRendererEvent(this.win.modalView, "downloaderStart");
-        await this.downloader.instance.start({
-          signal: this.downloader.abortController.signal
+        await downloader.instance.start({
+          signal: downloader.abortController.signal
         });
-        this.downloader.status = "end";
-        if (this.downloader.abortController.signal.aborted) {
-          this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
+        if (downloader.abortController.signal.aborted) {
+          this.#notifyDownloaderEnd(downloader, {
             hasError: false,
             aborted: true
           });
           return;
         }
-        this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
+        this.#notifyDownloaderEnd(downloader, {
           hasError: false,
           aborted: false
         });
       } catch (error: unknown) {
-        this.downloader.status = "end";
-        this.emitRendererEvent(this.win.modalView, "downloaderEnd", {
-          hasError: true,
-          error: getErrorString(error)
-        });
+        if (downloader.abortController.signal.aborted) {
+          this.#notifyDownloaderEnd(downloader, {
+            hasError: false,
+            aborted: true
+          });
+        } else {
+          this.#notifyDownloaderEnd(downloader, {
+            hasError: true,
+            error: getErrorString(error)
+          });
+        }
       } finally {
-        this.downloader.consoleLogger.removeAllListeners();
-        this.downloader = null;
+        downloader.instance.off("end", onDownloaderEnd);
+        if (downloader.abortFallbackTimer) {
+          clearTimeout(downloader.abortFallbackTimer);
+          downloader.abortFallbackTimer = null;
+        }
+        downloader.consoleLogger.removeAllListeners();
+        if (this.downloader === downloader) {
+          this.downloader = null;
+        }
       }
+    }
+
+    #notifyDownloaderEnd(
+      downloader: DownloaderBundle,
+      info: DownloaderEndInfo
+    ) {
+      if (downloader.endNotificationSent) {
+        return;
+      }
+      downloader.endNotificationSent = true;
+      downloader.status = "end";
+      if (downloader.abortFallbackTimer) {
+        clearTimeout(downloader.abortFallbackTimer);
+        downloader.abortFallbackTimer = null;
+      }
+      downloader.consoleLogger.removeAllListeners();
+      this.emitRendererEvent(this.win.modalView, "downloaderEnd", info);
     }
   };
 }
