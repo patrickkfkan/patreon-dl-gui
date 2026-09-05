@@ -445,7 +445,8 @@ export default class WebBrowserView extends WebContentsView {
               const an = await PatreonPageAnalyzer.analyze(html, signal, {
                 proxy: this.#proxy,
                 userAgent: WebBrowserView.#userAgent,
-                cookie
+                cookie,
+                currentURL: this.webContents.getURL()
               });
               if (an.status === "complete") {
                 resolve(an);
