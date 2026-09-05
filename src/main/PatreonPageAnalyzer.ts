@@ -12,6 +12,7 @@ export interface AnalyzerRequestOptions {
   } | null;
   userAgent: string;
   cookie: string;
+  currentURL?: string;
 }
 
 // "Custom domain" paths and rules not fully tested.
@@ -186,6 +187,17 @@ export default class PatreonPageAnalyzer {
       abortError.name = "AbortError";
       throw abortError;
     }
+    if ((!an || !an.target) && requestOptions.currentURL) {
+      const urlAnalysis = this.#analyzeCurrentURL(requestOptions.currentURL);
+      if (urlAnalysis) {
+        console.debug(
+          `PatreonPageAnalyzer: identified target from URL fallback: ${requestOptions.currentURL}`
+        );
+
+        an = urlAnalysis;
+        bootstrapNotFound = false;
+      }
+    }
     if (bootstrapNotFound) {
       return {
         status: "bootstrapNotFound"
@@ -198,6 +210,52 @@ export default class PatreonPageAnalyzer {
       tiers,
       campaignId
     };
+  }
+
+  static #analyzeCurrentURL(currentURL: string): PageAnalysis | null {
+    try {
+      const url = new URL(currentURL);
+
+      if (
+        url.hostname !== "www.patreon.com" &&
+        url.hostname !== "patreon.com"
+      ) {
+        return null;
+      }
+
+      // Patreon creator page formats:
+      // /cw/CREATOR
+      // /cw/CREATOR/posts
+      // /c/CREATOR
+      // /c/CREATOR/posts
+      const creatorMatch = /^\/(?:cw|c)\/([^/]+)(?:\/posts)?\/?$/.exec(
+        url.pathname
+      );
+
+      if (creatorMatch?.[1]) {
+        const vanity = decodeURIComponent(creatorMatch[1]);
+
+        const target: URLAnalysis = {
+          type: "postsByUser",
+          vanity
+        };
+
+        return {
+          normalizedURL: `${PATREON_URL}/${vanity}/posts`,
+          target: {
+            ...target,
+            description: this.#getTargetDesc(target)
+          }
+        };
+      }
+    } catch (error) {
+      console.warn(
+        `PatreonPageAnalyzer: failed to analyze URL "${currentURL}":`,
+        error
+      );
+    }
+
+    return null;
   }
 
   static async #getJSONWithPageBootstrap(
