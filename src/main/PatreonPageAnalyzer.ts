@@ -573,6 +573,18 @@ export default class PatreonPageAnalyzer {
       return null;
     }
 
+    // /[vanity]/posts/[postId]
+    if (second === "posts" && third) {
+      const { slug, id } = this.#parseSlugId(third);
+      if (id) {
+        return __result(
+          { type: "post", postId: id, slug: slug ?? undefined },
+          `${PATREON_URL}/posts/${third}`
+        );
+      }
+      return null;
+    }
+
     // /[vanity]/shop/[productId]
     if (second === "shop" && third) {
       const { slug, id } = this.#parseSlugId(third);
